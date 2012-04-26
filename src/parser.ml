@@ -25,6 +25,9 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+open Conversion
+
 type parse_status =
   | Parse_Null
   | Parse_OK

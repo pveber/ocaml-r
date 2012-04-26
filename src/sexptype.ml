@@ -57,6 +57,8 @@
 (*type vec_sexp = sexp vec*)
 (*type vec_expr = lang sxp vec*)     (* For EXPRSXP *)
 
+open Data
+
 (* Algebraic type reflecting R's dynamic typing. *)
 type sexptype =
   | NilSxp

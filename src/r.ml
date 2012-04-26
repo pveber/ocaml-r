@@ -26,26 +26,15 @@
 (*********************************************************************************)
 
 
-INCLUDE "environment.ml"
-
-module Standard : Environment = struct
-
-  INCLUDE "standard.ml"
-
-end
-
-INCLUDE "data.ml"
-INCLUDE "sexptype.ml"
-INCLUDE "sexprec.ml"
-INCLUDE "allocation.ml"
-INCLUDE "read_internal.ml"
-INCLUDE "write_internal.ml"
-INCLUDE "promise.ml"
-INCLUDE "symbols.ml"
-INCLUDE "conversion.ml"
-INCLUDE "internal.ml"
-INCLUDE "s3.ml"
-INCLUDE "s4.ml"
-INCLUDE "parser.ml"
-INCLUDE "reduction.ml"
-INCLUDE "initialisation.ml"
+include Environment
+module Standard = Standard
+include Sexptype
+include Data
+include Symbols
+include Conversion
+include Internal
+include S3
+include S4
+include Parser
+include Reduction
+include Initialisation

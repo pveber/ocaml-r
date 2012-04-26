@@ -25,6 +25,13 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Sexptype
+open Sexprec
+open Read_internal
+open Write_internal
+open Allocation
+open Data
+
 let rec list_of_pairlist (ll : 'a internallist) =
   match sexptype (ll : 'a internallist :> sexp) with
   | NilSxp -> [] | ListSxp | LangSxp | DotSxp ->
@@ -68,8 +75,8 @@ let vecsxp_of_list (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'b -
     let () = assign s offset hd in aux (1 + offset) tl
   in aux 0 l; s
 
-let bool_list_of_lglvecsxp   = list_of_vecsxp access_lglvecsxp
-let lglvecsxp_of_bool_list   = vecsxp_of_list alloc_lgl_vector assign_lglvecsxp
+let bool_list_of_lglvecsxp x = list_of_vecsxp access_lglvecsxp x
+let lglvecsxp_of_bool_list x = vecsxp_of_list alloc_lgl_vector assign_lglvecsxp x
 let bools_of_t tau = bool_list_of_lglvecsxp (cast_to_sxp (tau : bool list t :> sexp) : lglvecsxp)
 let bool_of_t tau = access_lglvecsxp (cast_to_sxp (tau : bool t :> sexp) : lglvecsxp) 0
   (* We access only the first element, because static typing is supposed to
@@ -77,8 +84,8 @@ let bool_of_t tau = access_lglvecsxp (cast_to_sxp (tau : bool t :> sexp) : lglve
 let bool b = (cast ((lglvecsxp_of_bool_list [b]) : lglvecsxp :> sexp) : bool t)
 let bools bl = (cast ((lglvecsxp_of_bool_list bl) : lglvecsxp :> sexp) : bool list t)
 
-let int_list_of_intvecsxp    = list_of_vecsxp access_intvecsxp
-let intvecsxp_of_int_list    = vecsxp_of_list alloc_int_vector assign_intvecsxp
+let int_list_of_intvecsxp x  = list_of_vecsxp access_intvecsxp x
+let intvecsxp_of_int_list x  = vecsxp_of_list alloc_int_vector assign_intvecsxp x
 let ints_of_t tau = int_list_of_intvecsxp (cast_to_sxp (tau : int list t :> sexp) : intvecsxp)
 let int_of_t tau = access_intvecsxp (cast_to_sxp (tau : int t :> sexp) : intvecsxp) 0
   (* We access only the first element, because static typing is supposed to
@@ -86,8 +93,8 @@ let int_of_t tau = access_intvecsxp (cast_to_sxp (tau : int t :> sexp) : intvecs
 let int i = (cast ((intvecsxp_of_int_list [i]) : intvecsxp :> sexp) : int t)
 let ints il = (cast ((intvecsxp_of_int_list il) : intvecsxp :> sexp) : int list t)
 
-let float_list_of_realvecsxp = list_of_vecsxp access_realvecsxp
-let realvecsxp_of_float_list = vecsxp_of_list alloc_real_vector assign_realvecsxp
+let float_list_of_realvecsxp x = list_of_vecsxp access_realvecsxp x
+let realvecsxp_of_float_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp x
 let floats_of_t tau = float_list_of_realvecsxp (cast_to_sxp (tau : float list t :> sexp) : realvecsxp)
 let float_of_t tau = access_realvecsxp (cast_to_sxp (tau : float t :> sexp) : realvecsxp) 0
   (* We access only the first element, because static typing is supposed to
@@ -95,8 +102,8 @@ let float_of_t tau = access_realvecsxp (cast_to_sxp (tau : float t :> sexp) : re
 let float x = (cast ((realvecsxp_of_float_list [x]) : realvecsxp :> sexp) : float t)
 let floats xl = (cast ((realvecsxp_of_float_list xl) : realvecsxp :> sexp) : float list t)
 
-let string_list_of_strvecsxp = list_of_vecsxp access_strvecsxp
-let strvecsxp_of_string_list = vecsxp_of_list alloc_str_vector assign_strvecsxp
+let string_list_of_strvecsxp x = list_of_vecsxp access_strvecsxp x 
+let strvecsxp_of_string_list x = vecsxp_of_list alloc_str_vector assign_strvecsxp x
 let strings_of_t tau = string_list_of_strvecsxp (cast_to_sxp (tau : string list t :> sexp) : strvecsxp)
 let string_of_t tau = access_strvecsxp (cast_to_sxp (tau : string t :> sexp) : strvecsxp) 0
   (* We access only the first element, because static typing is supposed to
@@ -104,8 +111,27 @@ let string_of_t tau = access_strvecsxp (cast_to_sxp (tau : string t :> sexp) : s
 external string : string -> string t = "ocamlr_strsxp_of_string"
 let strings sl = (cast ((strvecsxp_of_string_list sl) : strvecsxp :> sexp) : string list t)
 
-let sexp_list_of_rawvecsxp = list_of_vecsxp access_rawvecsxp
+let sexp_list_of_rawvecsxp x = list_of_vecsxp access_rawvecsxp x
 let sexps_of_t tau = sexp_list_of_rawvecsxp (cast_to_sxp (tau : sexp list t :> sexp) : rawvecsxp)
 
-let langsxp_list_of_exprvecsxp = list_of_vecsxp access_exprvecsxp
+let langsxp_list_of_exprvecsxp x = list_of_vecsxp access_exprvecsxp x
 let langsxps_of_t tau = langsxp_list_of_exprvecsxp (cast_to_sxp (tau : langsxp list t :> sexp) : exprvecsxp)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

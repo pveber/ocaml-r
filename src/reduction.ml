@@ -25,6 +25,10 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+open Parser
+open Conversion
+
 (* The following exception needs to be registered
    in a callback when the R interpreter is initialised. *)
 exception Runtime_error of langsxp * string

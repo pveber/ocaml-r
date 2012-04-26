@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+
 external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
 
 (* R constants - global symbols in libR.so. *)

@@ -28,9 +28,21 @@
 (* This file contains wrappers around allocation functions,
    returning uninitialised pairlists and vectors. *)
 
+open Data
+
 external alloc_list        : int -> 'a internallist = "ocamlr_alloc_list"
 external alloc_lgl_vector  : int -> lglvecsxp       = "ocamlr_alloc_lgl_vector"
 external alloc_int_vector  : int -> intvecsxp       = "ocamlr_alloc_int_vector"
 external alloc_real_vector : int -> realvecsxp      = "ocamlr_alloc_real_vector"
 external alloc_str_vector  : int -> strvecsxp       = "ocamlr_alloc_str_vector"
+
+
+
+
+
+
+
+
+
+
 

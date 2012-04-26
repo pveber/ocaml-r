@@ -25,6 +25,10 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+open Sexptype
+open Promise
+
 (* There's a lot of stuff concerning symbols and environments in the
    envir.c file of the R source code. *)
 

@@ -25,59 +25,69 @@
 /*             guillaume.yziquel@citycable.ch                                    */
 /*********************************************************************************/
 
-/* Memory allocation is done via functions exported from memory.c. */
+#define USE_RINTERNALS /* This compilation directive allows us to have access to
+                          the definition of R internal types. Compilation of the
+                          inspect* functions is otherwise prohibited. */
 
-/**  Allocates a pairlist.
+#include <caml/mlvalues.h>
+#include <caml/alloc.h>
+#include <caml/memory.h>
+#include <caml/fail.h>
+#include <caml/callback.h>
+#include <caml/signals.h>
+#include <caml/custom.h>
+#include <R.h>
+#include <Rdefines.h>
+#include <Rinternals.h>
+#include <Rinterface.h>
+#include <Rembedded.h>
+#include <R_ext/Parse.h>
+#include <stdio.h>
+
+#include "databridge.h"
+
+/**  Get the S3 class of a given SEXP.
   *
-  *  @note With 'let x = f () in x::(aux y)', you have tail recursion
-  *        because of the way the :: constructor is used in OCaml. You
-  *        cannot have tail-recursion with R CONS and the same code.
-  *        Hence the need to pre-allocate with this function.
-  *  @param i Size of the pairlist to allocate.
-  *  @return A newly allocated pairlist.
+  *  r_s3_class takes a SEXP as argument, and returns the S3 class
+  *  attribute of the given SEXP.
+  *
+  *  This calls getAttrib, which is part of the API, to access the
+  *  "class" attribute. Usage is (weakly) documented in section
+  *  5.9.4 "Attributes" of the "Writing R extensions" documentation,
+  *  a.k.a. r-exts.pdf.
+  *
+  *  Note: Calls to getAttrib do a lot of unnecessary dynamic type
+  *  checking. This will have to clarified and cleaned up in future
+  *  versions of OCaml-R, possibly bypassing the API.
   */
-CAMLprim value ocamlr_alloc_list (value i) {
-  /* allocList is a macro wrapping up a call to the
-     Rf_allocList symbol from libR.so. */
-  return(Val_sexp(allocList(Int_val(i))));
+
+CAMLprim value ocamlr_s3_class (value sexp) {
+  return(Val_sexp(getAttrib(Sexp_val(sexp), R_ClassSymbol)));
 }
 
 
-/**  Allocates a logical vector.
+/**  Get an attribute of a given SEXP.
   *
-  *  @param i Size of the logical vector to allocate.
-  *  @return A newly allocated logical vector.
+  *  r_get_attrib takes a SEXP as first argument, then an R symbol
+  *  name, and returns the attribute of the first argument matching
+  *  this symbol name. Such symbols can be created with the install
+  *  function, from Objective Caml side.
+  *
+  *  Note: As above, lots a dynamic type checking that will have to
+  *  be bypassed.
   */
-CAMLprim value ocamlr_alloc_lgl_vector (value i) {
-  return(Val_sexp(allocVector(LGLSXP, Int_val(i))));
+
+CAMLprim value ocamlr_get_attrib (value sexp, value symbolname) {
+  return(Val_sexp(getAttrib(Sexp_val(sexp), Sexp_val(symbolname))));
 }
 
 
-/**  Allocates a vector of integers.
+/**  Get the attribute list of a given SEXP.
   *
-  *  @param i Size of the vector of integers to allocate.
-  *  @return A newly allocated vector of integers.
+  *  r_get_attributes takes a SEXP as first argument, and returns
+  *  the attributes of the given SEXP.
   */
-CAMLprim value ocamlr_alloc_int_vector (value i) {
-  return(Val_sexp(allocVector(INTSXP, Int_val(i))));
-}
 
-
-/**  Allocates a vector of real numbers.
-  *
-  *  @param i Size of the vector of real numbers to allocate.
-  *  @return A newly allocated vector of real numbers.
-  */
-CAMLprim value ocamlr_alloc_real_vector (value i) {
-  return(Val_sexp(allocVector(REALSXP, Int_val(i))));
-}
-
-
-/**  Allocates a vector of strings.
-  *
-  *  @param i Size of the vector of strings to allocate.
-  *  @return A newly allocated vector of strings.
-  */
-CAMLprim value ocamlr_alloc_str_vector (value i) {
-  return(Val_sexp(allocVector(STRSXP, Int_val(i))));
+CAMLprim value ocamlr_get_attributes (value sexp) {
+  return(Val_sexp(ATTRIB(Sexp_val(sexp))));
 }

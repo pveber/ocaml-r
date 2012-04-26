@@ -1,61 +1,22 @@
-name = "R"
-version = "0.2"
-description = "R bindings for OCaml"
-requires = "unix, calendar"
-archive(byte) = "r.cma"
-archive(native) = "r.cmxa"
-
-package "math" (
-  version = "0.2"
-  description = "R mathematical library"
-  archive(byte) = "rmath.cma"
-  archive(native) = "rmath.cmxa"
-)
-
+# OASIS_START
+# DO NOT EDIT (digest: 11ab27308801301d2119330d1cc35df5)
+version = "2010-02-09"
+description
+ =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
+requires = "calendar"
+archive(byte) = "R.cma"
+archive(native) = "R.cmxa"
+exists_if = "R.cma"
 package "interpreter" (
-  version = "0.2"
-  description = "Embedded R interpreter"
-  requires = "R"
-  archive(byte) = "oCamlR.cmo"
-  archive(native) = "oCamlR.cmx"
+ version = "2010-02-09"
+ description
+  =
+  "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R"
+ archive(byte) = "R_interpreter.cma"
+ archive(native) = "R_interpreter.cmxa"
+ exists_if = "R_interpreter.cma"
 )
+# OASIS_STOP
 
-package "base" (
-  version = "0.2"
-  description = "R base library"
-  requires = "R.interpreter"
-  archive(byte) = "rbase.cma"
-  archive(native) = "rbase.cmxa"
-)
-
-package "methods" (
-  version = "0.2"
-  description = "R library for formal methods and classes"
-  requires = "R.interpreter"
-  archive(byte) = "rmethods.cma"
-  archive(native) = "rmethods.cmxa"
-)
-
-package "stats" (
-  version = "0.2"
-  description = "R statistics library"
-  requires = "R.interpreter"
-  archive(byte) = "rstats.cma"
-  archive(native) = "rstats.cmxa"
-)
-
-package "graphics" (
-  version = "0.2"
-  description = "R graphics library"
-  requires = "R.interpreter"
-  archive(byte) = "rgraphics.cma"
-  archive(native) = "rgraphics.cmxa"
-)
-
-package "grDevices" (
-  version = "0.2"
-  description = "R grDevices library"
-  requires = "R.interpreter"
-  archive(byte) = "rgrDevices.cma"
-  archive(native) = "rgrDevices.cmxa"
-)

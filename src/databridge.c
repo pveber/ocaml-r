@@ -70,6 +70,28 @@
    in way that multithreads with R code. */
 
 
+
+#define USE_RINTERNALS /* This compilation directive allows us to have access to
+                          the definition of R internal types. Compilation of the
+                          inspect* functions is otherwise prohibited. */
+
+#include <caml/mlvalues.h>
+#include <caml/alloc.h>
+#include <caml/memory.h>
+#include <caml/fail.h>
+#include <caml/callback.h>
+#include <caml/signals.h>
+#include <caml/custom.h>
+#include <R.h>
+#include <Rdefines.h>
+#include <Rinternals.h>
+#include <Rinterface.h>
+#include <Rembedded.h>
+#include <R_ext/Parse.h>
+#include <stdio.h>
+
+#include "databridge.h"
+
 /**  Finalisation function called when OCaml's GC deallocates wrapped R values.
   *
   *  @note This tells R's GC to release this value.
@@ -107,27 +129,3 @@ CAMLprim value Val_sexp (SEXP sexp) {
   (*((SEXP *) Data_custom_val(result))) = sexp;
   return result;
 }
-
-
-/**  Macro accessing the underlying SEXP wrapped in an OCaml block.
-  *
-  *  @param sexp An OCaml block wrapping up an R value.
-  *  @return The underlying R value.
-  */
-#define Sexp_val(sexp) (*((SEXP *) Data_custom_val(sexp)))
-
-
-/**  Macro wrapping up a R vector SEXP into an OCaml custom block.
-  *
-  *  @param x An R vector SEXP.
-  *  @return An OCaml block wrapping up the R vector SEXP.
-  */
-#define Val_vecsexp(x) Val_sexp(x)
-
-
-/**  Macro accessing the underlying vector SEXP in an OCaml block.
-  *
-  *  @param x An OCaml block wrapping up an R vector value.
-  *  @return The underlying vector SEXP.
-  */
-#define Vecsexp_val(x) ((VECSEXP) Sexp_val(x))

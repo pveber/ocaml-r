@@ -27,6 +27,11 @@
 
 (* Functions to initialise and terminate the R interpreter. *)
 
+open Reduction
+open Data
+open Sexprec
+open Environment
+
 external initialise : string array -> int -> int = "ocamlr_initEmbeddedR" "noalloc"
 external terminate : unit -> unit = "ocamlr_endEmbeddedR" "noalloc"
 

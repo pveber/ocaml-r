@@ -28,7 +28,7 @@
 (* The type system of OCaml-R. *)
 
 type sexp
-type +'a sxp = private sexp constraint 'a =
+type +'a sxp = sexp constraint 'a =
   [< `Nil
   |  `Sym
   |  `List of [< `Pair | `Call ]
@@ -39,7 +39,7 @@ type +'a sxp = private sexp constraint 'a =
   |  `Builtin
   |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
   ]
-type +'a t = private sexp
+type +'a t = sexp
 
 external cast_to_sxp : sexp -> 'a sxp = "%identity"
 external cast : sexp -> 'a t = "%identity"

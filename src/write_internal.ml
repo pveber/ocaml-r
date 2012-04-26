@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+
 external write_listsxp_carval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
 external write_listsxp_tagval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
 

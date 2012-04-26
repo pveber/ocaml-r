@@ -25,6 +25,8 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
+open Data
+
 external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
 
 (*let force : 'a promise -> 'a t = force_promsxp*)
@@ -43,4 +45,5 @@ external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
        the force function. If it is a lazy lazy value, we
        should force it manually, with OCaml semantics. If not,
        we can run eval on it. *)
+
 

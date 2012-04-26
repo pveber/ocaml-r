@@ -25,31 +25,27 @@
 /*             guillaume.yziquel@citycable.ch                                    */
 /*********************************************************************************/
 
-/* Parsing R code. */
+CAMLprim value Val_sexp (SEXP sexp);
 
-
-/**  Parses a given string.
+/**  Macro accessing the underlying SEXP wrapped in an OCaml block.
   *
-  *  @param expression A string containing R code, textually.
-  *  @param n_to_eval How many calls to parse. If set to -1, stops
-  *         when the string to parse is parsed completely.
-  *  @return An integer error code, and an R vector, of type EXPRSXP,
-  *          containing the parsing result.
+  *  @param sexp An OCaml block wrapping up an R value.
+  *  @return The underlying R value.
   */
-CAMLprim value ocamlr_parse_string (value expression, value n_to_eval) {
-  CAMLparam1(expression);
-  CAMLlocal1(parse_result);
-  ParseStatus status;
-  SEXP text;
-  PROTECT(text = mkString(String_val(expression)));
+#define Sexp_val(sexp) (*((SEXP *) Data_custom_val(sexp)))
 
-  /* Concerning the last and fourth argument of R_ParseVector:
-     http://tolstoy.newcastle.edu.au/R/e2/devel/07/01/1835.html */
 
-  parse_result = Val_sexp(R_ParseVector(text, Int_val(n_to_eval), &status, R_NilValue));
-  UNPROTECT(1);
-  value result = caml_alloc(2, 0);
-  Store_field(result, 0, Val_int(status));
-  Store_field(result, 1, parse_result);
-  CAMLreturn(result);
-}
+/**  Macro wrapping up a R vector SEXP into an OCaml custom block.
+  *
+  *  @param x An R vector SEXP.
+  *  @return An OCaml block wrapping up the R vector SEXP.
+  */
+#define Val_vecsexp(x) Val_sexp(x)
+
+
+/**  Macro accessing the underlying vector SEXP in an OCaml block.
+  *
+  *  @param x An OCaml block wrapping up an R vector value.
+  *  @return The underlying vector SEXP.
+  */
+#define Vecsexp_val(x) ((VECSEXP) Sexp_val(x))

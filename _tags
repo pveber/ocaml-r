@@ -1,0 +1,39 @@
+# OASIS_START
+# DO NOT EDIT (digest: 62727c98a4bde10613341734c0d1eaf3)
+# Library R
+<src/*.ml{,i}>: oasis_library_r_ccopt
+"src/initialisation_stub.c": oasis_library_r_ccopt
+"src/databridge.c": oasis_library_r_ccopt
+"src/sexp.c": oasis_library_r_ccopt
+"src/allocation_stub.c": oasis_library_r_ccopt
+"src/read_internal_stub.c": oasis_library_r_ccopt
+"src/write_internal_stub.c": oasis_library_r_ccopt
+"src/symbols_stub.c": oasis_library_r_ccopt
+"src/conversion_stub.c": oasis_library_r_ccopt
+"src/s3_stub.c": oasis_library_r_ccopt
+"src/s4_stub.c": oasis_library_r_ccopt
+"src/reduction_stub.c": oasis_library_r_ccopt
+"src/parser_stub.c": oasis_library_r_ccopt
+<src/R.{cma,cmxa}>: oasis_library_r_cclib
+"src/libR.lib": oasis_library_r_cclib
+"src/dllR.dll": oasis_library_r_cclib
+"src/libR.a": oasis_library_r_cclib
+"src/dllR.so": oasis_library_r_cclib
+<src/R.{cma,cmxa}>: use_libR
+"src/initialisation_stub.c": pkg_calendar
+"src/databridge.c": pkg_calendar
+"src/sexp.c": pkg_calendar
+"src/allocation_stub.c": pkg_calendar
+"src/read_internal_stub.c": pkg_calendar
+"src/write_internal_stub.c": pkg_calendar
+"src/symbols_stub.c": pkg_calendar
+"src/conversion_stub.c": pkg_calendar
+"src/s3_stub.c": pkg_calendar
+"src/s4_stub.c": pkg_calendar
+"src/reduction_stub.c": pkg_calendar
+"src/parser_stub.c": pkg_calendar
+# Library R_interpreter
+"src": include
+<src/*.ml{,i}>: use_R
+<src/*.ml{,i}>: pkg_calendar
+# OASIS_STOP

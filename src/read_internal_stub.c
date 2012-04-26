@@ -25,6 +25,27 @@
 /*             guillaume.yziquel@citycable.ch                                    */
 /*********************************************************************************/
 
+#define USE_RINTERNALS /* This compilation directive allows us to have access to
+                          the definition of R internal types. Compilation of the
+                          inspect* functions is otherwise prohibited. */
+
+#include <caml/mlvalues.h>
+#include <caml/alloc.h>
+#include <caml/memory.h>
+#include <caml/fail.h>
+#include <caml/callback.h>
+#include <caml/signals.h>
+#include <caml/custom.h>
+#include <R.h>
+#include <Rdefines.h>
+#include <Rinternals.h>
+#include <Rinterface.h>
+#include <Rembedded.h>
+#include <R_ext/Parse.h>
+#include <stdio.h>
+
+#include "databridge.h"
+
 /* Low-level data manipulation functions. */
 
 /* What follows is low-level accessor functions, in order to inspect

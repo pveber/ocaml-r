@@ -30,6 +30,8 @@
 (* What follows is low-level accessor functions, in order to inspect
    in details the contents of SEXPs and VECSEXPs. *)
 
+open Data
+
 external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
 external length_of_vecsxp   : 'a vecsxp -> int  = "ocamlr_inspect_vecsxp_length"
 

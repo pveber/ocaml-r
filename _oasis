@@ -1,19 +1,55 @@
-OASISFormat: 0.2
-OCamlVersion: >= 3.12.0
-Name: ocaml-r
-Version: 2010-02-09
-Authors: Maxence Guesdon, Guillaume Yziquel
-License: GPL
+OASISFormat:    0.2
+OCamlVersion:   >= 3.12.0
+Name:           ocaml-r
+Version:        2010-02-09
+Authors:        Maxence Guesdon, Guillaume Yziquel
+License:        GPL-3.0
 LicenseFile: LICENSE
-BuildType: custom (0.2)
-InstallType: custom (0.2)
-BuildTools: make
+Plugins:     META (0.2)
+Buildtools:  ocamlbuild
 Synopsis: Objective Caml binding embedding R's interpreter into OCaml code
 
-XCustomBuild: $make all
-XCustomInstall: $make install
-XCustomUninstall: $make uninstall
+Library R
+  FindlibName:          R
+  BuildDepends:         calendar
+  Path:                 src
+  Modules:              R
+  InternalModules:      Allocation,
+                        Conversion,
+                        Data,
+                        Environment,
+                        Initialisation,
+                        Internal,
+                        Parser,
+                        Promise,
+                        Read_internal,
+                        Reduction,
+                        S3,
+                        S4,
+                        Sexprec,
+                        Sexptype,
+                        Standard,
+                        Symbols,
+                        Write_internal
+  CSources:             initialisation_stub.c,
+                        databridge.c, databridge.h,
+                        sexp.c,
+                        allocation_stub.c,
+                        read_internal_stub.c,
+                        write_internal_stub.c,
+                        symbols_stub.c,
+                        conversion_stub.c,
+                        s3_stub.c,
+                        s4_stub.c,
+                        reduction_stub.c,
+                        parser_stub.c
+  CCOpt:                -I/usr/share/R/include -Imath
+  CCLib:                -L/usr/lib/R/lib -lR
 
-Library r
-  Path: src
 
+Library R_interpreter
+  FindlibName:          interpreter
+  FindlibParent:        R
+  Path:                 src
+  Modules:              OCamlR
+  BuildDepends:         R
