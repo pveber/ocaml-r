@@ -10,3 +10,9 @@ standard.ml
 *.o
 .chamo.sourceview.buffers
 ocamlinit.png
+config.status
+config.log
+master.Makefile
+setup.log
+setup.data
+_build

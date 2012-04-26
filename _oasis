@@ -1,0 +1,19 @@
+OASISFormat: 0.2
+OCamlVersion: >= 3.12.0
+Name: ocaml-r
+Version: 2010-02-09
+Authors: Maxence Guesdon, Guillaume Yziquel
+License: GPL
+LicenseFile: LICENSE
+BuildType: custom (0.2)
+InstallType: custom (0.2)
+BuildTools: make
+Synopsis: Objective Caml binding embedding R's interpreter into OCaml code
+
+XCustomBuild: $make all
+XCustomInstall: $make install
+XCustomUninstall: $make uninstall
+
+Library r
+  Path: src
+

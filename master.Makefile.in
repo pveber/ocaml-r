@@ -1,0 +1,116 @@
+#################################################################################
+#                OCaml-R                                                        #
+#                                                                               #
+#    Copyright (C) 2008-2010 Institut National de Recherche en                  #
+#    Informatique et en Automatique. All rights reserved.                       #
+#                                                                               #
+#    Copyright (C) 2009-2010 Guillaume Yziquel. All rights reserved.            #
+#                                                                               #
+#    This program is free software; you can redistribute it and/or modify       #
+#    it under the terms of the GNU General Public License as                    #
+#    published by the Free Software Foundation; either version 3 of the         #
+#    License, or  any later version.                                            #
+#                                                                               #
+#    This program is distributed in the hope that it will be useful,            #
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the               #
+#    GNU Library General Public License for more details.                       #
+#                                                                               #
+#    You should have received a copy of the GNU General Public                  #
+#    License along with this program; if not, write to the Free Software        #
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA                   #
+#    02111-1307  USA                                                            #
+#                                                                               #
+#    Contact: Maxence.Guesdon@inria.fr                                          #
+#             guillaume.yziquel@citycable.ch                                    #
+#################################################################################
+
+# Various commands and dir
+##########################
+OCAML    = @OCAML@
+OCAMLC   = @OCAMLC@ -warn-error FSPU -dtypes
+OCAMLOPT = @OCAMLOPT@ -warn-error FSPU -dtypes
+OCAMLDEP = @OCAMLDEP@
+OCAMLLIB = @OCAMLLIB@
+OCAMLMKTOP = @OCAMLMKTOP@
+OCAMLMKLIB = @OCAMLMKLIB@
+OCAMLDOCDIR= $(OCAMLLIB)/ocamldoc
+OCAMLBEST= @OCAMLBEST@
+OCAMLVERSION = @OCAMLVERSION@
+OCAMLFIND= @OCAMLFIND@
+EXTRAC_CRC = $(OCAMLLIB)/extract_crc
+OCAMLDOC= @OCAMLDOC@
+OCAMLPP=
+R=@R@
+
+OCAML_PKG_calendar = @OCAML_PKG_calendar@
+OCAML_PKG_unix = @OCAML_PKG_unix@
+
+RLIBDIR = /usr/lib/R/lib
+RINCLUDES = -I . -I /usr/share/R/include
+INCLUDES = -I +ocamldoc -I $(OCAMLLIB)/caml -I math $(RINCLUDES)
+COMPFLAGS = $(INCLUDES) -verbose
+LINKFLAGS = $(INCLUDES) -ccopt -L$(RLIBDIR) -cclib -lR
+LINKFLAGS_BYTE = $(INCLUDES) -ccopt -L$(RLIBDIR)  -cclib -lR
+
+LINKFLAGS_MATH=$(INCLUDES) -cclib -lRmath
+LINKFLAGS_MATH_BYTE=$(INCLUDES) -cclib -lRmath
+
+
+# For installation
+##############
+MKDIR=mkdir -p
+CP=cp -f
+CPDIR=$(CP) -r
+RM=rm -fR
+MV=mv
+
+DESTDIR=   # For debian packagers
+
+LIBDIR=$(DESTDIR)@LIBDIR@
+
+#CROTTE=@datarootdir@
+
+LIB=r.cmxa
+LIB_BYTE=r.cma
+LIB_CMI=r.cmi
+
+LIBMATH=rmath.cmxa
+LIBMATH_BYTE=rmath.cma
+LIBMATH_CMI=rmath.cmi
+
+# Compilation
+#############
+
+ROOT=@ROOT@
+
+# generic rules :
+#################
+.SUFFIXES: .mli .ml .cmi .cmo .cmx .cmxa .cmxs
+
+%.cmi:%.mli
+	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c $<
+
+%.cmo:%.ml
+	if test -f `dirname $<`/`basename $< .ml`.mli && test ! -f `dirname $<`/`basename $< .ml`.cmi ; then \
+  	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
+	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c $<
+
+%.cmi %.cmo:%.ml
+	if test -f `dirname $<`/`basename $< .ml`.mli && test ! -f `dirname $<`/`basename $< .ml`.cmi ; then \
+		$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
+	$(OCAMLFIND) ocamlc -package calendar $(COMPFLAGS) -c $<
+
+%.cmx %.o:%.ml
+	if test -f `dirname $<`/`basename $< .ml`.mli && test ! -f `dirname $<`/`basename $< .ml`.cmi ; then \
+		$(OCAMLFIND) ocamlopt -package calendar $(COMPFLAGS) -c `dirname $<`/`basename $< .ml`.mli; fi
+	$(OCAMLFIND) ocamlopt -package calendar $(COMPFLAGS) -c $<
+
+%.cmxs: %.cmxa
+	$(OCAMLOPT) -shared -linkall $(LINKFLAGS) -o $@ $<
+	#$(OCAMLOPT) -shared -linkall -ccopt -L/usr/lib/R/lib -ccopt -L. -o $@ $<
+
+%.o: %.c
+	$(OCAMLFIND) ocamlopt -package calendar $(COMPFLAGS) -ccopt -Wall -ccopt -fPIC -c $< \
+	&& ($(MV) `basename $@` `dirname $@` || true)
+
