@@ -19,12 +19,25 @@ module Stub = struct
   let sSgompertz = R.symbol "SSgompertz"
 
   (* The log normal distribution. *)
+  let dnorm = R.symbol "dnorm"
+  let pnorm = R.symbol "pnorm"
+  let qnorm = R.symbol "qnorm"
+  let rnorm = R.symbol "rnorm"
+
+  (* The log normal distribution. *)
   let dlnorm = R.symbol "dlnorm"
   let plnorm = R.symbol "plnorm"
   let qlnorm = R.symbol "qlnorm"
   let rlnorm = R.symbol "rlnorm"
 
 end
+
+let rnorm ?mean ?sd n =
+  R.eval Stub.rnorm [
+    R.arg R.int          n ;
+    R.opt R.float "mean" mean ;
+    R.opt R.float "sd"   sd ;
+  ]
 
 let cor x ?y ?use ?cor_method () =
   R.eval Stub.cor [
