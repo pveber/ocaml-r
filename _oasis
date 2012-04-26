@@ -9,6 +9,16 @@ Plugins:     META (0.2)
 Buildtools:  ocamlbuild
 Synopsis: Objective Caml binding embedding R's interpreter into OCaml code
 
+Library R_math
+  FindlibName:          math
+  FindlibParent:        R
+  Path:                 src/math
+  Modules:              Rmath
+  CSources:             rmath_stubs.c, wrappers.h
+  CCOpt:                -I/usr/share/R/include -Imath
+  CCLib:                -L/usr/lib/R/lib -lR
+
+
 Library R
   FindlibName:          R
   BuildDepends:         calendar
@@ -54,19 +64,44 @@ Library R_interpreter
   Modules:              OCamlR
   BuildDepends:         R
 
+
 Library R_base
   FindlibName:          base
   FindlibParent:        R
   Path:                 src/r-base
   Modules:              Rbase
   InternalModules:      Date, Listing, Dataframe
-  BuildDepends:         R
+  BuildDepends:         R.interpreter
 
-Library R_math
-  FindlibName:          math
+
+Library R_methods
+  FindlibName:          methods
   FindlibParent:        R
-  Path:                 src/math
-  Modules:              Rmath
-  CSources:             rmath_stubs.c, wrappers.h
-  CCOpt:                -I/usr/share/R/include -Imath
-  CCLib:                -L/usr/lib/R/lib -lR
+  Path:                 src/r-methods
+  Modules:              Rmethods
+  BuildDepends:         R.interpreter
+
+
+Library R_stats
+  FindlibName:          stats
+  FindlibParent:        R
+  Path:                 src/r-stats
+  Modules:              Rstats
+  BuildDepends:         R.interpreter
+
+
+Library R_graphics
+  FindlibName:          graphics
+  FindlibParent:        R
+  Path:                 src/r-graphics
+  Modules:              Rgraphics
+  BuildDepends:         R.interpreter
+
+
+Library R_grDevices
+  FindlibName:          grDevices
+  FindlibParent:        R
+  Path:                 src/r-grDevices
+  Modules:              RgrDevices
+  BuildDepends:         R.interpreter
+

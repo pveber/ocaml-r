@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 9e4c85dcd3cd3f79bd31eb2f827e4591)
+# DO NOT EDIT (digest: 9edf7f5e1e63a19e594f84592fe78eb4)
 version = "2010-02-09"
 description
  =
@@ -19,6 +19,39 @@ package "interpreter" (
  exists_if = "R_interpreter.cma"
 )
 
+package "graphics" (
+ version = "2010-02-09"
+ description
+  =
+  "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_graphics.cma"
+ archive(native) = "R_graphics.cmxa"
+ exists_if = "R_graphics.cma"
+)
+
+package "grDevices" (
+ version = "2010-02-09"
+ description
+  =
+  "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_grDevices.cma"
+ archive(native) = "R_grDevices.cmxa"
+ exists_if = "R_grDevices.cma"
+)
+
+package "methods" (
+ version = "2010-02-09"
+ description
+  =
+  "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_methods.cma"
+ archive(native) = "R_methods.cmxa"
+ exists_if = "R_methods.cma"
+)
+
 package "math" (
  version = "2010-02-09"
  description
@@ -34,10 +67,21 @@ package "base" (
  description
   =
   "Objective Caml binding embedding R's interpreter into OCaml code"
- requires = "R"
+ requires = "R.interpreter"
  archive(byte) = "R_base.cma"
  archive(native) = "R_base.cmxa"
  exists_if = "R_base.cma"
+)
+
+package "stats" (
+ version = "2010-02-09"
+ description
+  =
+  "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_stats.cma"
+ archive(native) = "R_stats.cmxa"
+ exists_if = "R_stats.cma"
 )
 # OASIS_STOP
 
