@@ -2,14 +2,46 @@
 
 
 *** What you need ***
-- OCaml 3.11.0 or above installed
+- OCaml 3.12.0 or above installed
 - R >= 2.9 with development libraries
-- make ;-)
 
 *** How to compile ***
-- ./configure
-- make all [or only 'make byte' if the native code compiler is not installed]
-- make install
-  The list of installed or not installed files is printed.
+
+  ocaml setup.ml -configure
+  ocaml setup.ml -build
+  ocaml setup.ml -install
 
 
+*** How to use ***
+
+
+[gesundheit:~ 16:29]$ocaml
+        Objective Caml version 3.12.1
+
+# #use "topfind";;
+- : unit = ()
+Findlib has been successfully loaded. Additional directives:
+  #require "package";;      to load a package
+  #list;;                   to list the available packages
+  #camlp4o;;                to load camlp4 (standard syntax)
+  #camlp4r;;                to load camlp4 (revised syntax)
+  #predicates "p,q,...";;   to set these predicates
+  Topfind.reset();;         to force that packages will be reloaded
+  #thread;;                 to enable threads
+
+- : unit = ()
+# #require "R.stats";;
+/usr/lib/ocaml/unix.cma: loaded
+/usr/lib/ocaml/str.cma: loaded
+/usr/lib/ocaml/calendar: added to search path
+/usr/lib/ocaml/calendar/calendarLib.cma: loaded
+/usr/local/lib/ocaml/3.12.1/R: added to search path
+/usr/local/lib/ocaml/3.12.1/R/R.cma: loaded
+/usr/local/lib/ocaml/3.12.1/R/R_interpreter.cma: loaded
+/usr/local/lib/ocaml/3.12.1/R/R_stats.cma: loaded
+# R.floats_of_t (Rstats.rnorm 10);;
+- : float list =
+[-0.684320682540535; -0.728849803333674551; -0.0875471375368341298;
+ 0.287256467518054226; -0.254776382424770242; -2.05319647197097943;
+ -0.886318938084490693; 2.34391951464416692; 1.04742079183489634;
+ 1.00112645242338938]
