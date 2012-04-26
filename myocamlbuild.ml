@@ -512,4 +512,36 @@ let package_default =
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
 (* OASIS_STOP *)
-Ocamlbuild_plugin.dispatch dispatch_default;;
+open Ocamlbuild_plugin
+
+let () =
+  dispatch
+    (fun hook ->
+       dispatch_default hook;
+       match hook with
+         | After_rules ->
+             rule "standard module generation" 
+               ~prods:["src/standard.ml"]
+               ~deps:["src/standard.R"]
+               begin fun _ _ ->
+                 Cmd(S[A"R"; A"--silent"; A"--vanilla"; A"--slave"; Sh"<"; P"src/standard.R"; Sh">"; Px"src/standard.ml"])
+               end
+         | _ ->
+             ())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
