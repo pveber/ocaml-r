@@ -25,9 +25,9 @@
 
 /* Wrappers for C functions. */
 
-#include <mlvalues.h>
-#include <alloc.h>
-#include <memory.h>
+#include <caml/mlvalues.h>
+#include <caml/alloc.h>
+#include <caml/memory.h>
 
 #define ID(x) (x)
 

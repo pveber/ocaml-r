@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: af2ceb4921264e2af280c634d8e9fa88)
+# DO NOT EDIT (digest: 9e4c85dcd3cd3f79bd31eb2f827e4591)
 version = "2010-02-09"
 description
  =
@@ -17,6 +17,16 @@ package "interpreter" (
  archive(byte) = "R_interpreter.cma"
  archive(native) = "R_interpreter.cmxa"
  exists_if = "R_interpreter.cma"
+)
+
+package "math" (
+ version = "2010-02-09"
+ description
+  =
+  "Objective Caml binding embedding R's interpreter into OCaml code"
+ archive(byte) = "R_math.cma"
+ archive(native) = "R_math.cmxa"
+ exists_if = "R_math.cma"
 )
 
 package "base" (

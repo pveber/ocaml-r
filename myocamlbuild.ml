@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 7edc16f037b463475d3b8270a3de36b2) *)
+(* DO NOT EDIT (digest: 0dddd29e98b1db0720bfa3e6760f628d) *)
 module OASISGettext = struct
 # 21 "/tmp/buildd/oasis-0.2.0/src/oasis/OASISGettext.ml"
   
@@ -455,9 +455,14 @@ let package_default =
        [
           ("src/R", ["src"]);
           ("src/R_interpreter", ["src"]);
+          ("src/math/R_math", ["src/math"]);
           ("src/r-base/R_base", ["src/r-base"])
        ];
-     lib_c = [("R", "src", ["src/databridge.h"])];
+     lib_c =
+       [
+          ("R", "src", ["src/databridge.h"]);
+          ("R_math", "src/math", ["src/math/wrappers.h"])
+       ];
      flags =
        [
           (["oasis_library_r_ccopt"; "compile"],
@@ -477,6 +482,24 @@ let package_default =
                  S [A "-cclib"; A "-L/usr/lib/R/lib"; A "-cclib"; A "-lR"])
             ]);
           (["oasis_library_r_cclib"; "ocamlmklib"; "c"],
+            [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lR"])]);
+          (["oasis_library_r_math_ccopt"; "compile"],
+            [
+               (OASISExpr.EBool true,
+                 S
+                   [
+                      A "-ccopt";
+                      A "-I/usr/share/R/include";
+                      A "-ccopt";
+                      A "-Imath"
+                   ])
+            ]);
+          (["oasis_library_r_math_cclib"; "link"],
+            [
+               (OASISExpr.EBool true,
+                 S [A "-cclib"; A "-L/usr/lib/R/lib"; A "-cclib"; A "-lR"])
+            ]);
+          (["oasis_library_r_math_cclib"; "ocamlmklib"; "c"],
             [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lR"])])
        ];
      }

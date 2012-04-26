@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 5142d67fc5461cc937576596e25e757a)
+# DO NOT EDIT (digest: 53f679aaf5a925a110ff47c1dbe38375)
 # Library R
 <src/*.ml{,i}>: oasis_library_r_ccopt
 "src/initialisation_stub.c": oasis_library_r_ccopt
@@ -36,6 +36,16 @@
 "src": include
 <src/*.ml{,i}>: use_R
 <src/*.ml{,i}>: pkg_calendar
+# Library R_math
+"src/math": include
+<src/math/*.ml{,i}>: oasis_library_r_math_ccopt
+"src/math/rmath_stubs.c": oasis_library_r_math_ccopt
+<src/math/R_math.{cma,cmxa}>: oasis_library_r_math_cclib
+"src/math/libR_math.lib": oasis_library_r_math_cclib
+"src/math/dllR_math.dll": oasis_library_r_math_cclib
+"src/math/libR_math.a": oasis_library_r_math_cclib
+"src/math/dllR_math.so": oasis_library_r_math_cclib
+<src/math/R_math.{cma,cmxa}>: use_libR_math
 # Library R_base
 "src/r-base": include
 <src/r-base/*.ml{,i}>: use_R

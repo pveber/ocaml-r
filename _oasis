@@ -58,6 +58,15 @@ Library R_base
   FindlibName:          base
   FindlibParent:        R
   Path:                 src/r-base
-  Modules:              RBase
+  Modules:              Rbase
   InternalModules:      Date, Listing, Dataframe
   BuildDepends:         R
+
+Library R_math
+  FindlibName:          math
+  FindlibParent:        R
+  Path:                 src/math
+  Modules:              Rmath
+  CSources:             rmath_stubs.c, wrappers.h
+  CCOpt:                -I/usr/share/R/include -Imath
+  CCLib:                -L/usr/lib/R/lib -lR
