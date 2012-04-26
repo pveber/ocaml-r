@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 62727c98a4bde10613341734c0d1eaf3)
+# DO NOT EDIT (digest: 5142d67fc5461cc937576596e25e757a)
 # Library R
 <src/*.ml{,i}>: oasis_library_r_ccopt
 "src/initialisation_stub.c": oasis_library_r_ccopt
@@ -36,4 +36,8 @@
 "src": include
 <src/*.ml{,i}>: use_R
 <src/*.ml{,i}>: pkg_calendar
+# Library R_base
+"src/r-base": include
+<src/r-base/*.ml{,i}>: use_R
+<src/r-base/*.ml{,i}>: pkg_calendar
 # OASIS_STOP

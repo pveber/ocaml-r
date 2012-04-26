@@ -53,3 +53,11 @@ Library R_interpreter
   Path:                 src
   Modules:              OCamlR
   BuildDepends:         R
+
+Library R_base
+  FindlibName:          base
+  FindlibParent:        R
+  Path:                 src/r-base
+  Modules:              RBase
+  InternalModules:      Date, Listing, Dataframe
+  BuildDepends:         R

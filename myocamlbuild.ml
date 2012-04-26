@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 948354de0b45841f619d8106628df7e8) *)
+(* DO NOT EDIT (digest: 7edc16f037b463475d3b8270a3de36b2) *)
 module OASISGettext = struct
 # 21 "/tmp/buildd/oasis-0.2.0/src/oasis/OASISGettext.ml"
   
@@ -452,7 +452,11 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("src/R", ["src"]); ("src/R_interpreter", ["src"])];
+       [
+          ("src/R", ["src"]);
+          ("src/R_interpreter", ["src"]);
+          ("src/r-base/R_base", ["src/r-base"])
+       ];
      lib_c = [("R", "src", ["src/databridge.h"])];
      flags =
        [
