@@ -16,3 +16,4 @@ master.Makefile
 setup.log
 setup.data
 _build
+*~

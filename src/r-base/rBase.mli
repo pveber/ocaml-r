@@ -9,14 +9,3 @@ val lapply : 'a list R.t -> 'b R.t -> 'c list R.t
 include module type of Listing
 include module type of Dataframe
 include module type of Date
-
-
-
-
-
-
-
-
-
-
-
