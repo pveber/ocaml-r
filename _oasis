@@ -68,7 +68,7 @@ Library R_interpreter
 Library R_base
   FindlibName:          base
   FindlibParent:        R
-  Path:                 src/r-base
+  Path:                 src/base
   Modules:              Rbase
   InternalModules:      Date, Listing, Dataframe
   BuildDepends:         R.interpreter
@@ -77,7 +77,7 @@ Library R_base
 Library R_methods
   FindlibName:          methods
   FindlibParent:        R
-  Path:                 src/r-methods
+  Path:                 src/methods
   Modules:              Rmethods
   BuildDepends:         R.interpreter
 
@@ -85,7 +85,7 @@ Library R_methods
 Library R_stats
   FindlibName:          stats
   FindlibParent:        R
-  Path:                 src/r-stats
+  Path:                 src/stats
   Modules:              Rstats
   BuildDepends:         R.interpreter
 
@@ -93,7 +93,7 @@ Library R_stats
 Library R_graphics
   FindlibName:          graphics
   FindlibParent:        R
-  Path:                 src/r-graphics
+  Path:                 src/graphics
   Modules:              Rgraphics
   BuildDepends:         R.interpreter
 
@@ -101,7 +101,7 @@ Library R_graphics
 Library R_grDevices
   FindlibName:          grDevices
   FindlibParent:        R
-  Path:                 src/r-grDevices
+  Path:                 src/grDevices
   Modules:              RgrDevices
   BuildDepends:         R.interpreter
 

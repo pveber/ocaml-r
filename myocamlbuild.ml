@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: b249071bf3dacf0f4a9ae0717b7d9ad7) *)
+(* DO NOT EDIT (digest: 1129a0a15e196b55f2e3996dde5dc763) *)
 module OASISGettext = struct
 # 21 "/tmp/buildd/oasis-0.2.0/src/oasis/OASISGettext.ml"
   
@@ -455,12 +455,12 @@ let package_default =
        [
           ("src/R", ["src"]);
           ("src/R_interpreter", ["src"]);
-          ("src/r-graphics/R_graphics", ["src/r-graphics"]);
-          ("src/r-grDevices/R_grDevices", ["src/r-grDevices"]);
-          ("src/r-methods/R_methods", ["src/r-methods"]);
+          ("src/graphics/R_graphics", ["src/graphics"]);
+          ("src/grDevices/R_grDevices", ["src/grDevices"]);
+          ("src/methods/R_methods", ["src/methods"]);
           ("src/math/R_math", ["src/math"]);
-          ("src/r-base/R_base", ["src/r-base"]);
-          ("src/r-stats/R_stats", ["src/r-stats"])
+          ("src/base/R_base", ["src/base"]);
+          ("src/stats/R_stats", ["src/stats"])
        ];
      lib_c =
        [

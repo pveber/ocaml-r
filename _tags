@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 2059b1aa3d4e23de26a0bfb0116a5f3a)
+# DO NOT EDIT (digest: 36ed67ef6b454c739e3da18b047ab06f)
 # Library R
 <src/*.ml{,i}>: oasis_library_r_ccopt
 "src/initialisation_stub.c": oasis_library_r_ccopt
@@ -37,20 +37,20 @@
 <src/*.ml{,i}>: use_R
 <src/*.ml{,i}>: pkg_calendar
 # Library R_graphics
-"src/r-graphics": include
-<src/r-graphics/*.ml{,i}>: use_R_interpreter
-<src/r-graphics/*.ml{,i}>: use_R
-<src/r-graphics/*.ml{,i}>: pkg_calendar
+"src/graphics": include
+<src/graphics/*.ml{,i}>: use_R_interpreter
+<src/graphics/*.ml{,i}>: use_R
+<src/graphics/*.ml{,i}>: pkg_calendar
 # Library R_grDevices
-"src/r-grDevices": include
-<src/r-grDevices/*.ml{,i}>: use_R_interpreter
-<src/r-grDevices/*.ml{,i}>: use_R
-<src/r-grDevices/*.ml{,i}>: pkg_calendar
+"src/grDevices": include
+<src/grDevices/*.ml{,i}>: use_R_interpreter
+<src/grDevices/*.ml{,i}>: use_R
+<src/grDevices/*.ml{,i}>: pkg_calendar
 # Library R_methods
-"src/r-methods": include
-<src/r-methods/*.ml{,i}>: use_R_interpreter
-<src/r-methods/*.ml{,i}>: use_R
-<src/r-methods/*.ml{,i}>: pkg_calendar
+"src/methods": include
+<src/methods/*.ml{,i}>: use_R_interpreter
+<src/methods/*.ml{,i}>: use_R
+<src/methods/*.ml{,i}>: pkg_calendar
 # Library R_math
 "src/math": include
 <src/math/*.ml{,i}>: oasis_library_r_math_ccopt
@@ -62,13 +62,13 @@
 "src/math/dllR_math.so": oasis_library_r_math_cclib
 <src/math/R_math.{cma,cmxa}>: use_libR_math
 # Library R_base
-"src/r-base": include
-<src/r-base/*.ml{,i}>: use_R_interpreter
-<src/r-base/*.ml{,i}>: use_R
-<src/r-base/*.ml{,i}>: pkg_calendar
+"src/base": include
+<src/base/*.ml{,i}>: use_R_interpreter
+<src/base/*.ml{,i}>: use_R
+<src/base/*.ml{,i}>: pkg_calendar
 # Library R_stats
-"src/r-stats": include
-<src/r-stats/*.ml{,i}>: use_R_interpreter
-<src/r-stats/*.ml{,i}>: use_R
-<src/r-stats/*.ml{,i}>: pkg_calendar
+"src/stats": include
+<src/stats/*.ml{,i}>: use_R_interpreter
+<src/stats/*.ml{,i}>: use_R
+<src/stats/*.ml{,i}>: pkg_calendar
 # OASIS_STOP
