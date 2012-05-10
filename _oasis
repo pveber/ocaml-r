@@ -70,7 +70,6 @@ Library R_base
   FindlibParent:        R
   Path:                 src/base
   Modules:              Rbase
-  InternalModules:      Date, Listing, Dataframe
   BuildDepends:         R.interpreter
 
 

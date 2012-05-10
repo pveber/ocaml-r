@@ -47,6 +47,43 @@ let tilde (x : 'a R.t) (y : 'a R.t) : 'c R.t =
     (R.arg (fun x -> x) x)    ;
     (R.arg (fun x -> x) y)    ]
 
-include Listing
-include Dataframe
-include Date
+
+
+
+
+
+class virtual listing = object (self)
+  inherit R.s3
+  method names = R.strings_of_t (self#attribute "names")
+end
+
+let subset2 = R.symbol ~generic: true "[[.data.frame"
+
+class virtual dataframe = object (self)
+  inherit Listing.listing
+  method row_names = R.strings_of_t (self#attribute "row.names")
+  method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [
+    R.arg (fun x -> x) (R.cast __underlying)  ;
+    R.arg R.int        x           ]
+  method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [
+    R.arg (fun x -> x) (R.cast __underlying)     ;
+    R.arg R.int        x              ;
+    R.arg R.int        y              ]
+end
+
+let dataframe r = object inherit dataframe inherit R.instance r end
+
+class virtual date = object (self)
+  inherit R.s3
+  method as_float = R.float_of_t (Obj.magic __underlying)
+  method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float)
+end
+
+
+
+
+
+
+
+
+
