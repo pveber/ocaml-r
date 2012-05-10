@@ -105,3 +105,10 @@ Library R_grDevices
   Modules:              RgrDevices
   BuildDepends:         R.interpreter
 
+Document doclib
+  Title:                API reference for OCaml-R
+  Type:                 ocamlbuild (0.2)
+  Install:              false
+  BuildTools+:          ocamldoc
+  XOCamlbuildPath:      src
+  XOCamlbuildLibraries: R, R.base, R.stats, R.graphics, R.grDevices
