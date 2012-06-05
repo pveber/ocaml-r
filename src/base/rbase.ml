@@ -60,7 +60,7 @@ end
 let subset2 = R.symbol ~generic: true "[[.data.frame"
 
 class virtual dataframe = object (self)
-  inherit Listing.listing
+  inherit listing
   method row_names = R.strings_of_t (self#attribute "row.names")
   method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [
     R.arg (fun x -> x) (R.cast __underlying)  ;
