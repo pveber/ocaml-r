@@ -16,7 +16,7 @@ Library R_math
   Modules:              Rmath
   CSources:             rmath_stubs.c, wrappers.h
   CCOpt:                -I/usr/share/R/include -Imath
-  CCLib:                -L/usr/lib/R/lib -lR
+  CCLib:                -L/usr/lib/R/lib -lRmath
 
 
 Library R

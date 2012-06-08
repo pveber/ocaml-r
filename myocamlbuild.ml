@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 5d67025676cec5a4881e9e2b5b763d2e) *)
+(* DO NOT EDIT (digest: 569d2d583a514574f7a423b54892b255) *)
 module OASISGettext = struct
 # 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/oasis/OASISGettext.ml"
 
@@ -596,10 +596,12 @@ let package_default =
           (["oasis_library_r_math_cclib"; "link"],
             [
                (OASISExpr.EBool true,
-                 S [A "-cclib"; A "-L/usr/lib/R/lib"; A "-cclib"; A "-lR"])
+                 S
+                   [A "-cclib"; A "-L/usr/lib/R/lib"; A "-cclib"; A "-lRmath"
+                   ])
             ]);
           (["oasis_library_r_math_cclib"; "ocamlmklib"; "c"],
-            [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lR"])])
+            [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lRmath"])])
        ];
      includes =
        [
@@ -614,7 +616,7 @@ let package_default =
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 618 "myocamlbuild.ml"
+# 620 "myocamlbuild.ml"
 (* OASIS_STOP *)
 open Ocamlbuild_plugin
 
