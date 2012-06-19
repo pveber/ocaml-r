@@ -1,7 +1,7 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 569d2d583a514574f7a423b54892b255) *)
+(* DO NOT EDIT (digest: c5cd1e8dc26cecf7dfdcbe927343f8ee) *)
 module OASISGettext = struct
-# 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/oasis/OASISGettext.ml"
+# 21 "/home/pveber/w/oasis/src/oasis/OASISGettext.ml"
 
   let ns_ str =
     str
@@ -24,7 +24,7 @@ module OASISGettext = struct
 end
 
 module OASISExpr = struct
-# 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/oasis/OASISExpr.ml"
+# 21 "/home/pveber/w/oasis/src/oasis/OASISExpr.ml"
 
 
 
@@ -114,8 +114,9 @@ module OASISExpr = struct
 end
 
 
+# 117 "myocamlbuild.ml"
 module BaseEnvLight = struct
-# 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/base/BaseEnvLight.ml"
+# 21 "/home/pveber/w/oasis/src/base/BaseEnvLight.ml"
 
   module MapString = Map.Make(String)
 
@@ -211,8 +212,9 @@ module BaseEnvLight = struct
 end
 
 
+# 215 "myocamlbuild.ml"
 module MyOCamlbuildFindlib = struct
-# 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/plugins/ocamlbuild/MyOCamlbuildFindlib.ml"
+# 21 "/home/pveber/w/oasis/src/plugins/ocamlbuild/MyOCamlbuildFindlib.ml"
 
   (** OCamlbuild extension, copied from 
     * http://brion.inria.fr/gallium/index.php/Using_ocamlfind_with_ocamlbuild
@@ -321,7 +323,7 @@ module MyOCamlbuildFindlib = struct
 end
 
 module MyOCamlbuildBase = struct
-# 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/plugins/ocamlbuild/MyOCamlbuildBase.ml"
+# 21 "/home/pveber/w/oasis/src/plugins/ocamlbuild/MyOCamlbuildBase.ml"
 
   (** Base functions for writing myocamlbuild.ml
       @author Sylvain Le Gall
@@ -337,7 +339,7 @@ module MyOCamlbuildBase = struct
   type name = string 
   type tag = string 
 
-# 56 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/plugins/ocamlbuild/MyOCamlbuildBase.ml"
+# 56 "/home/pveber/w/oasis/src/plugins/ocamlbuild/MyOCamlbuildBase.ml"
 
   type t =
       {
@@ -543,45 +545,28 @@ module MyOCamlbuildBase = struct
 end
 
 
+# 548 "myocamlbuild.ml"
 open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
        [
+          ("R_math", ["src/math"]);
           ("R", ["src"]);
           ("R_interpreter", ["src"]);
-          ("R_graphics", ["src/graphics"]);
-          ("R_grDevices", ["src/grDevices"]);
-          ("R_methods", ["src/methods"]);
           ("R_base", ["src/base"]);
+          ("R_methods", ["src/methods"]);
           ("R_stats", ["src/stats"]);
-          ("R_math", ["src/math"])
+          ("R_graphics", ["src/graphics"]);
+          ("R_grDevices", ["src/grDevices"])
        ];
      lib_c =
        [
-          ("R", "src", ["src/databridge.h"]);
-          ("R_math", "src/math", ["src/math/wrappers.h"])
+          ("R_math", "src/math", ["src/math/wrappers.h"]);
+          ("R", "src", ["src/databridge.h"])
        ];
      flags =
        [
-          (["oasis_library_r_ccopt"; "compile"],
-            [
-               (OASISExpr.EBool true,
-                 S
-                   [
-                      A "-ccopt";
-                      A "-I/usr/share/R/include";
-                      A "-ccopt";
-                      A "-Imath"
-                   ])
-            ]);
-          (["oasis_library_r_cclib"; "link"],
-            [
-               (OASISExpr.EBool true,
-                 S [A "-cclib"; A "-L/usr/lib/R/lib"; A "-cclib"; A "-lR"])
-            ]);
-          (["oasis_library_r_cclib"; "ocamlmklib"; "c"],
-            [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lR"])]);
           (["oasis_library_r_math_ccopt"; "compile"],
             [
                (OASISExpr.EBool true,
@@ -601,7 +586,25 @@ let package_default =
                    ])
             ]);
           (["oasis_library_r_math_cclib"; "ocamlmklib"; "c"],
-            [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lRmath"])])
+            [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lRmath"])]);
+          (["oasis_library_r_ccopt"; "compile"],
+            [
+               (OASISExpr.EBool true,
+                 S
+                   [
+                      A "-ccopt";
+                      A "-I/usr/share/R/include";
+                      A "-ccopt";
+                      A "-Imath"
+                   ])
+            ]);
+          (["oasis_library_r_cclib"; "link"],
+            [
+               (OASISExpr.EBool true,
+                 S [A "-cclib"; A "-L/usr/lib/R/lib"; A "-cclib"; A "-lR"])
+            ]);
+          (["oasis_library_r_cclib"; "ocamlmklib"; "c"],
+            [(OASISExpr.EBool true, S [A "-L/usr/lib/R/lib"; A "-lR"])])
        ];
      includes =
        [
@@ -616,7 +619,7 @@ let package_default =
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 620 "myocamlbuild.ml"
+# 623 "myocamlbuild.ml"
 (* OASIS_STOP *)
 open Ocamlbuild_plugin
 

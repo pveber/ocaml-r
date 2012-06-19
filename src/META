@@ -1,70 +1,92 @@
 # OASIS_START
-# DO NOT EDIT (digest: 204ff595aebfc76c21a076389cc82f1a)
+# DO NOT EDIT (digest: d78090cfb0881fa42032cf40b12c68aa)
 version = "2010-02-09"
-description = "Objective Caml binding embedding R's interpreter into OCaml code"
+description =
+"Objective Caml binding embedding R's interpreter into OCaml code"
 requires = "calendar"
 archive(byte) = "R.cma"
+archive(byte, plugin) = "R.cma"
 archive(native) = "R.cmxa"
+archive(native, plugin) = "R.cmxs"
 exists_if = "R.cma"
-package "math" (
- version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
- archive(byte) = "R_math.cma"
- archive(native) = "R_math.cmxa"
- exists_if = "R_math.cma"
-)
-
 package "stats" (
  version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
+ description =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
  requires = "R.interpreter"
  archive(byte) = "R_stats.cma"
+ archive(byte, plugin) = "R_stats.cma"
  archive(native) = "R_stats.cmxa"
+ archive(native, plugin) = "R_stats.cmxs"
  exists_if = "R_stats.cma"
-)
-
-package "base" (
- version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
- requires = "R.interpreter"
- archive(byte) = "R_base.cma"
- archive(native) = "R_base.cmxa"
- exists_if = "R_base.cma"
 )
 
 package "methods" (
  version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
+ description =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
  requires = "R.interpreter"
  archive(byte) = "R_methods.cma"
+ archive(byte, plugin) = "R_methods.cma"
  archive(native) = "R_methods.cmxa"
+ archive(native, plugin) = "R_methods.cmxs"
  exists_if = "R_methods.cma"
 )
 
-package "grDevices" (
+package "math" (
  version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
- requires = "R.interpreter"
- archive(byte) = "R_grDevices.cma"
- archive(native) = "R_grDevices.cmxa"
- exists_if = "R_grDevices.cma"
-)
-
-package "graphics" (
- version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
- requires = "R.interpreter"
- archive(byte) = "R_graphics.cma"
- archive(native) = "R_graphics.cmxa"
- exists_if = "R_graphics.cma"
+ description =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
+ archive(byte) = "R_math.cma"
+ archive(byte, plugin) = "R_math.cma"
+ archive(native) = "R_math.cmxa"
+ archive(native, plugin) = "R_math.cmxs"
+ exists_if = "R_math.cma"
 )
 
 package "interpreter" (
  version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
+ description =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
  requires = "R"
- archive(byte) = "R_interpreter.cma"
- archive(native) = "R_interpreter.cmxa"
- exists_if = "R_interpreter.cma"
+ archive(byte) = "oCamlR.cmo"
+ archive(native) = "oCamlR.cmx"
+ exists_if = "oCamlR.cmo"
+)
+
+package "graphics" (
+ version = "2010-02-09"
+ description =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_graphics.cma"
+ archive(byte, plugin) = "R_graphics.cma"
+ archive(native) = "R_graphics.cmxa"
+ archive(native, plugin) = "R_graphics.cmxs"
+ exists_if = "R_graphics.cma"
+)
+
+package "grDevices" (
+ version = "2010-02-09"
+ description =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_grDevices.cma"
+ archive(byte, plugin) = "R_grDevices.cma"
+ archive(native) = "R_grDevices.cmxa"
+ archive(native, plugin) = "R_grDevices.cmxs"
+ exists_if = "R_grDevices.cma"
+)
+
+package "base" (
+ version = "2010-02-09"
+ description =
+ "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_base.cma"
+ archive(byte, plugin) = "R_base.cma"
+ archive(native) = "R_base.cmxa"
+ archive(native, plugin) = "R_base.cmxs"
+ exists_if = "R_base.cma"
 )
 # OASIS_STOP

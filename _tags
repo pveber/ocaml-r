@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 5f471db2fa3fab727616dce36572400d)
+# DO NOT EDIT (digest: 8a32abcd2a88dc0c0aea5aa62b374450)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -13,6 +13,16 @@
 ".git": not_hygienic
 "_darcs": -traverse
 "_darcs": not_hygienic
+# Library R_math
+"src/math/R_math.cmxs": use_R_math
+<src/math/*.ml{,i}>: oasis_library_r_math_ccopt
+"src/math/rmath_stubs.c": oasis_library_r_math_ccopt
+<src/math/R_math.{cma,cmxa}>: oasis_library_r_math_cclib
+"src/math/libR_math_stubs.lib": oasis_library_r_math_cclib
+"src/math/dllR_math_stubs.dll": oasis_library_r_math_cclib
+"src/math/libR_math_stubs.a": oasis_library_r_math_cclib
+"src/math/dllR_math_stubs.so": oasis_library_r_math_cclib
+<src/math/R_math.{cma,cmxa}>: use_libR_math_stubs
 # Library R
 "src/R.cmxs": use_R
 <src/*.ml{,i}>: oasis_library_r_ccopt
@@ -46,43 +56,27 @@
 "src/s4_stub.c": pkg_calendar
 "src/reduction_stub.c": pkg_calendar
 "src/parser_stub.c": pkg_calendar
-# Library R_interpreter
-"src/R_interpreter.cmxs": use_R_interpreter
+# Object R_interpreter
 <src/*.ml{,i}>: use_R
 <src/*.ml{,i}>: pkg_calendar
+# Library R_base
+"src/base/R_base.cmxs": use_R_base
+<src/base/*.ml{,i}>: use_R
+<src/base/*.ml{,i}>: pkg_calendar
+# Library R_methods
+"src/methods/R_methods.cmxs": use_R_methods
+<src/methods/*.ml{,i}>: use_R
+<src/methods/*.ml{,i}>: pkg_calendar
+# Library R_stats
+"src/stats/R_stats.cmxs": use_R_stats
+<src/stats/*.ml{,i}>: use_R
+<src/stats/*.ml{,i}>: pkg_calendar
 # Library R_graphics
 "src/graphics/R_graphics.cmxs": use_R_graphics
-<src/graphics/*.ml{,i}>: use_R_interpreter
 <src/graphics/*.ml{,i}>: use_R
 <src/graphics/*.ml{,i}>: pkg_calendar
 # Library R_grDevices
 "src/grDevices/R_grDevices.cmxs": use_R_grDevices
-<src/grDevices/*.ml{,i}>: use_R_interpreter
 <src/grDevices/*.ml{,i}>: use_R
 <src/grDevices/*.ml{,i}>: pkg_calendar
-# Library R_methods
-"src/methods/R_methods.cmxs": use_R_methods
-<src/methods/*.ml{,i}>: use_R_interpreter
-<src/methods/*.ml{,i}>: use_R
-<src/methods/*.ml{,i}>: pkg_calendar
-# Library R_base
-"src/base/R_base.cmxs": use_R_base
-<src/base/*.ml{,i}>: use_R_interpreter
-<src/base/*.ml{,i}>: use_R
-<src/base/*.ml{,i}>: pkg_calendar
-# Library R_stats
-"src/stats/R_stats.cmxs": use_R_stats
-<src/stats/*.ml{,i}>: use_R_interpreter
-<src/stats/*.ml{,i}>: use_R
-<src/stats/*.ml{,i}>: pkg_calendar
-# Library R_math
-"src/math/R_math.cmxs": use_R_math
-<src/math/*.ml{,i}>: oasis_library_r_math_ccopt
-"src/math/rmath_stubs.c": oasis_library_r_math_ccopt
-<src/math/R_math.{cma,cmxa}>: oasis_library_r_math_cclib
-"src/math/libR_math_stubs.lib": oasis_library_r_math_cclib
-"src/math/dllR_math_stubs.dll": oasis_library_r_math_cclib
-"src/math/libR_math_stubs.a": oasis_library_r_math_cclib
-"src/math/dllR_math_stubs.so": oasis_library_r_math_cclib
-<src/math/R_math.{cma,cmxa}>: use_libR_math_stubs
 # OASIS_STOP
