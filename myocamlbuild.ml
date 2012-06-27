@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 569d2d583a514574f7a423b54892b255) *)
+(* DO NOT EDIT (digest: ab219c091ca7962b4696d5975f740d63) *)
 module OASISGettext = struct
 # 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/oasis/OASISGettext.ml"
 
@@ -551,6 +551,7 @@ let package_default =
           ("R", ["src"]);
           ("R_interpreter", ["src"]);
           ("R_graphics", ["src/graphics"]);
+          ("R_syntax", ["src/syntax"]);
           ("R_grDevices", ["src/grDevices"]);
           ("R_methods", ["src/methods"]);
           ("R_base", ["src/base"]);
@@ -616,7 +617,7 @@ let package_default =
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 620 "myocamlbuild.ml"
+# 621 "myocamlbuild.ml"
 (* OASIS_STOP *)
 open Ocamlbuild_plugin
 

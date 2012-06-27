@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 5f471db2fa3fab727616dce36572400d)
+# DO NOT EDIT (digest: 7a146e93efa2a2722eb7c41228f7c20e)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -55,6 +55,11 @@
 <src/graphics/*.ml{,i}>: use_R_interpreter
 <src/graphics/*.ml{,i}>: use_R
 <src/graphics/*.ml{,i}>: pkg_calendar
+# Library R_syntax
+"src/syntax/R_syntax.cmxs": use_R_syntax
+<src/syntax/*.ml{,i}>: pkg_camlp4.quotations.o
+<src/syntax/*.ml{,i}>: pkg_camlp4.lib
+<src/syntax/*.ml{,i}>: pkg_camlp4.extend
 # Library R_grDevices
 "src/grDevices/R_grDevices.cmxs": use_R_grDevices
 <src/grDevices/*.ml{,i}>: use_R_interpreter
@@ -86,3 +91,4 @@
 "src/math/dllR_math_stubs.so": oasis_library_r_math_cclib
 <src/math/R_math.{cma,cmxa}>: use_libR_math_stubs
 # OASIS_STOP
+<src/syntax/*.ml>: syntax_camlp4o, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations

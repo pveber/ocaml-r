@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 204ff595aebfc76c21a076389cc82f1a)
+# DO NOT EDIT (digest: 67e4592727f5f9b9e14df76964ecc7ea)
 version = "2010-02-09"
 description = "Objective Caml binding embedding R's interpreter into OCaml code"
 requires = "calendar"
@@ -48,6 +48,15 @@ package "grDevices" (
  archive(byte) = "R_grDevices.cma"
  archive(native) = "R_grDevices.cmxa"
  exists_if = "R_grDevices.cma"
+)
+
+package "syntax" (
+ version = "2010-02-09"
+ description = "Syntactic sugar for R"
+ requires = "camlp4"
+ archive(syntax, preprocessor) = "R_syntax.cma"
+ archive(syntax, toploop) = "R_syntax.cma"
+ exists_if = "R_syntax.cma"
 )
 
 package "graphics" (

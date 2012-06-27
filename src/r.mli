@@ -347,9 +347,8 @@ end
 (** {2 S3 classes.} *)
 
 (**  Virtual class for S3 objects in R. *)
-class virtual s3 : object
-
-  val virtual __underlying : sexp
+class s3 : 'a t -> object
+  val __underlying : sexp
   (**  Access to the underlying R data structure. *)
 
   method private attribute  : 'a. string -> 'a t
@@ -366,8 +365,6 @@ class virtual s3 : object
     *  an instance of. *)
 
 end
-
-class instance : 'a t -> object inherit s3 val __underlying : sexp end
 
 (**  Constructor of an [s3] object from an R S3 object. *)
 val s3 : 'a t -> s3

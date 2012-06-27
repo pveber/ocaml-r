@@ -79,6 +79,15 @@ Library R_methods
   Modules:              Rmethods
   BuildDepends:         R.interpreter
 
+Library R_syntax
+  FindlibName: syntax
+  FindlibParent: R
+  Path: src/syntax
+  Modules: Pa_r
+  BuildDepends: camlp4.lib, camlp4.quotations.o, camlp4.extend
+  XMETAType: syntax
+  XMETADescription: Syntactic sugar for R
+  XMETARequires: camlp4
 
 Library R_stats
   FindlibName:          stats

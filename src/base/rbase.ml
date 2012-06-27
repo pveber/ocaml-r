@@ -12,6 +12,8 @@ module Stub = struct
 
   let tilde = R.symbol "~"
 
+  let dollar = R.symbol "$"
+
   let t = R.symbol "t"
 
   let cbind = R.symbol "cbind"
@@ -48,36 +50,46 @@ let tilde (x : 'a R.t) (y : 'a R.t) : 'c R.t =
     (R.arg (fun x -> x) y)    ]
 
 
+let dollar (x : 'a R.t) (y : string) : 'c R.t =
+  R.eval Stub.dollar [
+    (R.arg (fun x -> x) x)    ;
+    (R.arg R.string     y)    ]
 
 
-
-
-class virtual listing = object (self)
-  inherit R.s3
-  method names = R.strings_of_t (self#attribute "names")
+class type ['a] compound = object
+  method component : 'b. string -> 'b R.t
 end
+
+class ['b] listing r = object (self)
+  inherit R.s3 r
+  method names = R.strings_of_t (self#attribute "names")
+  method component : 'a. string -> 'a R.t = dollar r
+  method compound : 'b compound = (self :> 'b compound)
+end
+
+let listing r = new listing r
 
 let subset2 = R.symbol ~generic: true "[[.data.frame"
 
-class virtual dataframe = object (self)
-  inherit listing
-  method row_names = R.strings_of_t (self#attribute "row.names")
-  method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [
-    R.arg (fun x -> x) (R.cast __underlying)  ;
-    R.arg R.int        x           ]
-  method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [
-    R.arg (fun x -> x) (R.cast __underlying)     ;
-    R.arg R.int        x              ;
-    R.arg R.int        y              ]
-end
+(* class virtual dataframe = object (self) *)
+(*   inherit listing *)
+(*   method row_names = R.strings_of_t (self#attribute "row.names") *)
+(*   method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [ *)
+(*     R.arg (fun x -> x) (R.cast __underlying)  ; *)
+(*     R.arg R.int        x           ] *)
+(*   method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [ *)
+(*     R.arg (fun x -> x) (R.cast __underlying)     ; *)
+(*     R.arg R.int        x              ; *)
+(*     R.arg R.int        y              ] *)
+(* end *)
 
-let dataframe r = object inherit dataframe inherit R.instance r end
+(* let dataframe r = object inherit dataframe inherit R.instance r end *)
 
-class virtual date = object (self)
-  inherit R.s3
-  method as_float = R.float_of_t (Obj.magic __underlying)
-  method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float)
-end
+(* class virtual date = object (self) *)
+(*   inherit R.s3 *)
+(*   method as_float = R.float_of_t (Obj.magic __underlying) *)
+(*   method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float) *)
+(* end *)
 
 
 
