@@ -52,19 +52,18 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
       (fun old_filter stream -> old_filter (filter stream))
 
 
-  let unescape lab =
-    assert (lab <> "");
-    let lab =
-      if lab.[0] = '_' then String.sub lab 1 (String.length lab - 1) else lab
-    in
-    try
-      let i = String.rindex lab '_' in
-      if i = 0 then raise Not_found;
-      String.sub lab 0 i
-    with Not_found ->
-      lab
-
   let fresh_type _loc = <:ctyp< '$random_var ()$ >>
+
+  let string_map f s = String.(
+    let r = copy s in
+    for i = 0 to length s - 1 do
+      r.[i] <- f s.[i]
+    done ;
+    r
+  )
+
+  let id_ml2r = string_map (function '\'' -> '.' | x -> x)
+  let id_r2ml = string_map (function '.' -> '\'' | x -> x)
 
   let access_object e m m_loc comp_type f =
     let _loc = Ast.loc_of_expr e in
@@ -89,7 +88,7 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
      [ e = SELF; (lab_loc, lab) = jsmeth ->
          let comp_type = fresh_type _loc in
          access_object e lab lab_loc comp_type (fun x ->
-         <:expr< ($lid:x$#component $str:unescape lab$ : $comp_type$) >>)
+         <:expr< ($lid:x$#component $str:id_ml2r lab$ : $comp_type$) >>)
      ]];
   END
 

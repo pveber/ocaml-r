@@ -1,9 +1,10 @@
 open Rbase
 
-let res : < estimate : float R.t > listing R.t = R.eval_string "fisher.test(matrix(c(2,3,4,5),ncol=2))";;
+let res : < estimate : float R.t ; p'value : float R.t > listing R.t = 
+  R.eval_string "fisher.test(matrix(c(2,3,4,5),ncol=2))";;
 
 let () = 
-  print_float (R.float_of_t ((listing res)#component "p.value")) ;
+  print_float (R.float_of_t ((listing res) ## p'value)) ;
   print_newline ()
 ;;
 
