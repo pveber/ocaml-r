@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 7a146e93efa2a2722eb7c41228f7c20e)
+# DO NOT EDIT (digest: bd947c358be2c40085a2ccf283c3a947)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -50,6 +50,11 @@
 "src/R_interpreter.cmxs": use_R_interpreter
 <src/*.ml{,i}>: use_R
 <src/*.ml{,i}>: pkg_calendar
+# Library R_base
+"src/base/R_base.cmxs": use_R_base
+<src/base/*.ml{,i}>: use_R_interpreter
+<src/base/*.ml{,i}>: use_R
+<src/base/*.ml{,i}>: pkg_calendar
 # Library R_graphics
 "src/graphics/R_graphics.cmxs": use_R_graphics
 <src/graphics/*.ml{,i}>: use_R_interpreter
@@ -70,13 +75,9 @@
 <src/methods/*.ml{,i}>: use_R_interpreter
 <src/methods/*.ml{,i}>: use_R
 <src/methods/*.ml{,i}>: pkg_calendar
-# Library R_base
-"src/base/R_base.cmxs": use_R_base
-<src/base/*.ml{,i}>: use_R_interpreter
-<src/base/*.ml{,i}>: use_R
-<src/base/*.ml{,i}>: pkg_calendar
 # Library R_stats
 "src/stats/R_stats.cmxs": use_R_stats
+<src/stats/*.ml{,i}>: use_R_base
 <src/stats/*.ml{,i}>: use_R_interpreter
 <src/stats/*.ml{,i}>: use_R
 <src/stats/*.ml{,i}>: pkg_calendar

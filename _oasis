@@ -94,7 +94,7 @@ Library R_stats
   FindlibParent:        R
   Path:                 src/stats
   Modules:              Rstats
-  BuildDepends:         R.interpreter
+  BuildDepends:         R.interpreter, R.base
 
 
 Library R_graphics

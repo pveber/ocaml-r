@@ -20,6 +20,9 @@ module Stub = struct
 
   let rbind = R.symbol "rbind"
 
+  let matrix = R.symbol "matrix"
+
+  let dim = R.symbol "dim"
 end
 
 let sample (x : 'a list R.t) size ?replace ?(prob: float list option) () : 'a list R.t =
@@ -43,6 +46,27 @@ let lapply (x : 'a list R.t) (func : 'b R.t) : 'c list R.t =
   R.eval Stub.lapply [
     (R.arg (fun x -> x) x)    ;
     (R.arg (fun x -> x) func) ]
+
+class array_ r = object (self)
+  inherit R.s3 r
+  method dim : float list R.t = 
+    R.eval Stub.dim [
+      R.arg (fun x -> x) r
+    ]
+end
+
+class matrix r = object (self)
+  inherit array_ r
+  method floats : float array array = assert false
+end
+
+let matrix ?byrow ~nrow ~ncol v = 
+  R.eval Stub.matrix [
+    R.arg R.floats v ;
+    R.arg R.int            nrow ;
+    R.arg R.int            ncol ;
+    R.opt R.bool   "byrow" byrow ;
+  ]
 
 let tilde (x : 'a R.t) (y : 'a R.t) : 'c R.t =
   R.eval Stub.tilde [

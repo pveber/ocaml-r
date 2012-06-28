@@ -1,19 +1,14 @@
 open Rbase
 
-let res : < estimate : float R.t ; p'value : float R.t > listing R.t = 
-  R.eval_string "fisher.test(matrix(c(2,3,4,5),ncol=2))";;
+
+open Rbase;;
+
+let res = listing (Rstats.fisher_test_2x2 ~ff:2 ~ft:3 ~tf:4 ~tt:5 ())
 
 let () = 
-  print_float (R.float_of_t ((listing res) ## p'value)) ;
-  print_newline ()
-;;
+  Printf.printf 
+    "%f %f\n%s\n"
+    (R.float_of_t (res ## estimate))
+    (R.float_of_t (res ## p'value))
+    (R.string_of_t (res ## alternative))
 
-let () = 
-  print_float (R.float_of_t ((listing res) ## estimate)) ;
-  print_newline ()
-;;
-
-let () = 
-  print_float (R.float_of_t ((listing res) ## mestimate)) ;
-  print_newline ()
-;;

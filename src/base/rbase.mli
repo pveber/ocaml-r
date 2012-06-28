@@ -6,6 +6,19 @@ val sample : 'a list R.t -> int -> ?replace: bool -> ?prob: float list -> unit -
 (**  Lapply function, somewhat like List.map.*)
 val lapply : 'a list R.t -> 'b R.t -> 'c list R.t
 
+
+class array_ : array_ R.t -> object
+  inherit R.s3
+  method dim : float list R.t
+end
+
+class matrix : matrix R.t -> object
+  inherit array_
+  method floats : float array array
+end
+
+val matrix : ?byrow:bool -> nrow:int -> ncol:int -> float list -> array_ R.t
+
 type 'a compound = private < component : 'b. string -> 'b R.t ; .. >
 
 (**  Virtual class for R list S3 objects. *)

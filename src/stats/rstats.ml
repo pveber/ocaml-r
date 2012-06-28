@@ -1,3 +1,5 @@
+open Rbase
+
 let () = ignore (R.eval_string "require(stats, quietly=TRUE)")
 
 module Stub = struct
@@ -62,3 +64,14 @@ let lm formula ?data ?subset ?weights ?na_action ?lm_method ?model ?x ?y ?qr ?si
     R.opt (fun x -> x) "contrasts"    contrasts   ;
     R.opt (fun x -> x) "offset"       offset      ]
 
+let string_of_test_kind = function
+| `two_sided -> "two.sided"
+| `greater -> "greater"
+| `less -> "less"
+
+let fisher_test_2x2 ?alternative ~ff ~ft ~tf ~tt () = 
+  let data = List.map float [ ff ; ft ; tf ; tt ] in
+  R.eval Stub.fisher_test [
+    R.arg (fun x -> matrix ~nrow:2 ~ncol:2 x) data ;
+    R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
+  ]

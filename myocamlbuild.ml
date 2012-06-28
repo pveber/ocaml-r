@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: ab219c091ca7962b4696d5975f740d63) *)
+(* DO NOT EDIT (digest: 28782cd2d63a46f423ff3d2e312b4a73) *)
 module OASISGettext = struct
 # 21 "/home/pveber/usr/ocamlbrew/ocaml-3.12.1/build/odb/install-oasis/oasis-0.3.0~rc3/src/oasis/OASISGettext.ml"
 
@@ -550,11 +550,11 @@ let package_default =
        [
           ("R", ["src"]);
           ("R_interpreter", ["src"]);
+          ("R_base", ["src/base"]);
           ("R_graphics", ["src/graphics"]);
           ("R_syntax", ["src/syntax"]);
           ("R_grDevices", ["src/grDevices"]);
           ("R_methods", ["src/methods"]);
-          ("R_base", ["src/base"]);
           ("R_stats", ["src/stats"]);
           ("R_math", ["src/math"])
        ];
@@ -606,7 +606,7 @@ let package_default =
        ];
      includes =
        [
-          ("src/stats", ["src"]);
+          ("src/stats", ["src"; "src/base"]);
           ("src/methods", ["src"]);
           ("src/graphics", ["src"]);
           ("src/grDevices", ["src"]);

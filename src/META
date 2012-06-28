@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 67e4592727f5f9b9e14df76964ecc7ea)
+# DO NOT EDIT (digest: b7116123ea75926673a3591b590e26b2)
 version = "2010-02-09"
 description = "Objective Caml binding embedding R's interpreter into OCaml code"
 requires = "calendar"
@@ -17,19 +17,10 @@ package "math" (
 package "stats" (
  version = "2010-02-09"
  description = "Objective Caml binding embedding R's interpreter into OCaml code"
- requires = "R.interpreter"
+ requires = "R.interpreter R.base"
  archive(byte) = "R_stats.cma"
  archive(native) = "R_stats.cmxa"
  exists_if = "R_stats.cma"
-)
-
-package "base" (
- version = "2010-02-09"
- description = "Objective Caml binding embedding R's interpreter into OCaml code"
- requires = "R.interpreter"
- archive(byte) = "R_base.cma"
- archive(native) = "R_base.cmxa"
- exists_if = "R_base.cma"
 )
 
 package "methods" (
@@ -66,6 +57,15 @@ package "graphics" (
  archive(byte) = "R_graphics.cma"
  archive(native) = "R_graphics.cmxa"
  exists_if = "R_graphics.cma"
+)
+
+package "base" (
+ version = "2010-02-09"
+ description = "Objective Caml binding embedding R's interpreter into OCaml code"
+ requires = "R.interpreter"
+ archive(byte) = "R_base.cma"
+ archive(native) = "R_base.cmxa"
+ exists_if = "R_base.cma"
 )
 
 package "interpreter" (

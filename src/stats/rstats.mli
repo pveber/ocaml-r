@@ -1,4 +1,5 @@
 (** Runtime R statistics library. *)
+open Rbase
 
 val rnorm : ?mean:float -> ?sd:float -> int -> float list R.t
 (** Random generation for the normal distribution. [mean] and [sd] default to [0.]
@@ -16,11 +17,14 @@ val lm : 'a R.t -> ?data:'b R.t -> ?subset:'c R.t -> ?weights:'d R.t ->
 (* [stl] Seasonal decomposition of time series by Loess. *)
 
 
-
-
-
-
-
-
-
-
+(** {5 Testing} *)
+val fisher_test_2x2 : 
+  ?alternative:[`two_sided | `greater | `less] ->
+  ff:int -> ft:int -> tf:int -> tt:int -> unit -> 
+  < p'value : float R.t ;
+    conf'int : float list R.t ;
+    estimate : float R.t ;
+    null'value : float R.t ;
+    alternative : string R.t ;
+    _method : string R.t ;
+    data'name : string R.t > listing R.t

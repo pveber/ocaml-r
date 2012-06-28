@@ -62,8 +62,13 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
     r
   )
 
-  let id_ml2r = string_map (function '\'' -> '.' | x -> x)
-  let id_r2ml = string_map (function '.' -> '\'' | x -> x)
+  let id_ml2r id = 
+    let r = string_map (function '\'' -> '.' | x -> x) id in 
+    String.(
+      if length r > 0 && r.[0] = '_' then 
+        sub r 1 (length r - 1)
+      else r
+    )
 
   let access_object e m m_loc comp_type f =
     let _loc = Ast.loc_of_expr e in
