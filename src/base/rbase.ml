@@ -71,25 +71,33 @@ let listing r = new listing r
 
 let subset2 = R.symbol ~generic: true "[[.data.frame"
 
-(* class virtual dataframe = object (self) *)
-(*   inherit listing *)
-(*   method row_names = R.strings_of_t (self#attribute "row.names") *)
-(*   method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [ *)
-(*     R.arg (fun x -> x) (R.cast __underlying)  ; *)
-(*     R.arg R.int        x           ] *)
-(*   method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [ *)
-(*     R.arg (fun x -> x) (R.cast __underlying)     ; *)
-(*     R.arg R.int        x              ; *)
-(*     R.arg R.int        y              ] *)
-(* end *)
+class ['a] dataframe r = object (self)
+  inherit ['a] listing r
+  method row_names = R.strings_of_t (self#attribute "row.names")
+  method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [
+    R.arg (fun x -> x) (R.cast __underlying)  ;
+    R.arg R.int        x           ]
+  method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [
+    R.arg (fun x -> x) (R.cast __underlying)     ;
+    R.arg R.int        x              ;
+    R.arg R.int        y              ]
+end
 
-(* let dataframe r = object inherit dataframe inherit R.instance r end *)
+let dataframe r = new dataframe r
 
-(* class virtual date = object (self) *)
-(*   inherit R.s3 *)
-(*   method as_float = R.float_of_t (Obj.magic __underlying) *)
-(*   method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float) *)
-(* end *)
+class date r = object (self)
+  inherit R.s3 r
+  method as_float = R.float_of_t (Obj.magic __underlying)
+  method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float)
+end
+
+
+
+
+
+
+
+
 
 
 

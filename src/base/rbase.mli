@@ -19,21 +19,27 @@ end
 val listing : 'a listing R.t -> 'a listing
 
 (**  Virtual class for R data frame S3 objects. *)
-(* class virtual dataframe : object *)
-(*   inherit listing *)
-(*   method row_names : string list *)
-(*   method column : 'a. int -> 'a R.t *)
-(*   method element : 'a. int -> int -> 'a R.t *)
-(* end *)
+class ['a] dataframe : 'a dataframe R.t -> object
+  inherit ['a] listing
+  method row_names : string list
+  method column : 'a. int -> 'a R.t
+  method element : 'a. int -> int -> 'a R.t
+end
 
-(* val dataframe : dataframe R.t -> dataframe *)
+val dataframe : 'a dataframe R.t -> 'a dataframe
 
 (** Virtual class for dates in R. *)
-(* class virtual date : object *)
-(*   inherit R.s3 *)
-(*   method as_float : float *)
-(*   method as_date : CalendarLib.Calendar.Date.t *)
-(* end *)
+class date : date R.t -> object
+  inherit R.s3 
+  method as_float : float
+  method as_date : CalendarLib.Calendar.Date.t
+end
+
+
+
+
+
+
 
 
 
