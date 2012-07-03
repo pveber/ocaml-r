@@ -57,9 +57,8 @@ Library R
   CCLib:                -L/usr/lib/R/lib -lR
 
 
-Library R_interpreter
-  FindlibName:          interpreter
-  FindlibParent:        R
+Object R_interpreter
+  FindlibFullName:      R.interpreter
   Path:                 src
   Modules:              OCamlR
   BuildDepends:         R
