@@ -8,4 +8,9 @@ val png :
   ?pointsize:int -> 
   string -> unit
 
+val pdf : 
+  ?width:float -> ?height:float -> 
+  ?pointsize:int -> 
+  string -> unit
+
 val dev_off : unit -> unit

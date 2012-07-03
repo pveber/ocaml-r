@@ -4,6 +4,8 @@ module Stub = struct
 
   let png = R.symbol "png"
 
+  let pdf = R.symbol "pdf"
+
   let dev_off = R.symbol "dev.off"
 
   (* TODO: This segfaults: let dev = R.symbol "dev" *)
@@ -27,6 +29,15 @@ let png ?width ?height ?unit ?pointsize path =
       R.opt R.float       "width"     width ;
       R.opt R.float       "height"    height ;
       R.opt r_length_unit "unit"      unit ;
+      R.opt R.int         "pointsize" pointsize
+    ])
+
+let pdf ?width ?height ?pointsize path = 
+  ignore (
+    R.eval Stub.pdf [
+      R.arg R.string                  path ;
+      R.opt R.float       "width"     width ;
+      R.opt R.float       "height"    height ;
       R.opt R.int         "pointsize" pointsize
     ])
 
