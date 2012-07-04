@@ -17,7 +17,10 @@ class matrix : matrix R.t -> object
   method floats : float array array
 end
 
-val matrix : ?byrow:bool -> nrow:int -> ncol:int -> float list -> array_ R.t
+val matrix : ?byrow:bool -> nrow:int -> ncol:int -> float list -> matrix R.t
+
+val matrix_by_rows : float list list -> matrix R.t
+
 
 type 'a compound = private < component : 'b. string -> 'b R.t ; .. >
 

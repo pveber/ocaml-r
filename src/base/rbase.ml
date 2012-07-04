@@ -68,6 +68,17 @@ let matrix ?byrow ~nrow ~ncol v =
     R.opt R.bool   "byrow" byrow ;
   ]
 
+let matrix_by_rows = function
+| [] -> matrix ~nrow:0 ~ncol:0 []
+| h :: t as data -> 
+    let ncol = List.length h in
+    let () = 
+      if List.exists (fun r -> List.length r <> ncol) data
+      then raise (Invalid_argument "Rbase.matrix_by_rows: not all lines have the same dimension")
+    in
+    let nrow = List.length data in
+    matrix ~byrow:true ~nrow ~ncol (List.concat data)
+
 let tilde (x : 'a R.t) (y : 'a R.t) : 'c R.t =
   R.eval Stub.tilde [
     (R.arg (fun x -> x) x)    ;
