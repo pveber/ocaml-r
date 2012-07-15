@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: fd9f53f0b89293bf9890e9358820cfb6)
+# DO NOT EDIT (digest: e9f3065f4c0d4271b93fe269bb683e47)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -15,34 +15,9 @@
 "_darcs": not_hygienic
 # Library R_math
 "src/math/R_math.cmxs": use_R_math
-<src/math/*.ml{,i}>: oasis_library_r_math_ccopt
-"src/math/rmath_stubs.c": oasis_library_r_math_ccopt
-<src/math/R_math.{cma,cmxa}>: oasis_library_r_math_cclib
-"src/math/libR_math_stubs.lib": oasis_library_r_math_cclib
-"src/math/dllR_math_stubs.dll": oasis_library_r_math_cclib
-"src/math/libR_math_stubs.a": oasis_library_r_math_cclib
-"src/math/dllR_math_stubs.so": oasis_library_r_math_cclib
 <src/math/R_math.{cma,cmxa}>: use_libR_math_stubs
 # Library R
 "src/R.cmxs": use_R
-<src/*.ml{,i}>: oasis_library_r_ccopt
-"src/initialisation_stub.c": oasis_library_r_ccopt
-"src/databridge.c": oasis_library_r_ccopt
-"src/sexp.c": oasis_library_r_ccopt
-"src/allocation_stub.c": oasis_library_r_ccopt
-"src/read_internal_stub.c": oasis_library_r_ccopt
-"src/write_internal_stub.c": oasis_library_r_ccopt
-"src/symbols_stub.c": oasis_library_r_ccopt
-"src/conversion_stub.c": oasis_library_r_ccopt
-"src/s3_stub.c": oasis_library_r_ccopt
-"src/s4_stub.c": oasis_library_r_ccopt
-"src/reduction_stub.c": oasis_library_r_ccopt
-"src/parser_stub.c": oasis_library_r_ccopt
-<src/R.{cma,cmxa}>: oasis_library_r_cclib
-"src/libR_stubs.lib": oasis_library_r_cclib
-"src/dllR_stubs.dll": oasis_library_r_cclib
-"src/libR_stubs.a": oasis_library_r_cclib
-"src/dllR_stubs.so": oasis_library_r_cclib
 <src/R.{cma,cmxa}>: use_libR_stubs
 "src/initialisation_stub.c": pkg_calendar
 "src/databridge.c": pkg_calendar

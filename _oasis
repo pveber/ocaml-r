@@ -15,8 +15,6 @@ Library R_math
   Path:                 src/math
   Modules:              Rmath
   CSources:             rmath_stubs.c, wrappers.h
-  CCOpt:                -I/usr/share/R/include -Imath
-  CCLib:                -L/usr/lib/R/lib -lRmath
 
 
 Library R
@@ -53,8 +51,6 @@ Library R
                         s4_stub.c,
                         reduction_stub.c,
                         parser_stub.c
-  CCOpt:                -I/usr/share/R/include -Imath
-  CCLib:                -L/usr/lib/R/lib -lR
 
 
 Object R_interpreter
