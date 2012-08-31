@@ -13,4 +13,9 @@ val pdf :
   ?pointsize:int -> 
   string -> unit
 
+val postscript : 
+  ?width:float -> ?height:float -> 
+  ?pointsize:int -> 
+  string -> unit
+
 val dev_off : unit -> unit

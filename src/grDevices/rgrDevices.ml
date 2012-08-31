@@ -6,6 +6,8 @@ module Stub = struct
 
   let pdf = R.symbol "pdf"
 
+  let postscript = R.symbol "postscript"
+
   let dev_off = R.symbol "dev.off"
 
   (* TODO: This segfaults: let dev = R.symbol "dev" *)
@@ -41,7 +43,24 @@ let pdf ?width ?height ?pointsize path =
       R.opt R.int         "pointsize" pointsize
     ])
 
+let postscript ?width ?height ?pointsize path = 
+  ignore (
+    R.eval Stub.postscript [
+      R.arg R.string                  path ;
+      R.opt R.float       "width"     width ;
+      R.opt R.float       "height"    height ;
+      R.opt R.int         "pointsize" pointsize
+    ])
+
 let dev_off () = 
   ignore (
     R.eval Stub.dev_off []
   )
+
+
+
+
+
+
+
+
