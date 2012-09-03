@@ -266,6 +266,12 @@ val floats : float list -> float list t
   *  real numbers.
   *)
 
+val optfloats : float option list -> float option list t
+(**  Converts a Objective Caml list of float options into an R array of
+  *  real numbers with possibly missing values. The value [None] is 
+  *  converted to [NA] on the R side.
+  *)
+
 val strings_of_t : string list t -> string list
 (**  Converts an R array of strings into a list of Objective Caml
   *  strings.

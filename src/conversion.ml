@@ -102,6 +102,9 @@ let float_of_t tau = access_realvecsxp (cast_to_sxp (tau : float t :> sexp) : re
 let float x = (cast ((realvecsxp_of_float_list [x]) : realvecsxp :> sexp) : float t)
 let floats xl = (cast ((realvecsxp_of_float_list xl) : realvecsxp :> sexp) : float list t)
 
+let realvecsxp_of_float_option_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp_opt x
+let optfloats xl = (cast ((realvecsxp_of_float_option_list xl) : realvecsxp :> sexp) : float option list t)
+
 let string_list_of_strvecsxp x = list_of_vecsxp access_strvecsxp x 
 let strvecsxp_of_string_list x = vecsxp_of_list alloc_str_vector assign_strvecsxp x
 let strings_of_t tau = string_list_of_strvecsxp (cast_to_sxp (tau : string list t :> sexp) : strvecsxp)

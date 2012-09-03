@@ -67,6 +67,16 @@ external assign_intvecsxp  : intvecsxp -> int -> int -> unit = "ocamlr_assign_in
 external assign_realvecsxp : realvecsxp -> int -> float -> unit = "ocamlr_assign_realvecsxp"
 
 
+(**  Sets the element of a vector of real numbers with possibly missing values
+  *
+  *  assign_real_vecsxp takes a vector of real numbers as first argument,
+  *  an offset as second argument, and a possibly missig real number as third argument,
+  *  and sets the vector's offset element to the real number's value or NA if non available.
+  *)
+
+external assign_realvecsxp_opt : realvecsxp -> int -> float option -> unit = "ocamlr_assign_realvecsxp_opt"
+
+
 (**  Sets the element of a vector of string.
   *
   *  assign_str_vecsxp takes a vector of strings as first argument,

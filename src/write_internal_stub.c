@@ -105,6 +105,22 @@ CAMLprim value ocamlr_assign_realvecsxp (value realsxp, value offset, value x) {
 }
 
 
+/**  Sets the element of a vector of real numbers with possibly missing values.
+  *
+  *  ocamlr_assign_real_vecsxp takes a vector of real numbers as first argument,
+  *  an offset as second argument, and a possibly missing real number as third argument,
+  *  and sets the vector's offset element to the real number's value, or NA if not 
+  *  available.
+  */
+
+CAMLprim value ocamlr_assign_realvecsxp_opt (value realsxp, value offset, value x) {
+  double rx = (x == Val_int(0)) ? NA_REAL : Double_val(Field(x,0)) ;
+    
+  REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)] = rx;
+  return Val_unit;
+}
+
+
 /**  Sets the element of a vector of string.
   *
   *  ocamlr_assign_str_vecsxp takes a vector of strings as first argument,
