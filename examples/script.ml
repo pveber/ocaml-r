@@ -1,3 +1,1 @@
-let o = <:script<
-  return(1)
->>
+let o = <:rscript<1>>

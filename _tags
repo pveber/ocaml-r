@@ -62,3 +62,5 @@
 <src/grDevices/*.ml{,i}>: pkg_calendar
 # OASIS_STOP
 <src/syntax/*.ml>: syntax_camlp4o, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations
+<examples/*.ml>: syntax_camlp4o, pa_rscript, use_R_syntax
+true: use_menhir

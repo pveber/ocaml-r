@@ -78,8 +78,9 @@ Library R_syntax
   FindlibName: syntax
   FindlibParent: R
   Path: src/syntax
-  Modules: Pa_r, Pa_rscript
+  Modules: Pa_r, Pa_rscript, R_lang_lexer, R_lang_parser, R_lang_parser_y, R_lang_types
   BuildDepends: camlp4.lib, camlp4.quotations.o, camlp4.extend
+  Buildtools:     menhir
   XMETAType: syntax
   XMETADescription: Syntactic sugar for R
   XMETARequires: camlp4
@@ -106,6 +107,11 @@ Library R_grDevices
   Path:                 src/grDevices
   Modules:              RgrDevices
   BuildDepends:         R.interpreter
+
+Executable test_script
+  Path:                 examples
+  MainIs:               script.ml
+  BuildDepends:         R.syntax
 
 Document doclib
   Title:                API reference for OCaml-R
