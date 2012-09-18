@@ -78,7 +78,7 @@ Library R_syntax
   FindlibName: syntax
   FindlibParent: R
   Path: src/syntax
-  Modules: Pa_r
+  Modules: Pa_r, Pa_rscript
   BuildDepends: camlp4.lib, camlp4.quotations.o, camlp4.extend
   XMETAType: syntax
   XMETADescription: Syntactic sugar for R
