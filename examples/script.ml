@@ -1,3 +1,3 @@
 let o = <:rscript<
-1
+a <- 1
 >>

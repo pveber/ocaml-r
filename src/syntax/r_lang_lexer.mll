@@ -3,7 +3,7 @@
 }
 
 rule token = parse
-| ' ' '\t' { token lexbuf }
+| [' ''\t']+ { token lexbuf }
 | '\n' { EOL }
 | "<-" { ASSIGN }
 | ';' { SEMICOLON }

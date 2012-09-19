@@ -29,13 +29,23 @@ eos:
 ;
 
 statement:
-| expr eos { St_expr $1 }
+| expr eos               { St_expr $1 }
+| lvalue ASSIGN expr eos { St_assign ($1,$3) }
 ;
 
 expr:
 | i = INT
     { Expr_int i }
+| s = IDENT
+    { Expr_id s }
 ;
+
+lvalue:
+| s = IDENT
+    { Lval_id s }
+;
+
+
 
 
 
