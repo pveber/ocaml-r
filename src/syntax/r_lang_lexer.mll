@@ -7,6 +7,10 @@ rule token = parse
 | '\n' { EOL }
 | "<-" { ASSIGN }
 | ';' { SEMICOLON }
+| '(' { LPAREN }
+| ')' { RPAREN }
+| ',' { COMMA }
+| '=' { EQUAL }
 
 | ['0'-'9']+ as i
     { INT (int_of_string i) }

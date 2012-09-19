@@ -4,8 +4,8 @@
 
 %token <int> INT
 %token <string> IDENT
-%token SEMICOLON
-%token ASSIGN EOL EOI
+%token SEMICOLON COMMA LPAREN RPAREN
+%token EQUAL ASSIGN EOL EOI
 
 %start prog
 %type <R_lang_ast.t> prog
@@ -13,7 +13,14 @@
 %%
 
 prog:
-| p = separated_list(list(EOL),statement) EOI { p }
+| statements EOI { List.rev $1 }
+;
+
+statements:
+| 
+    { [] }
+| statements EOL { $1 }
+| statements statement { $2 :: $1 }
 ;
 
 statement:
@@ -31,6 +38,13 @@ expr:
     { Expr_int i }
 | s = IDENT
     { Expr_id s }
+| e = expr LPAREN args = separated_list(COMMA,arg) RPAREN
+    { Expr_apply (e,args) }
+;
+
+arg:
+| expr { Arg_anon $1 }
+| argname = IDENT EQUAL expr { Arg_named (argname,$3) }
 ;
 
 lvalue:
