@@ -13,24 +13,17 @@
 %%
 
 prog:
-| statements EOI { List.rev $1 }
-;
-
-statements:
-| 
-    { [] }
-| statements EOL { $1 }
-| statements statement { $2 :: $1 }
-;
-
-eos:
-| SEMICOLON { () }
-| EOL { () }
+| p = separated_list(list(EOL),statement) EOI { p }
 ;
 
 statement:
 | expr eos               { St_expr $1 }
 | lvalue ASSIGN expr eos { St_assign ($1,$3) }
+;
+
+eos:
+| SEMICOLON { () }
+| EOL { () }
 ;
 
 expr:
