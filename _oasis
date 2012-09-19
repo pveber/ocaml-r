@@ -108,10 +108,10 @@ Library R_grDevices
   Modules:              RgrDevices
   BuildDepends:         R.interpreter
 
-Executable test_script
-  Path:                 examples
-  MainIs:               script.ml
-  BuildDepends:         R.syntax
+#Executable test_script
+#  Path:                 examples
+#  MainIs:               script.ml
+#  BuildDepends:         R.interpreter, R.syntax
 
 Document doclib
   Title:                API reference for OCaml-R

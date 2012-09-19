@@ -1,3 +1,4 @@
+open Printf
 open Camlp4.PreCast
 
 type script = {
@@ -17,8 +18,14 @@ let script_expander _loc _ s =
   (*     done with _ -> ()) *)
   (* in  *)
   let ast = R_lang_parser_y.prog R_lang_lexer.token buf in
-  let code = R_lang_ast.to_string ast in
-  <:expr<let code = $str:code$ in print_endline code>>
+  let body = R_lang_ast.to_string ast in
+  let code = sprintf "f <- function() {\n%s}\n" body in
+  <:expr<
+    let code = $str:code$ in 
+    let _ = R.eval_string code in
+    let stub = R.symbol "f" in
+    R.eval stub []
+  >>
 
 let () = Quotation.(add "rscript" Quotation.DynAst.expr_tag) script_expander
 

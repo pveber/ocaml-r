@@ -34,12 +34,12 @@ and arg_to_string = function
     arg_id ^ " = " ^ (expr_to_string e)
 
 let statement_to_string = function
-| St_expr e -> expr_to_string e
+| St_expr e -> (expr_to_string e) ^ "\n"
 | St_assign (lvalue, e) ->
-    (lvalue_to_string lvalue) ^ " <- " ^ (expr_to_string e)
+    (lvalue_to_string lvalue) ^ " <- " ^ (expr_to_string e) ^ "\n"
 
 let to_string prog = 
-  String.concat "\n" (List.map statement_to_string prog)
+  String.concat "" (List.map statement_to_string prog)
 
 
 
