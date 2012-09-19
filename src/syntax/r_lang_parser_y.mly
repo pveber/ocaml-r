@@ -1,4 +1,5 @@
 %{
+  open R_lang_ast
 %}
 
 %token <int> INT
@@ -7,7 +8,7 @@
 %token ASSIGN EOL EOI
 
 %start prog
-%type <int list> prog
+%type <R_lang_ast.t> prog
 
 %%
 
@@ -28,12 +29,12 @@ eos:
 ;
 
 statement:
-| expr eos { $1 }
+| expr eos { St_expr $1 }
 ;
 
 expr:
 | i = INT
-    { i }
+    { Expr_int i }
 ;
 
 
