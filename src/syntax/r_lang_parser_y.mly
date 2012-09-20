@@ -4,6 +4,7 @@
 
 %token <int> INT
 %token <string> IDENT
+%token <Camlp4.PreCast.Syntax.Ast.expr> EXPR
 %token SEMICOLON COMMA LPAREN RPAREN
 %token EQUAL ASSIGN EOL EOI
 

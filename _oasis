@@ -80,7 +80,7 @@ Library R_syntax
   Path: src/syntax
   Modules: Pa_r, Pa_rscript, R_lang_ast, R_lang_lexer, R_lang_parser, R_lang_parser_y
   BuildDepends: camlp4.lib, camlp4.quotations.o, camlp4.extend
-  Buildtools:     menhir
+  Buildtools: menhir
   XMETAType: syntax
   XMETADescription: Syntactic sugar for R
   XMETARequires: camlp4
