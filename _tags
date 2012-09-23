@@ -65,4 +65,4 @@
 <examples/*.ml>: syntax_camlp4o, pa_rscript
 <examples/*.byte>: use_R_interpreter
 true: use_menhir
-<src/syntax/*.mlypack>: pkg_camlp4.lib
+<src/syntax/*.mly>: pkg_camlp4.lib
