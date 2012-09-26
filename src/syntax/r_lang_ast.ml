@@ -10,6 +10,7 @@ and expr =
   | Expr_int of int
   | Expr_id of string
   | Expr_apply of expr * arg list
+  | Expr_antiquot of string * [`r | `int] * Camlp4.PreCast.Syntax.Ast.expr
 
 and lvalue =
   | Lval_id of string
@@ -28,6 +29,8 @@ let rec expr_to_string = function
     sprintf "(%s)(%s)"
       (expr_to_string e)
       (String.concat "," (List.map arg_to_string args))
+| Expr_antiquot (var,_,_) -> var
+
 and arg_to_string = function
 | Arg_anon e -> expr_to_string e
 | Arg_named (arg_id, e) ->
@@ -41,10 +44,18 @@ let statement_to_string = function
 let to_string prog = 
   String.concat "" (List.map statement_to_string prog)
 
+let rec free_variables prog = 
+  List.fold_left
+    (fun accu st -> (free_variables_of_statement st) @ accu)
+    [] prog
 
+and free_variables_of_statement = function
+  | St_expr e -> free_variables_of_expr e
+  | St_assign (_,e) -> free_variables_of_expr e
 
-
-
+and free_variables_of_expr = function
+  | Expr_antiquot (var,typ,e) -> [ (var, typ, e) ]
+  | _ -> []
 
 
 

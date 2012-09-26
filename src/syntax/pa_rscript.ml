@@ -6,7 +6,7 @@ type script = {
   wrapper : unit -> unit
 }
 
-let script_expander _loc _ s = 
+let script_expander _loc _ s =
   let buf = Lexing.from_string s in
   (* let _ =  *)
   (*   R_lang_parser_y.(try while true do  *)
@@ -18,13 +18,27 @@ let script_expander _loc _ s =
   (*     done with _ -> ()) *)
   (* in  *)
   let ast = R_lang_parser_y.prog R_lang_lexer.token buf in
-  let body = R_lang_ast.to_string ast in
-  let code = sprintf "f <- function() {\n%s}\n" body in
+  let body = R_lang_ast.to_string ast
+  and arguments = R_lang_ast.free_variables ast in
+  let code =
+    sprintf "f <- function(%s) {\n%s}\n"
+      (String.concat "," (List.map (fun (x,_,_) -> x) arguments))
+      body 
+  and conversion_expr =
+    List.fold_right
+      (fun (var,typ,e) accu -> 
+	let arg = match typ with
+	  | `r -> <:expr< R.arg (fun x -> x) $e$>>
+	  | `int -> <:expr< R.arg R.int $e$>>
+	in 
+	<:expr< $arg$ :: $accu$>>)
+      arguments <:expr< [] >>
+  in
   <:expr<
-    let code = $str:code$ in 
+    let code = $str:code$ in
     let _ = R.eval_string code in
     let stub = R.symbol "f" in
-    R.eval stub []
+    R.eval stub $conversion_expr$
   >>
 
 let () = Quotation.(add "rscript" Quotation.DynAst.expr_tag) script_expander

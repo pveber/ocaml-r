@@ -30,8 +30,8 @@ rule token = parse
 
 | ['A'-'Z''a'-'z''0'-'9''-''_']+ as lxm { IDENT(lxm) }
 
-| '$' (([^ '?' '!' '$'] [^ ':']* as typ) ':' ([^'$']* as e)) '$'
-    { EXPR (typ, expr lexbuf (2 + String.length typ) e) }
+| '$' (([^ '$'] [^ ':']* as typ) ':' ([^'$']* as e)) '$'
+    { ANTIQUOT (typ, expr lexbuf (2 + String.length typ) e) }
 
 | eof
     { EOI }

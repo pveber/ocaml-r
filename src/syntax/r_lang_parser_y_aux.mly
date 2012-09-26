@@ -1,10 +1,16 @@
 %{
+  open Printf
   open R_lang_ast
+
+  let typ_of_string = function
+    | "i" -> `int
+    | "r" -> `r
+    | x -> failwith (sprintf "Unknown conversion character %s" x)
 %}
 
 %token <int> INT
 %token <string> IDENT
-%token <string * Camlp4.PreCast.Syntax.Ast.expr> EXPR
+%token <string * Camlp4.PreCast.Syntax.Ast.expr> ANTIQUOT
 %token SEMICOLON COMMA LPAREN RPAREN
 %token EQUAL ASSIGN EOL EOI
 
@@ -39,6 +45,9 @@ expr:
     { Expr_int i }
 | s = IDENT
     { Expr_id s }
+| a = ANTIQUOT
+    { let (k,expr) = a in
+      Expr_antiquot (Pa_r.random_var (), typ_of_string k, expr) }
 | e = expr LPAREN args = separated_list(COMMA,arg) RPAREN
     { Expr_apply (e,args) }
 ;

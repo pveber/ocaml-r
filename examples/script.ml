@@ -4,7 +4,7 @@
 
 let o = <:rscript<
 
-a <- 1
+a <- $i:1$
 print(a)
 
 >>
