@@ -104,7 +104,7 @@ end
 
 let listing r = new listing r
 
-let subset2 = R.symbol ~generic: true "[[.data.frame"
+let subset2 = R.symbol ~generic: true ".subset2"
 
 class ['a] dataframe r = object (self)
   inherit ['a] listing r

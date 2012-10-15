@@ -76,7 +76,7 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
     let obj_type = fresh_type _loc in
     let constr =
       let y = random_var () in
-      <:expr< fun () -> let _ : Rbase.compound $obj_type$ = $lid:x$#compound in 
+      <:expr< fun () -> let (_ : Rbase.compound (< .. > as $obj_type$)) = $lid:x$#compound in 
                         fun ($lid:y$ : $obj_type$) -> ($lid:y$#$m$ : $comp_type$) >>
     in
     <:expr< let $lid:x$ = $e$ in
