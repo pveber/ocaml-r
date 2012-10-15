@@ -57,7 +57,18 @@ and free_variables_of_statement = function
 
 and free_variables_of_expr = function
   | Expr_antiquot (var,typ,e) -> [ (var, typ, e) ]
+  | Expr_apply (fun_expr, args) ->
+      (free_variables_of_expr fun_expr) @ (List.fold_left (fun accu x -> (free_variables_of_arg x) @ accu) [] args)
   | _ -> []
+
+and free_variables_of_arg = function
+| Arg_anon e | Arg_named (_,e) -> free_variables_of_expr e
+
+
+
+
+
+
 
 
 
