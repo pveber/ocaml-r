@@ -24,6 +24,7 @@ rule token = parse
 | ')' { RPAREN }
 | ',' { COMMA }
 | '=' { EQUAL }
+| '.' { DOT }
 
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
@@ -32,6 +33,14 @@ rule token = parse
 
 | '$' (([^ '$'] [^ ':']* as typ) ':' ([^'$']* as e)) '$'
     { ANTIQUOT (typ, expr lexbuf (2 + String.length typ) e) }
+
+| '"' [^ '"']* "\""
+    { let s = Lexing.lexeme lexbuf in
+      STRING(String.sub s 1 (String.length s - 2)) }
+
+| ''' [^ ''']* '''
+    { let s = Lexing.lexeme lexbuf in
+      STRING(String.sub s 1 (String.length s - 2)) }
 
 | eof
     { EOI }

@@ -9,8 +9,9 @@ and statement =
 and expr = 
   | Expr_int of int
   | Expr_id of string
+  | Expr_string of string
   | Expr_apply of expr * arg list
-  | Expr_antiquot of string * [`r | `int] * Camlp4.PreCast.Syntax.Ast.expr
+  | Expr_antiquot of string * [`r | `int | `string | `vector] * Camlp4.PreCast.Syntax.Ast.expr
 
 and lvalue =
   | Lval_id of string
@@ -24,6 +25,7 @@ let lvalue_to_string = function
 
 let rec expr_to_string = function
 | Expr_id id -> id
+| Expr_string s -> sprintf "'%s'" s
 | Expr_int i -> string_of_int i
 | Expr_apply (e,args) ->
     sprintf "(%s)(%s)"

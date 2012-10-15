@@ -4,14 +4,17 @@
 
   let typ_of_string = function
     | "i" -> `int
+    | "s" -> `string
+    | "v" -> `vector
     | "r" -> `r
     | x -> failwith (sprintf "Unknown conversion character %s" x)
 %}
 
 %token <int> INT
 %token <string> IDENT
+%token <string> STRING
 %token <string * Camlp4.PreCast.Syntax.Ast.expr> ANTIQUOT
-%token SEMICOLON COMMA LPAREN RPAREN
+%token SEMICOLON COMMA DOT LPAREN RPAREN
 %token EQUAL ASSIGN EOL EOI
 
 %start prog
@@ -43,8 +46,10 @@ eos:
 expr:
 | i = INT
     { Expr_int i }
-| s = IDENT
-    { Expr_id s }
+| l = separated_nonempty_list(DOT,IDENT)
+    { Expr_id (String.concat "." l) }
+| s = STRING
+    { Expr_string s }
 | a = ANTIQUOT
     { let (k,expr) = a in
       Expr_antiquot (Pa_r.random_var (), typ_of_string k, expr) }

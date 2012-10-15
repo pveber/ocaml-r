@@ -30,6 +30,8 @@ let script_expander _loc _ s =
 	let arg = match typ with
 	  | `r -> <:expr< R.arg (fun x -> x) $e$>>
 	  | `int -> <:expr< R.arg R.int $e$>>
+	  | `string -> <:expr< R.arg R.string $e$>>
+	  | `vector -> <:expr< R.arg R.floats $e$>>
 	in 
 	<:expr< $arg$ :: $accu$>>)
       arguments <:expr< [] >>
