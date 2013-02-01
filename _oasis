@@ -79,7 +79,7 @@ Library R_syntax
   FindlibParent: R
   Path: src/syntax
   Modules: Pa_r, Pa_rscript, R_lang_ast, R_lang_lexer, R_lang_parser, R_lang_parser_y
-  BuildDepends: camlp4.lib, camlp4.quotations.o, camlp4.extend
+  BuildDepends: camlp4.lib, camlp4.quotations.r, camlp4.extend
   Buildtools: menhir
   XMETAType: syntax
   XMETADescription: Syntactic sugar for R

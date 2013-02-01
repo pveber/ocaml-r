@@ -20,6 +20,9 @@ let script_expander _loc _ s =
   let ast = R_lang_parser_y.prog R_lang_lexer.token buf in
   let body = R_lang_ast.to_string ast
   and arguments = R_lang_ast.free_variables ast in
+  let oc = open_out "delme.R" in 
+  fprintf oc "%s" body ;
+  close_out oc ;
   let code =
     sprintf "f <- function(%s) {\n%s}\n"
       (String.concat "," (List.map (fun (x,_,_) -> x) arguments))
@@ -33,7 +36,7 @@ let script_expander _loc _ s =
 	  | `string -> <:expr< R.arg R.string $e$>>
 	  | `vector -> <:expr< R.arg R.floats $e$>>
 	in 
-	<:expr< $arg$ :: $accu$>>)
+	<:expr< [ $arg$ :: $accu$ ] >>)
       arguments <:expr< [] >>
   in
   <:expr<

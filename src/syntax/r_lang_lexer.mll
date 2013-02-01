@@ -25,11 +25,19 @@ rule token = parse
 | ',' { COMMA }
 | '=' { EQUAL }
 | '.' { DOT }
+| '#' { SHARP }
+| '+' { PLUS }
+| '-' { MINUS }
+| '*' { TIMES }
+| '/' { DIV }
+| '&' { AMPERSAND }
+| '<' { LT }
+| '>' { GT }
 
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
 
-| ['A'-'Z''a'-'z''0'-'9''-''_']+ as lxm { IDENT(lxm) }
+| ['A'-'Z''a'-'z''0'-'9''_']['A'-'Z''a'-'z''0'-'9''-''_']* as lxm { IDENT(lxm) }
 
 | '$' (([^ '$'] [^ ':']* as typ) ':' ([^'$']* as e)) '$'
     { ANTIQUOT (typ, expr lexbuf (2 + String.length typ) e) }

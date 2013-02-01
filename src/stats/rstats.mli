@@ -28,3 +28,7 @@ val fisher_test_2x2 :
     alternative : string R.t ;
     _method : string R.t ;
     data'name : string R.t > listing R.t
+
+val p'adjust :
+  ?method_ : [`holm | `hochberg | `hommel | `bonferroni | `BH | `BY | `fdr] ->
+  float list -> float list

@@ -14,8 +14,16 @@
 %token <string> IDENT
 %token <string> STRING
 %token <string * Camlp4.PreCast.Syntax.Ast.expr> ANTIQUOT
-%token SEMICOLON COMMA DOT LPAREN RPAREN
+%token SEMICOLON COMMA DOT LPAREN RPAREN 
+%token PLUS MINUS TIMES DIV SHARP
+%token LT GT AMPERSAND
 %token EQUAL ASSIGN EOL EOI
+%left AMPERSAND
+%left LT GT
+%left PLUS MINUS
+%left TIMES DIV
+%left SHARP
+%nonassoc LPAREN
 
 %start prog
 %type <R_lang_ast.t> prog
@@ -46,8 +54,8 @@ eos:
 expr:
 | i = INT
     { Expr_int i }
-| l = separated_nonempty_list(DOT,IDENT)
-    { Expr_id (String.concat "." l) }
+| id = ident
+    { Expr_id id }
 | s = STRING
     { Expr_string s }
 | a = ANTIQUOT
@@ -55,19 +63,41 @@ expr:
       Expr_antiquot (Pa_r.random_var (), typ_of_string k, expr) }
 | e = expr LPAREN args = separated_list(COMMA,arg) RPAREN
     { Expr_apply (e,args) }
+| LPAREN e = expr RPAREN
+    { e }
+| e = expr AMPERSAND f = expr
+    { Expr_op (e, Op_and, f) }
+| e = expr GT f = expr
+    { Expr_op (e, Op_gt, f) }
+| e = expr LT f = expr
+    { Expr_op (e, Op_lt, f) }
+| e = expr PLUS f = expr
+    { Expr_op (e, Op_plus, f) }
+| e = expr MINUS f = expr
+    { Expr_op (e, Op_minus, f) }
+| e = expr TIMES f = expr
+    { Expr_op (e, Op_times, f) }
+| e = expr DIV f = expr
+    { Expr_op (e, Op_div, f) }
+| e = expr SHARP id = ident
+    { Expr_subset (e, id) }
+| MINUS e = expr
+    { Expr_unop (Op_minus, e) }
 ;
 
 arg:
 | expr { Arg_anon $1 }
-| argname = IDENT EQUAL expr { Arg_named (argname,$3) }
+| argname = ident EQUAL expr { Arg_named (argname,$3) }
 ;
 
 lvalue:
-| s = IDENT
+| s = ident
     { Lval_id s }
 ;
 
-
+ident:
+| id = separated_nonempty_list(DOT,IDENT)
+    { String.concat "." id }
 
 
 

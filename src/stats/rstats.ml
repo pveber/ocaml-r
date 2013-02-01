@@ -18,6 +18,8 @@ module Stub = struct
 
   let fitted = R.symbol "fitted"
 
+  let p'adjust = R.symbol "p.adjust"
+
   let sSgompertz = R.symbol "SSgompertz"
 
   (* The log normal distribution. *)
@@ -75,3 +77,38 @@ let fisher_test_2x2 ?alternative ~ff ~ft ~tf ~tt () =
     R.arg (fun x -> matrix ~nrow:2 ~ncol:2 x) data ;
     R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
   ]
+
+let string_of_p'adjust_method = function
+| `fdr -> "fdr" 
+| `holm -> "holm" 
+| `hochberg -> "hochberg" 
+| `hommel -> "hommel" 
+| `bonferroni -> "bonferroni" 
+| `BH -> "BH" 
+| `BY -> "BY"
+
+let p'adjust ?method_ data =
+  R.floats_of_t (
+    R.eval Stub.p'adjust [
+      R.arg R.floats data ;
+      R.opt (fun x -> R.string (string_of_p'adjust_method x)) "method" method_
+    ]
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
