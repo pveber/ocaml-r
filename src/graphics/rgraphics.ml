@@ -6,6 +6,13 @@ module Stub = struct
 
 end
 
+type hist = < breaks : float list R.t ;
+              counts : float list R.t ;
+              density : float list R.t ;
+              mids : float list R.t ;
+              xname : string R.t ;
+              equidist : bool R.t >
+
 let r_breaks = function
 | `n n -> Obj.magic (R.int n)
 | `l v -> Obj.magic v
