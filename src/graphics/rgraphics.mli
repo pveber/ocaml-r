@@ -1,4 +1,5 @@
 (** Runtime R graphics library. *)
+open Rbase
 
 type hist = < breaks : float list R.t ;
               counts : float list R.t ;
@@ -13,7 +14,7 @@ val hist :
   ?right:bool ->
   ?main:string -> ?xlab:string -> ?ylab:string ->
   ?xlim:float -> ?ylim:float -> 
-  float list R.t -> hist R.t
+  float list R.t -> hist listing R.t
 
 
 

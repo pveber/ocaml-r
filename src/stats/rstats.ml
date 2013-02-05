@@ -71,6 +71,22 @@ let string_of_test_kind = function
 | `greater -> "greater"
 | `less -> "less"
 
+type fisher_test =
+  < p'value : float R.t ;
+    conf'int : float list R.t ;
+    estimate : float R.t ;
+    null'value : float R.t ;
+    alternative : string R.t ;
+    _method : string R.t ;
+    data'name : string R.t >
+
+let fisher_test ?alternative v v' = 
+  R.eval Stub.fisher_test [
+    R.arg R.floats v ;
+    R.arg R.floats v' ;
+    R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
+  ]
+
 let fisher_test_2x2 ?alternative ~ff ~ft ~tf ~tt () = 
   let data = List.map float [ ff ; ft ; tf ; tt ] in
   R.eval Stub.fisher_test [

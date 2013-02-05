@@ -98,7 +98,7 @@ Library R_graphics
   FindlibParent:        R
   Path:                 src/graphics
   Modules:              Rgraphics
-  BuildDepends:         R.interpreter
+  BuildDepends:         R.interpreter, R.base
 
 
 Library R_grDevices
