@@ -39,6 +39,9 @@ rule token = parse
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
 
+| ['0'-'9']+ '.' ['0'-'9']* as f
+    { FLOAT (float_of_string f) }
+
 | ['A'-'Z''a'-'z''0'-'9''_']['A'-'Z''a'-'z''0'-'9''-''_']* as lxm { IDENT(lxm) }
 
 | '$' (([^ '$'] [^ ':']* as typ) ':' ([^'$']* as e)) '$'

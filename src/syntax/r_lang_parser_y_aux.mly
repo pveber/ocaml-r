@@ -11,6 +11,7 @@
 %}
 
 %token <int> INT
+%token <float> FLOAT
 %token <string> IDENT
 %token <string> STRING
 %token <string * Camlp4.PreCast.Syntax.Ast.expr> ANTIQUOT
@@ -56,6 +57,8 @@ eos:
 expr:
 | i = INT
     { Expr_int i }
+| f = FLOAT
+    { Expr_float f }
 | id = ident
     { Expr_id id }
 | s = STRING

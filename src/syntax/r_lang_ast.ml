@@ -8,6 +8,7 @@ and statement =
       
 and expr = 
   | Expr_int of int
+  | Expr_float of float
   | Expr_id of string
   | Expr_string of string
   | Expr_apply of expr * arg list
@@ -40,6 +41,7 @@ let rec expr_to_string = function
 | Expr_id id -> id
 | Expr_string s -> sprintf "'%s'" s
 | Expr_int i -> string_of_int i
+| Expr_float f -> string_of_float f
 | Expr_apply (e,args) ->
     sprintf "(%s)(%s)"
       (expr_to_string e)
@@ -101,7 +103,7 @@ and free_variables_of_expr = function
       (free_variables_of_expr e) @ (free_variables_of_expr e')
   | Expr_unop (_,e) ->
       (free_variables_of_expr e)
-  | Expr_id _ | Expr_int _ | Expr_string _ -> []
+  | Expr_id _ | Expr_int _ | Expr_float _ | Expr_string _ -> []
 
 and free_variables_of_arg = function
 | Arg_anon e | Arg_named (_,e) -> free_variables_of_expr e
