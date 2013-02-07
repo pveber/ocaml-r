@@ -11,6 +11,7 @@ and expr =
   | Expr_id of string
   | Expr_string of string
   | Expr_apply of expr * arg list
+  | Expr_index of expr * expr list
   | Expr_antiquot of string * [`r | `int | `string | `vector] * Camlp4.PreCast.Syntax.Ast.expr
   | Expr_subset of expr * string
   | Expr_op of expr * operator * expr
@@ -43,6 +44,10 @@ let rec expr_to_string = function
     sprintf "(%s)(%s)"
       (expr_to_string e)
       (String.concat "," (List.map arg_to_string args))
+| Expr_index (e,indices) ->
+    sprintf "(%s)[%s]"
+      (expr_to_string e)
+      (String.concat "," (List.map expr_to_string indices))
 | Expr_antiquot (var,_,_) -> var
 | Expr_subset (e,field) -> 
     sprintf "((%s)$%s)" (expr_to_string e) field
@@ -88,6 +93,8 @@ and free_variables_of_expr = function
   | Expr_antiquot (var,typ,e) -> [ (var, typ, e) ]
   | Expr_apply (fun_expr, args) ->
       (free_variables_of_expr fun_expr) @ (List.fold_left (fun accu x -> (free_variables_of_arg x) @ accu) [] args)
+  | Expr_index (fun_expr, indices) ->
+      (free_variables_of_expr fun_expr) @ (List.fold_left (fun accu x -> (free_variables_of_expr x) @ accu) [] indices)
   | Expr_subset (e, field) -> 
       free_variables_of_expr e 
   | Expr_op (e,_,e') ->

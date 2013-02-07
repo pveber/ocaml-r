@@ -22,6 +22,8 @@ rule token = parse
 | ';' { SEMICOLON }
 | '(' { LPAREN }
 | ')' { RPAREN }
+| '[' { LBRACKET }
+| ']' { RBRACKET }
 | ',' { COMMA }
 | '=' { EQUAL }
 | '.' { DOT }

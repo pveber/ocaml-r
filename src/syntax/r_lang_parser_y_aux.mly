@@ -15,6 +15,7 @@
 %token <string> STRING
 %token <string * Camlp4.PreCast.Syntax.Ast.expr> ANTIQUOT
 %token SEMICOLON COMMA DOT LPAREN RPAREN 
+%token LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIV SHARP
 %token LT GT AMPERSAND
 %token EQUAL ASSIGN EOL EOI
@@ -24,6 +25,7 @@
 %left TIMES DIV
 %left SHARP
 %nonassoc LPAREN
+%nonassoc LBRACKET
 
 %start prog
 %type <R_lang_ast.t> prog
@@ -61,6 +63,8 @@ expr:
 | a = ANTIQUOT
     { let (k,expr) = a in
       Expr_antiquot (Pa_r.random_var (), typ_of_string k, expr) }
+| e = expr LBRACKET indices = separated_list(COMMA,expr) RBRACKET
+    { Expr_index (e,indices) }
 | e = expr LPAREN args = separated_list(COMMA,arg) RPAREN
     { Expr_apply (e,args) }
 | LPAREN e = expr RPAREN
