@@ -14,6 +14,8 @@ module Stub = struct
 
   let dollar = R.symbol "$"
 
+  let dot_subset2 = R.symbol ".subset2"
+
   let t = R.symbol "t"
 
   let cbind = R.symbol "cbind"
@@ -90,6 +92,10 @@ let dollar (x : 'a R.t) (y : string) : 'c R.t =
     (R.arg (fun x -> x) x)    ;
     (R.arg R.string     y)    ]
 
+let dot_subset2 l i =
+  R.eval Stub.dot_subset2 [ R.arg (fun x -> x) l ; 
+                            R.arg R.int i ]
+
 
 class type ['a] compound = object
   method component : 'b. string -> 'b R.t
@@ -125,6 +131,27 @@ class date r = object (self)
   method as_float = R.float_of_t (Obj.magic __underlying)
   method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float)
 end
+
+module Listing = struct
+  type 'a t = [ `listing of (< .. > as 'a) ] compound R.t
+
+  module Stub = struct
+      let length = R.symbol "length"
+  end
+
+  let length l = R.int_of_t (R.eval Stub.length [ R.arg (fun x -> x) l ])
+
+  let nth l i = dot_subset2 l i
+
+  let elt l name = dollar l name
+
+end 
+
+module Infix = struct
+  let ( $ ) o x = dollar o x
+end
+
+
 
 
 

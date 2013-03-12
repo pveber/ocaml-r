@@ -51,6 +51,21 @@ class date : date R.t -> object
   method as_date : CalendarLib.Calendar.Date.t
 end
 
+module Listing : sig
+  type 'a t = [ `listing of (< .. > as 'a) ] compound R.t
+
+  val length : 'a t -> int
+  val nth : 'a t -> int -> 'b R.t
+  val elt : 'a t -> string -> 'b R.t
+end
+
+module Infix : sig
+  val ( $ ) : 'a compound R.t -> string -> 'b R.t
+end
+
+
+
+
 
 
 
