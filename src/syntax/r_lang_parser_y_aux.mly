@@ -66,7 +66,7 @@ expr:
 | a = ANTIQUOT
     { let (k,expr) = a in
       Expr_antiquot (Pa_r.random_var (), typ_of_string k, expr) }
-| e = expr LBRACKET indices = separated_list(COMMA,expr) RBRACKET
+| e = expr LBRACKET indices = separated_nonempty_list(COMMA,option(expr)) RBRACKET
     { Expr_index (e,indices) }
 | e = expr LPAREN args = separated_list(COMMA,arg) RPAREN
     { Expr_apply (e,args) }
