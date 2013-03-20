@@ -1,6 +1,6 @@
-#camlp4o;;
-#require "R.syntax";;
-#require "R.stats";;
+(* #camlp4o;; *)
+(* #require "R.syntax";; *)
+(* #require "R.stats";; *)
 
 open Rbase
 

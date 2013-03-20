@@ -102,9 +102,9 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
   let rdollar = Gram.Entry.mk "rdollar"
 
   EXTEND Gram
-    rdollar: [["$"; lab = label -> (_loc, lab) ]];
+    rdollar: [["##"; lab = label -> (_loc, lab) ]];
     expr: BEFORE "."
-    ["$" RIGHTA
+    ["##" RIGHTA
      [ e = SELF; (lab_loc, lab) = rdollar ->
          access_object _loc e lab lab_loc
      ]];
