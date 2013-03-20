@@ -25,6 +25,9 @@ module Stub = struct
   let matrix = R.symbol "matrix"
 
   let dim = R.symbol "dim"
+
+  let length = R.symbol ~generic:true "length"
+  let subset2 = R.symbol ~generic:true "[["
 end
 
 let sample (x : 'a list R.t) size ?replace ?(prob: float list option) () : 'a list R.t =
@@ -87,7 +90,7 @@ let tilde (x : 'a R.t) (y : 'a R.t) : 'c R.t =
     (R.arg (fun x -> x) y)    ]
 
 
-let dollar (x : 'a R.t) (y : string) : 'c R.t =
+let component (x : 'a R.t) (y : string) : 'c R.t =
   R.eval Stub.dollar [
     (R.arg (fun x -> x) x)    ;
     (R.arg R.string     y)    ]
@@ -97,70 +100,66 @@ let dot_subset2 l i =
                             R.arg R.int i ]
 
 
-class type ['a] compound = object
-  method component : 'b. string -> 'b R.t
+(* class type ['a] compound = object *)
+(*   method component : 'b. string -> 'b R.t *)
+(* end *)
+
+(* class ['b] listing r = object (self) *)
+(*   inherit R.s3 r *)
+(*   method names = R.strings_of_t (self#attribute "names") *)
+(*   method component : 'a. string -> 'a R.t = component r *)
+(*   method compound : 'b compound = (self :> 'b compound) *)
+(* end *)
+
+(* let listing r = new listing r *)
+
+(* let subset2 = R.symbol ~generic: true ".subset2" *)
+
+(* class ['a] dataframe r = object (self) *)
+(*   inherit ['a] listing r *)
+(*   method row_names = R.strings_of_t (self#attribute "row.names") *)
+(*   method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [ *)
+(*     R.arg (fun x -> x) (R.cast __underlying)  ; *)
+(*     R.arg R.int        x           ] *)
+(*   method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [ *)
+(*     R.arg (fun x -> x) (R.cast __underlying)     ; *)
+(*     R.arg R.int        x              ; *)
+(*     R.arg R.int        y              ] *)
+(* end *)
+
+(* let dataframe r = new dataframe r *)
+
+(* class date r = object (self) *)
+(*   inherit R.s3 r *)
+(*   method as_float = R.float_of_t (Obj.magic __underlying) *)
+(*   method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float) *)
+(* end *)
+
+
+let length l = R.int_of_t (R.eval Stub.length [ R.arg (fun x -> x) l ])
+
+let subset2 x i = R.eval Stub.subset2 [
+  R.arg (fun x -> x) x  ;
+  R.arg R.int        i
+]
+
+let subset2_s x label = R.eval Stub.subset2 [
+  R.arg (fun x -> x) x  ;
+  R.arg R.string label
+]
+
+
+class type ['a] listing = object
+  method subset2_s : 'b. string -> 'b R.t
+  method subset2   : 'b. int -> 'b R.t
+  method length : int
+  method ty : 'a
 end
 
-class ['b] listing r = object (self)
-  inherit R.s3 r
-  method names = R.strings_of_t (self#attribute "names")
-  method component : 'a. string -> 'a R.t = dollar r
-  method compound : 'b compound = (self :> 'b compound)
+class type ['a] dataframe = object
+  inherit ['a] listing
+  method subset : 'b. int -> int -> 'b R.t
 end
-
-let listing r = new listing r
-
-let subset2 = R.symbol ~generic: true ".subset2"
-
-class ['a] dataframe r = object (self)
-  inherit ['a] listing r
-  method row_names = R.strings_of_t (self#attribute "row.names")
-  method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [
-    R.arg (fun x -> x) (R.cast __underlying)  ;
-    R.arg R.int        x           ]
-  method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [
-    R.arg (fun x -> x) (R.cast __underlying)     ;
-    R.arg R.int        x              ;
-    R.arg R.int        y              ]
-end
-
-let dataframe r = new dataframe r
-
-class date r = object (self)
-  inherit R.s3 r
-  method as_float = R.float_of_t (Obj.magic __underlying)
-  method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float)
-end
-
-module Listing = struct
-  type 'a t = [ `listing of (< .. > as 'a) ] compound R.t
-
-  module Stub = struct
-      let length = R.symbol "length"
-  end
-
-  let length l = R.int_of_t (R.eval Stub.length [ R.arg (fun x -> x) l ])
-
-  let nth l i = dot_subset2 l i
-
-  let elt l name = dollar l name
-
-end 
-
-module Infix = struct
-  let ( $ ) o x = dollar o x
-end
-
-
-
-
-
-
-
-
-
-
-
 
 
 

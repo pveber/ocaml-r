@@ -22,46 +22,57 @@ val matrix : ?byrow:bool -> nrow:int -> ncol:int -> float list -> matrix R.t
 val matrix_by_rows : float list list -> matrix R.t
 
 
-type 'a compound = private < component : 'b. string -> 'b R.t ; .. >
+val length : < length : int ; .. > R.t -> int
 
-(**  Virtual class for R list S3 objects. *)
-class ['a] listing : 'a listing R.t -> object
-  inherit R.s3
-  method component : 'b. string -> 'b R.t
-  method names : string list
-  method compound : 'a compound
+val subset2_s : < subset2_s : 'b. string -> 'b R.t ; .. > R.t -> string -> 'b R.t
+
+val subset2 : < subset2 : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
+
+class type ['a] listing = object
+  method subset2_s : 'b. string -> 'b R.t
+  method subset2   : 'b. int -> 'b R.t
+  method length : int
+  method ty : 'a
 end
 
-val listing : 'a listing R.t -> 'a listing
-
-(**  Virtual class for R data frame S3 objects. *)
-class ['a] dataframe : 'a dataframe R.t -> object
+class type ['a] dataframe = object
   inherit ['a] listing
-  method row_names : string list
-  method column : 'a. int -> 'a R.t
-  method element : 'a. int -> int -> 'a R.t
+  method subset : 'b. int -> int -> 'b R.t
 end
 
-val dataframe : 'a dataframe R.t -> 'a dataframe
 
-(** Virtual class for dates in R. *)
-class date : date R.t -> object
-  inherit R.s3 
-  method as_float : float
-  method as_date : CalendarLib.Calendar.Date.t
-end
+(* type 'a compound = private < component : 'b. string -> 'b R.t ; .. > *)
+(* val component : 'a compound R.t -> string -> 'b R.t *)
 
-module Listing : sig
-  type 'a t = [ `listing of (< .. > as 'a) ] compound R.t
+(* (\**  Virtual class for R list S3 objects. *\) *)
+(* class ['a] listing : 'a listing R.t -> object *)
+(*   inherit R.s3 *)
+(*   method component : 'b. string -> 'b R.t *)
+(*   method names : string list *)
+(*   method ty : 'a compound *)
+(* end *)
 
-  val length : 'a t -> int
-  val nth : 'a t -> int -> 'b R.t
-  val elt : 'a t -> string -> 'b R.t
-end
+(* val listing : 'a listing R.t -> 'a listing *)
 
-module Infix : sig
-  val ( $ ) : 'a compound R.t -> string -> 'b R.t
-end
+(* (\**  Virtual class for R data frame S3 objects. *\) *)
+(* class ['a] dataframe : 'a dataframe R.t -> object *)
+(*   inherit ['a] listing *)
+(*   method row_names : string list *)
+(*   method column : 'a. int -> 'a R.t *)
+(*   method element : 'a. int -> int -> 'a R.t *)
+(* end *)
+
+(* val dataframe : 'a dataframe R.t -> 'a dataframe *)
+
+(* (\** Virtual class for dates in R. *\) *)
+(* class date : date R.t -> object *)
+(*   inherit R.s3  *)
+(*   method as_float : float *)
+(*   method as_date : CalendarLib.Calendar.Date.t *)
+(* end *)
+
+(* type 'a compound *)
+
 
 
 

@@ -70,7 +70,7 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
       else r
     )
 
-  let access_object e m m_loc comp_type f =
+  let access_object e m m_loc comp_type =
     let _loc = Ast.loc_of_expr e in
     let x = random_var () in
     let obj_type = fresh_type _loc in
@@ -81,19 +81,32 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
     in
     <:expr< let $lid:x$ = $e$ in
             let _ = $constr$ in
-            $f x$ >>
+            ($lid:x$#component $str:id_ml2r m$ : $comp_type$) >>
 
+  let access_object _loc e m m_loc =
+    let m_typ = fresh_type _loc in
+    let x = random_var () in
+    let obj_type = fresh_type _loc in
+    let constr =
+      let y = random_var () in
+      let body =
+        let o = <:expr< $lid:y$ >> in
+        let _loc = m_loc in <:expr< ($o$#$m$ : $m_typ$) >>
+      in
+      <:expr< fun ($lid:y$ : $obj_type$) -> $body$ >>
+    in
+    <:expr< let $lid:x$ = ($e$ : R.t (#Rbase.listing (< .. > as $obj_type$))) in
+            let _ = $constr$ in
+            (Rbase.subset2_s $lid:x$ $str:id_ml2r m$ : $m_typ$) >>
 
-  let jsmeth = Gram.Entry.mk "jsmeth"
+  let rdollar = Gram.Entry.mk "rdollar"
 
   EXTEND Gram
-    jsmeth: [["##"; lab = label -> (_loc, lab) ]];
+    rdollar: [["$"; lab = label -> (_loc, lab) ]];
     expr: BEFORE "."
-    ["##" RIGHTA
-     [ e = SELF; (lab_loc, lab) = jsmeth ->
-         let comp_type = fresh_type _loc in
-         access_object e lab lab_loc comp_type (fun x ->
-         <:expr< ($lid:x$#component $str:id_ml2r lab$ : $comp_type$) >>)
+    ["$" RIGHTA
+     [ e = SELF; (lab_loc, lab) = rdollar ->
+         access_object _loc e lab lab_loc
      ]];
   END
 
