@@ -27,6 +27,7 @@ module Stub = struct
   let dim = R.symbol "dim"
 
   let length = R.symbol ~generic:true "length"
+  let subset = R.symbol ~generic:true "["
   let subset2 = R.symbol ~generic:true "[["
 end
 
@@ -138,6 +139,12 @@ let dot_subset2 l i =
 
 let length l = R.int_of_t (R.eval Stub.length [ R.arg (fun x -> x) l ])
 
+let subset_ii x i j = R.eval Stub.subset [
+  R.arg (fun x -> x) x ;
+  R.arg R.int        i ;
+  R.arg R.int        j ;
+]
+  
 let subset2 x i = R.eval Stub.subset2 [
   R.arg (fun x -> x) x  ;
   R.arg R.int        i
@@ -158,7 +165,7 @@ end
 
 class type ['a] dataframe = object
   inherit ['a] listing
-  method subset : 'b. int -> int -> 'b R.t
+  method subset_ii : 'b. int -> int -> 'b R.t
 end
 
 

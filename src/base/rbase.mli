@@ -24,8 +24,8 @@ val matrix_by_rows : float list list -> matrix R.t
 
 val length : < length : int ; .. > R.t -> int
 
+val subset_ii : < subset_ii : 'b. int -> int -> 'b R.t ; .. > R.t -> int -> int -> 'b R.t
 val subset2_s : < subset2_s : 'b. string -> 'b R.t ; .. > R.t -> string -> 'b R.t
-
 val subset2 : < subset2 : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
 
 class type ['a] listing = object
@@ -37,7 +37,7 @@ end
 
 class type ['a] dataframe = object
   inherit ['a] listing
-  method subset : 'b. int -> int -> 'b R.t
+  method subset_ii : 'b. int -> int -> 'b R.t
 end
 
 
