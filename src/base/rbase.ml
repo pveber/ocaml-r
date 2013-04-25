@@ -163,10 +163,20 @@ class type ['a] listing = object
   method ty : 'a
 end
 
+let nth = subset2
+
 class type ['a] dataframe = object
   inherit ['a] listing
   method subset_ii : 'b. int -> int -> 'b R.t
 end
+
+
+
+
+
+
+
+
 
 
 
