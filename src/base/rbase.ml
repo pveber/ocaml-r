@@ -163,7 +163,10 @@ class type ['a] listing = object
   method ty : 'a
 end
 
-let nth = subset2
+let to_list (listing : 'a list #listing R.t) =
+  List.map
+    R.cast
+    (R.sexps_of_t (R.cast (listing : 'c R.t :> R.sexp) : R.sexp list R.t))
 
 class type ['a] dataframe = object
   inherit ['a] listing

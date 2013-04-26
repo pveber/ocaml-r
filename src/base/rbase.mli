@@ -35,7 +35,7 @@ class type ['a] listing = object
   method ty : 'a
 end
 
-val nth : 'a list listing R.t -> int -> 'a R.t
+val to_list : 'a list #listing R.t -> 'a R.t list
 
 class type ['a] dataframe = object
   inherit ['a] listing
