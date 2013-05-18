@@ -33,6 +33,7 @@ rule token = parse
 | '*' { TIMES }
 | '/' { DIV }
 | '&' { AMPERSAND }
+| '~' { TILDE }
 | '<' { LT }
 | '>' { GT }
 

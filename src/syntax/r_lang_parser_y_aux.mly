@@ -18,8 +18,9 @@
 %token SEMICOLON COMMA DOT LPAREN RPAREN 
 %token LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIV SHARP
-%token LT GT AMPERSAND
+%token LT GT AMPERSAND TILDE
 %token EQUAL ASSIGN EOL EOI
+%left TILDE
 %left AMPERSAND
 %left LT GT
 %left PLUS MINUS
@@ -72,6 +73,8 @@ expr:
     { Expr_apply (e,args) }
 | LPAREN e = expr RPAREN
     { e }
+| e = expr TILDE f = expr
+    { Expr_op (e, Op_tilde, f) }
 | e = expr AMPERSAND f = expr
     { Expr_op (e, Op_and, f) }
 | e = expr GT f = expr

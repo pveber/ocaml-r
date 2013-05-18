@@ -33,6 +33,7 @@ and operator =
   | Op_and
   | Op_lt
   | Op_gt
+  | Op_tilde
 
 let lvalue_to_string = function
 | Lval_id id -> id
@@ -71,6 +72,7 @@ and op_to_string = function
 | Op_and -> "&"
 | Op_gt -> ">"
 | Op_lt -> "<"
+| Op_tilde -> "~"
 
 
 
