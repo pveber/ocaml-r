@@ -17,6 +17,7 @@
 
 rule token = parse
 | [' ''\t']+ { token lexbuf }
+| "\\\n" { token lexbuf }
 | '\n' { EOL }
 | "<-" { ASSIGN }
 | ';' { SEMICOLON }
