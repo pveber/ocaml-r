@@ -54,48 +54,6 @@
 
 /**********************************************************************
  *                                                                    *
- *                 Error handling from R to OCaml                     *
- *                                                                    *
- **********************************************************************/
-
-
-/* Transmitting errors from R to Objective Caml is a rather painful
-   topic. Essentially because it is undocumented, but also not
-   supported by the R API. And not even "public". So we have to resort
-   to writing our own headers to cope with this. For discussion, see
-   posting https://stat.ethz.ch/pipermail/r-help/2008-August/171493.html */
-
-void R_SetErrorHook(void (*hook)(SEXP, char *));
-
-/* This header allows us to access a function that sets hooks for error
-   handling. Moreover, each time an error occurs, the hook is removed. So
-   you have to re-hook the hook from code within the hook itself...
-   Moreover, behaviour when coping recursively with errors is unknown. */
-
-/* The global variables where we cache our error status. */
-
-/* TODO: We have to think through the interaction between the
-   ocamlr_error_call variable and the R GC. */
-
-static SEXP ocamlr_error_call = NULL;
-static char * ocamlr_error_message = NULL;
-
-/* The hook in charge of caching the error status. */
-
-static void ocamlr_error_hook(SEXP call, char * message) {
-  ocamlr_error_call = call;
-  ocamlr_error_message = message;
-  R_SetErrorHook(&ocamlr_error_hook);
-}
-
-CAMLprim value ocamlr_init_error_hook (value ml_unit) {
-  R_SetErrorHook(&ocamlr_error_hook);
-  return Val_unit;
-}
-
-
-/**********************************************************************
- *                                                                    *
  *                   Beta reduction of R calls.                       *
  *                                                                    *
  **********************************************************************/
@@ -141,11 +99,6 @@ CAMLprim value ocamlr_eval_sxp (value sexp_list) {
   CAMLreturn(Val_sexp(e));
 }
 
-//CAMLprim value r_apply_closure (value call, value op, value arglist) {
-//  CAMLparam3(call, op, arglist);
-//  CAMLreturn(Val_sexp(Rf_applyClosure(Sexp_val(call), Sexp_val(op),
-//    Sexp_val(arglist), R_GlobalEnv, R_BaseEnv)));
-//}
 
 
 
