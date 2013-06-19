@@ -100,7 +100,6 @@ CAMLprim value ocamlr_init_error_hook (value ml_unit) {
  *                                                                    *
  **********************************************************************/
 
-
 CAMLprim value ocamlr_eval_sxp (value sexp_list) {
 
   /* sexp_list is an OCaml value containing a SEXP of sexptype LANGSXP.
@@ -115,7 +114,8 @@ CAMLprim value ocamlr_eval_sxp (value sexp_list) {
      checking being done in the scope of the R_tryEval function, and it
      would be nice to shortcut it with statically typed equivalents. */
 
-  CAMLparam0();
+  CAMLparam1(sexp_list);
+  CAMLlocalN(error_arguments,2);
 
   SEXP e;        // Placeholder for the result of beta-reduction.
   int error = 0; // Error catcher boolean.
@@ -127,32 +127,20 @@ CAMLprim value ocamlr_eval_sxp (value sexp_list) {
 
   /* Implements error handling from R to Objective Caml. */
   if (error) {
-
-    value ml_error_call = Val_unit;
-    value ml_error_message = Val_unit;
-
-    Begin_roots2(ml_error_call, ml_error_message);
-
-    ml_error_call = Val_sexp(ocamlr_error_call);
+    error_arguments[0] = Val_sexp(ocamlr_error_call);
     ocamlr_error_call = NULL;      //should check for a memory leak here...
                                    //depends on GC status of prior error_call.
 
-    ml_error_message = caml_copy_string(ocamlr_error_message);
+    error_arguments[1] = caml_copy_string(ocamlr_error_message);
     ocamlr_error_message = NULL;   //should check for a memory leak here...
                                    //it seems to me that a string is leaked here.
-
-    value error_result = caml_alloc_small(2, 0);
-    Store_field(error_result, 0, ml_error_call);
-    Store_field(error_result, 1, ml_error_message);
 
     /* The exception callback mechanism is described on the webpage
        http://www.pps.jussieu.fr/Livres/ora/DA-OCAML/book-ora118.html
        We should check to see if we could avoid the string-name lookup
        to avoid unnecessary delays in exception handling. */
 
-    caml_raise_with_arg(*caml_named_value("OCaml-R generic error"), error_result);
-
-    End_roots();
+    caml_raise_with_args(*caml_named_value("OCaml-R generic error"), 2, error_arguments);
   }
 
   CAMLreturn(Val_sexp(e));
