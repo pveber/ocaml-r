@@ -127,13 +127,8 @@ CAMLprim value ocamlr_eval_sxp (value sexp_list) {
 
   /* Implements error handling from R to Objective Caml. */
   if (error) {
-    error_arguments[0] = Val_sexp(ocamlr_error_call);
-    ocamlr_error_call = NULL;      //should check for a memory leak here...
-                                   //depends on GC status of prior error_call.
-
-    error_arguments[1] = caml_copy_string(ocamlr_error_message);
-    ocamlr_error_message = NULL;   //should check for a memory leak here...
-                                   //it seems to me that a string is leaked here.
+    error_arguments[0] = sexp_list;
+    error_arguments[1] = caml_copy_string(R_curErrorBuf());
 
     /* The exception callback mechanism is described on the webpage
        http://www.pps.jussieu.fr/Livres/ora/DA-OCAML/book-ora118.html
