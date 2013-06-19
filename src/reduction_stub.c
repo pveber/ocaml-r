@@ -51,7 +51,6 @@
 /* TODO: fix memory leaks... */
 
 
-
 /**********************************************************************
  *                                                                    *
  *                   Beta reduction of R calls.                       *
@@ -98,7 +97,6 @@ CAMLprim value ocamlr_eval_sxp (value sexp_list) {
 
   CAMLreturn(Val_sexp(e));
 }
-
 
 
 
