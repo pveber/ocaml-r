@@ -76,6 +76,13 @@ CAMLprim value ocamlr_initEmbeddedR (value ml_argv, value ml_sigs) {
   // This is the libR.so function.
   i = Rf_initEmbeddedR(length, argv);
 
+  // The interpreter is not in an interactive context, and we should prevent it from
+  // prompting a user or using printing trickery that's only meaningful in a terminal.
+  // see [http://stat.ethz.ch/R-manual/R-patched/library/base/html/interactive.html]
+  // and [http://cran.r-project.org/doc/manuals/R-exts.html#Embedding-R-under-Unix_002dalikes]
+  // for technical details
+  R_Interactive = 0;
+
   // Returns 1 if R is correctly initialised.
   return Val_int(i);
 }
