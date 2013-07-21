@@ -111,7 +111,7 @@ Library R_grDevices
 Executable test_suite
   Path:                 examples
   MainIs:               test_suite.ml
-  BuildDepends:         R, R.base
+  BuildDepends:         R, R_base
   Install:              false
 
 Document doclib
