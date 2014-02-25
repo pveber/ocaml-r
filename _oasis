@@ -1,4 +1,4 @@
-OASISFormat:    0.3
+OASISFormat:    0.4
 OCamlVersion:   >= 3.12.0
 Name:           ocaml-r
 Version:        2010-02-09
@@ -8,6 +8,7 @@ LicenseFile:    LICENSE
 Plugins:        META (0.3), DevFiles (0.3)
 Buildtools:     ocamlbuild
 Synopsis:       Objective Caml binding embedding R's interpreter into OCaml code
+BetaFeatures:	section_object
 
 Library R_math
   FindlibName:          math
