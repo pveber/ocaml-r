@@ -65,9 +65,9 @@ external string_of_charsxp : charvecsxp -> string = "ocamlr_internal_string_of_c
 
 let list_of_vecsxp (access : 'a vecsxp -> int -> 'b) (s : 'a vecsxp) =
   let lngth = length_of_vecsxp s in
-  let rec aux n s = match n with | 0 -> [] | _ ->
-    let x = access s (lngth - n) in x::(aux (n - 1) s)
-  in aux lngth s
+  let rec aux n accu = match n with | 0 -> accu | _ ->
+    let x = access s (n - 1) in aux (n - 1) (x :: accu)
+  in aux lngth []
 
 let vecsxp_of_list (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'b -> unit) (l: 'b list) =
   let s = alloc (List.length l) in

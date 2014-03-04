@@ -14,7 +14,9 @@ let _ =
     R.Runtime_error (x,y) -> print_endline y
 ;;
 
-
+let _ =
+  let l = [ 1. ; 2. ; 3. ] in
+  assert (l = R.floats_of_t (R.floats l))
 
 
 
