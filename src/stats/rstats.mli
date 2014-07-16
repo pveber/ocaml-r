@@ -18,7 +18,7 @@ val lm : 'a R.t -> ?data:'b R.t -> ?subset:'c R.t -> ?weights:'d R.t ->
 
 
 (** {5 Testing} *)
-type fisher_test =
+type fisher'test =
   < p'value : float R.t ;
     conf'int : float list R.t ;
     estimate : float R.t ;
@@ -27,13 +27,22 @@ type fisher_test =
     _method : string R.t ;
     data'name : string R.t >
 
-val fisher_test_2x2 : 
+val fisher'test_2x2 :
   ?alternative:[`two_sided | `greater | `less] ->
-  ff:int -> ft:int -> tf:int -> tt:int -> unit -> fisher_test listing R.t
+  ff:int -> ft:int -> tf:int -> tt:int -> unit -> fisher'test listing R.t
 
-val fisher_test :
+val fisher'test :
   ?alternative:[`two_sided | `greater | `less] ->
-  float list -> float list -> fisher_test listing R.t
+  float list -> float list -> fisher'test listing R.t
+
+val ks'test :
+  ?alternative:[`two_sided | `greater | `less] ->
+  float list -> float list ->
+  < statistic : float R.t ;
+    p'value : float R.t ;
+    alternative : string R.t ;
+    _method : string R.t ;
+    data'name : string R.t > listing R.t
 
 val p'adjust :
   ?method_ : [`holm | `hochberg | `hommel | `bonferroni | `BH | `BY | `fdr] ->

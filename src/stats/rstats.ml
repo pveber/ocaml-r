@@ -10,7 +10,9 @@ module Stub = struct
 
   let stl = R.symbol "stl"
 
-  let fisher_test = R.symbol "fisher.test"
+  let ks'test = R.symbol "ks.test"
+
+  let fisher'test = R.symbol "fisher.test"
 
   let poisson_test = R.symbol "poisson.test"
 
@@ -71,7 +73,7 @@ let string_of_test_kind = function
 | `greater -> "greater"
 | `less -> "less"
 
-type fisher_test =
+type fisher'test =
   < p'value : float R.t ;
     conf'int : float list R.t ;
     estimate : float R.t ;
@@ -80,27 +82,34 @@ type fisher_test =
     _method : string R.t ;
     data'name : string R.t >
 
-let fisher_test ?alternative v v' = 
-  R.eval Stub.fisher_test [
+let fisher'test ?alternative v v' =
+  R.eval Stub.fisher'test [
     R.arg R.floats v ;
     R.arg R.floats v' ;
     R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
   ]
 
-let fisher_test_2x2 ?alternative ~ff ~ft ~tf ~tt () = 
+let fisher'test_2x2 ?alternative ~ff ~ft ~tf ~tt () =
   let data = List.map float [ ff ; ft ; tf ; tt ] in
-  R.eval Stub.fisher_test [
+  R.eval Stub.fisher'test [
     R.arg (fun x -> matrix ~nrow:2 ~ncol:2 x) data ;
     R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
   ]
 
+let ks'test ?alternative v v' =
+  R.eval Stub.ks'test [
+    R.arg R.floats v ;
+    R.arg R.floats v' ;
+    R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
+  ]
+
 let string_of_p'adjust_method = function
-| `fdr -> "fdr" 
-| `holm -> "holm" 
-| `hochberg -> "hochberg" 
-| `hommel -> "hommel" 
-| `bonferroni -> "bonferroni" 
-| `BH -> "BH" 
+| `fdr -> "fdr"
+| `holm -> "holm"
+| `hochberg -> "hochberg"
+| `hommel -> "hommel"
+| `bonferroni -> "bonferroni"
+| `BH -> "BH"
 | `BY -> "BY"
 
 let p'adjust ?method_ data =
