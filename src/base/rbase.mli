@@ -22,16 +22,17 @@ val matrix : ?byrow:bool -> nrow:int -> ncol:int -> float list -> matrix R.t
 val matrix_by_rows : float list list -> matrix R.t
 
 
-val length : < length : int ; .. > R.t -> int
+val length : < length : int R.t ; .. > R.t -> int
 
 val subset_ii : < subset_ii : 'b. int -> int -> 'b R.t ; .. > R.t -> int -> int -> 'b R.t
 val subset2_s : < subset2_s : 'b. string -> 'b R.t ; .. > R.t -> string -> 'b R.t
 val subset2 : < subset2 : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
+val dim : < dim : float list R.t ; .. > R.t -> float list R.t
 
 class type ['a] listing = object
   method subset2_s : 'b. string -> 'b R.t
   method subset2   : 'b. int -> 'b R.t
-  method length : int
+  method length : int R.t
   method ty : 'a
 end
 
@@ -40,6 +41,7 @@ val to_list : 'a list #listing R.t -> 'a R.t list
 class type ['a] dataframe = object
   inherit ['a] listing
   method subset_ii : 'b. int -> int -> 'b R.t
+  method dim : float list R.t
 end
 
 

@@ -159,7 +159,7 @@ let subset2_s x label = R.eval Stub.subset2 [
 class type ['a] listing = object
   method subset2_s : 'b. string -> 'b R.t
   method subset2   : 'b. int -> 'b R.t
-  method length : int
+  method length : int R.t
   method ty : 'a
 end
 
@@ -168,9 +168,12 @@ let to_list (listing : 'a list #listing R.t) =
     R.cast
     (R.sexps_of_t (R.cast (listing : 'c R.t :> R.sexp) : R.sexp list R.t))
 
+let dim df = R.eval (R.symbol "dim") [ R.arg (fun x -> x) df ]
+
 class type ['a] dataframe = object
   inherit ['a] listing
   method subset_ii : 'b. int -> int -> 'b R.t
+  method dim : float list R.t
 end
 
 
