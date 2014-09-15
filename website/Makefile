@@ -1,4 +1,4 @@
-include ../master.Makefile
+#include ../master.Makefile
 
 #MYSITE=/gnu/mysite/mysite
 MYSITE=/opt/mysite/mysite

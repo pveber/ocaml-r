@@ -47,7 +47,7 @@ let () =
       dispatch_default hook;
       match hook with
       | After_rules ->
-          rule "standard module generation" 
+          rule "standard module generation"
             ~prods:["src/standard.ml"]
             ~deps:["src/standard.R"]
             begin fun _ _ ->
@@ -71,10 +71,14 @@ let () =
             let cnv flag = [A ocaml_flag; A flag] in
             List.concat (List.map cnv chunks)
           in
-          let split_flags flags =
+          let ldify flags =
             let chunks = split_string flags in
-            let cnv flag = A flag in
-            List.map cnv chunks
+            let cnv flag =
+              if String.length flag >= 2 && (let prefix = String.sub flag 0 2 in prefix = "-l" || prefix = "-L")
+              then [ A flag ]
+              else [ A "-ldopt" ; A flag ]
+            in
+            List.concat (List.map cnv chunks)
           in
           let olibR_cflags =
             let cmd = "pkg-config --cflags libR" in
@@ -86,7 +90,7 @@ let () =
             let cmd = "pkg-config --libs libR" in
             match read_lines_from_cmd ~max_lines:1 cmd with
             | [libs] ->
-                S (split_flags libs), S (ocamlify ~ocaml_flag:"-cclib" libs)
+                S (ldify libs), S (ocamlify ~ocaml_flag:"-cclib" libs)
             | _ -> failwith "pkg-config failed for libs"
           in
           let olibRmath_cflags =
@@ -99,7 +103,7 @@ let () =
             let cmd = "pkg-config --libs libRmath" in
             match read_lines_from_cmd ~max_lines:1 cmd with
             | [libs] ->
-                S (split_flags libs), S (ocamlify ~ocaml_flag:"-cclib" libs)
+                S (ldify libs), S (ocamlify ~ocaml_flag:"-cclib" libs)
             | _ -> failwith "pkg-config failed for libs"
           in
           flag ["compile"; "c"] olibR_cflags;
@@ -117,20 +121,7 @@ let () =
           flag ["ocaml"; "ocamldep"; "pa_rscript"] & S[A"-ppopt"; A "src/syntax/R_syntax.cma"];
           flag ["ocaml"; "doc"; "pa_rscript"] & S[A"-ppopt"; A "src/syntax/R_syntax.cma"];
           dep ["ocaml"; "ocamldep"; "pa_rscript"] ["src/syntax/R_syntax.cma"]
-          
+
 
       | _ ->
           ())
-
-
-
-
-
-
-
-
-
-
-
-
-
