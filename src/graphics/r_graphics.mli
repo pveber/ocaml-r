@@ -1,5 +1,5 @@
 (** Runtime R graphics library. *)
-open Rbase
+open R_base
 
 type hist = < breaks : float list R.t ;
               counts : float list R.t ;
@@ -7,30 +7,11 @@ type hist = < breaks : float list R.t ;
               mids : float list R.t ;
               xname : string R.t ;
               equidist : bool R.t >
-val hist : 
+val hist :
   ?breaks:[`n of int | `l of float list R.t | `m of [`Sturges | `Scott | `FD]] ->
   ?freq:bool ->
   ?include_lowest:bool ->
   ?right:bool ->
   ?main:string -> ?xlab:string -> ?ylab:string ->
-  ?xlim:float -> ?ylim:float -> 
+  ?xlim:float -> ?ylim:float ->
   float list R.t -> hist listing R.t
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

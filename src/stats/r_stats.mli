@@ -1,5 +1,5 @@
 (** Runtime R statistics library. *)
-open Rbase
+open R_base
 
 val rnorm : ?mean:float -> ?sd:float -> int -> float list R.t
 (** Random generation for the normal distribution. [mean] and [sd] default to [0.]

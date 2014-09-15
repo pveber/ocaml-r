@@ -14,8 +14,8 @@ Library R_math
   FindlibName:          math
   FindlibParent:        R
   Path:                 src/math
-  Modules:              Rmath
-  CSources:             rmath_stubs.c, wrappers.h
+  Modules:              R_math
+  CSources:             r_math_stubs.c, wrappers.h
 
 
 Library R
@@ -57,14 +57,14 @@ Library R
 Object R_interpreter
   FindlibFullName:      R.interpreter
   Path:                 src
-  Modules:              OCamlR
+  Modules:              R_interpreter
   BuildDepends:         R
 
 Library R_base
   FindlibName:          base
   FindlibParent:        R
   Path:                 src/base
-  Modules:              Rbase
+  Modules:              R_base
   BuildDepends:         R.interpreter
 
 
@@ -72,7 +72,7 @@ Library R_methods
   FindlibName:          methods
   FindlibParent:        R
   Path:                 src/methods
-  Modules:              Rmethods
+  Modules:              R_methods
   BuildDepends:         R.interpreter
 
 Library R_syntax
@@ -90,7 +90,7 @@ Library R_stats
   FindlibName:          stats
   FindlibParent:        R
   Path:                 src/stats
-  Modules:              Rstats
+  Modules:              R_stats
   BuildDepends:         R.interpreter, R.base
 
 
@@ -98,7 +98,7 @@ Library R_graphics
   FindlibName:          graphics
   FindlibParent:        R
   Path:                 src/graphics
-  Modules:              Rgraphics
+  Modules:              R_graphics
   BuildDepends:         R.interpreter, R.base
 
 
@@ -106,13 +106,13 @@ Library R_grDevices
   FindlibName:          grDevices
   FindlibParent:        R
   Path:                 src/grDevices
-  Modules:              RgrDevices
+  Modules:              R_grDevices
   BuildDepends:         R.interpreter
 
 Executable test_suite
   Path:                 examples
   MainIs:               test_suite.ml
-  BuildDepends:         R, R.base
+  BuildDepends:         R.base
   Install:              false
 
 Document doclib

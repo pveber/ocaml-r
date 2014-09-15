@@ -1,4 +1,4 @@
-open Rbase
+open R_base
 
 let () = ignore (R.eval_string "require(stats, quietly=TRUE)")
 

@@ -1,5 +1,3 @@
-module M = OCamlR
-
 let _ =
   try
     ignore (R.eval_string "azer")
