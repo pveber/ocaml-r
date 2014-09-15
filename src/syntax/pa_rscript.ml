@@ -20,22 +20,22 @@ let script_expander _loc _ s =
   let ast = R_lang_parser_y.prog R_lang_lexer.token buf in
   let body = R_lang_ast.to_string ast
   and arguments = R_lang_ast.free_variables ast in
-  let oc = open_out "delme.R" in 
+  let oc = open_out "delme.R" in
   fprintf oc "%s" body ;
   close_out oc ;
   let code =
     sprintf "f <- function(%s) {\n%s}\n"
       (String.concat "," (List.map (fun (x,_,_) -> x) arguments))
-      body 
+      body
   and conversion_expr =
     List.fold_right
-      (fun (var,typ,e) accu -> 
+      (fun (var,typ,e) accu ->
 	let arg = match typ with
 	  | `r -> <:expr< R.arg (fun x -> x) $e$>>
 	  | `int -> <:expr< R.arg R.int $e$>>
 	  | `string -> <:expr< R.arg R.string $e$>>
 	  | `vector -> <:expr< R.arg R.floats $e$>>
-	in 
+	in
 	<:expr< [ $arg$ :: $accu$ ] >>)
       arguments <:expr< [] >>
   in
@@ -47,21 +47,3 @@ let script_expander _loc _ s =
   >>
 
 let () = Quotation.(add "rscript" Quotation.DynAst.expr_tag) script_expander
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -4,5 +4,6 @@
 <src/syntax/*.ml>:    syntax_camlp4o, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations
 #<examples/*.ml>: syntax_camlp4o, pa_rscript
 <examples/*.byte>: use_R_interpreter
+<src/stats/*.ml>: syntax_camlp4o, pa_rscript, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations.rx
 true: use_menhir, annot
 <src/syntax/*.mlypack>: pkg_camlp4.lib

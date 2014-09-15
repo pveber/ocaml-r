@@ -1,5 +1,5 @@
-(* 
- * Adapted from: 
+(*
+ * Adapted from:
  *
  * Js_of_ocaml library
  * http://www.ocsigen.org/js_of_ocaml/
@@ -62,10 +62,10 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
     r
   )
 
-  let id_ml2r id = 
-    let r = string_map (function '\'' -> '.' | x -> x) id in 
+  let id_ml2r id =
+    let r = string_map (function '\'' -> '.' | x -> x) id in
     String.(
-      if length r > 0 && r.[0] = '_' then 
+      if length r > 0 && r.[0] = '_' then
         sub r 1 (length r - 1)
       else r
     )
@@ -76,7 +76,7 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
     let obj_type = fresh_type _loc in
     let constr =
       let y = random_var () in
-      <:expr< fun () -> let (_ : Rbase.compound (< .. > as $obj_type$)) = $lid:x$#compound in 
+      <:expr< fun () -> let (_ : R_base.compound (< .. > as $obj_type$)) = $lid:x$#compound in
                         fun ($lid:y$ : $obj_type$) -> ($lid:y$#$m$ : $comp_type$) >>
     in
     <:expr< let $lid:x$ = $e$ in
@@ -95,9 +95,9 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
       in
       <:expr< fun ($lid:y$ : $obj_type$) -> $body$ >>
     in
-    <:expr< let $lid:x$ = ($e$ : R.t (#Rbase.listing (< .. > as $obj_type$))) in
+    <:expr< let $lid:x$ = ($e$ : R.t (#R_base.listing (< .. > as $obj_type$))) in
             let _ = $constr$ in
-            (Rbase.subset2_s $lid:x$ $str:id_ml2r m$ : $m_typ$) >>
+            (R_base.subset2_s $lid:x$ $str:id_ml2r m$ : $m_typ$) >>
 
   let rdollar = Gram.Entry.mk "rdollar"
 
