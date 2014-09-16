@@ -300,6 +300,12 @@ val sexps_of_t : sexp list t -> sexp list
 
 (**  {2 Inspection and specification of internals.} *)
 
+(** {5 Handling possibly null values} *)
+
+val is_nil : _ t -> bool
+val nil_map : 'a t -> f:('a t -> 'b) -> 'b option
+
+
 (**  Provides a module with strong data types and typing,
   *  aiming to be an indirect specification of low-level
   *  structure of SEXPs.

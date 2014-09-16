@@ -31,6 +31,11 @@ open Sexptype
 open Sexprec
 open Conversion
 
+let is_nil x = sexptype (x : _ t :> sexp) = NilSxp
+let nil_map x ~f =
+  if is_nil x then None
+  else Some (f x)
+
 module Specification = struct
 
   type symbol = (string * (sexp option)) option option
