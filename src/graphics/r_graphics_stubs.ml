@@ -18,7 +18,8 @@ let plot ?main ?xlab ?ylab ?xlim ?ylim x =
     R.opt id "ylim" ylim ;
   ]
 
-let plot2 ?main ?xlab ?ylab ?xlim ?ylim x y =
+let plot2
+ ?main ?xlab ?ylab ?xlim ?ylim x y =
   R.eval Symbol.plot [
     R.arg id x ;
     R.arg id y ;

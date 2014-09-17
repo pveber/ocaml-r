@@ -6,7 +6,6 @@ let ( |? ) o f = match o with
   | None -> None
 
 module Symbol = struct
-  let fisher'test = R.symbol "fisher.test"
   let ks'test = R.symbol "ks.test"
   let p'adjust = R.symbol "p.adjust"
 end
@@ -42,11 +41,10 @@ class fisher'test o = object
 end
 
 let fisher'test ?alternative v v' =
-  R.eval Symbol.fisher'test [
-    R.arg R.floats v ;
-    R.arg R.floats v' ;
-    R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
-  ]
+  R_stats_stubs.fisher'test
+    ?alternative:(alternative |? string_of_test_kind |? R.string)
+    (R.floats v)
+    (R.floats v')
   |> new fisher'test
 
 

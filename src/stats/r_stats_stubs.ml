@@ -17,6 +17,8 @@ module Symbol = struct
   let cor = R.symbol "cor"
   let lm = R.symbol "lm"
   let stl = R.symbol "stl"
+
+  let fisher'test = R.symbol "fisher.test"
   let poisson_test = R.symbol "poisson.test"
   let shapiro_test = R.symbol "shapiro.test"
   let fitted = R.symbol "fitted"
@@ -28,6 +30,13 @@ let rnorm ?mean ?sd n =
     R.arg id n ;
     R.opt id "mean" mean ;
     R.opt id "sd" sd
+  ]
+
+let fisher'test ?alternative v v' =
+  R.eval Symbol.fisher'test [
+    R.arg id v ;
+    R.arg id v' ;
+    R.opt id "alternative" alternative ;
   ]
 
 let cor x ?y ?use ?cor_method () =
