@@ -3,7 +3,8 @@
 <src/syntax/pa_r.ml>: syntax_camlp4o, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations.r
 <src/syntax/*.ml>:    syntax_camlp4o, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations
 #<examples/*.ml>: syntax_camlp4o, pa_rscript
+<src/base/*.ml>: syntax_camlp4o, pa_r, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations.r
 <examples/*.byte>: use_R_interpreter
 <src/stats/*.ml>: syntax_camlp4o, pa_rscript, pkg_camlp4, pkg_camlp4.extend, pkg_camlp4.quotations.rx
-true: use_menhir, annot
+true: use_menhir, annot, debug
 <src/syntax/*.mlypack>: pkg_camlp4.lib

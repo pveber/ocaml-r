@@ -95,9 +95,9 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
       in
       <:expr< fun ($lid:y$ : $obj_type$) -> $body$ >>
     in
-    <:expr< let $lid:x$ = ($e$ : R.t (#R_base.listing (< .. > as $obj_type$))) in
+    <:expr< let $lid:x$ = ($e$ : R.t (#R.list_ (< .. > as $obj_type$))) in
             let _ = $constr$ in
-            (R_base.subset2_s $lid:x$ $str:id_ml2r m$ : $m_typ$) >>
+            (R_base_stubs.subset2_s $lid:x$ (R.string $str:id_ml2r m$) : $m_typ$) >>
 
   let rdollar = Gram.Entry.mk "rdollar"
 

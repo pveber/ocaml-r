@@ -108,66 +108,20 @@ module Standard : Environment
   *)
 
 
-(** {2 The type system of OCaml-R.} *)
+(** {2 Internal representation of R values.} *)
 
 type sexp
-type +'a sxp = private sexp constraint 'a =
-  [< `Nil
-  |  `Sym
-  |  `List of [< `Pair | `Call ]
-  |  `Clo
-  |  `Env
-  |  `Prom
-  |  `Special       
-  |  `Builtin
-  |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
-  ]
+
 type +'a t = private sexp
+(** Phantom-typed representation of R values. ['a] provides an
+    information on the actual type of the underlying R value. *)
 
-external cast_to_sxp : sexp -> 'a sxp = "%identity"
 external cast : sexp -> 'a t = "%identity"
+(** Upcast an SEXP to any typed representation. Of course this should
+    never be used. *)
 
-
-(** {2 Types aliases. } *)
-
-type nilsxp         = [`Nil]                                      sxp
-type symsxp         = [`Sym]                                      sxp
-type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         sxp
-and 'a internallist = [`Nil | `List of [< `Pair | `Call] as 'a]   sxp
-type langsxp        = [`List of [`Call]]                          sxp
-type closxp         = [`Clo]                                      sxp
-type envsxp         = [`Env]                                      sxp
-type promsxp        = [`Prom]                                     sxp
-type builtinsxp     = [`Builtin]                                  sxp
-type charvecsxp     = [`Vec  of [`Char]]                          sxp
-type lglvecsxp      = [`Vec  of [`Lgl ]]                          sxp
-type intvecsxp      = [`Vec  of [`Int ]]                          sxp
-type realvecsxp     = [`Vec  of [`Real]]                          sxp
-type strvecsxp      = [`Vec  of [`Str ]]                          sxp
-type rawvecsxp      = [`Vec  of [`Raw ]]                          sxp
-type exprvecsxp     = [`Vec  of [`Raw ]]                          sxp
-
-
-(** {2 Low-level SEXP typing.} *)
-
-(*type 'a sxp*)
-(**  A polymorphic type for wrapped R values. ['a] represents
-  *  the dynamic typing of the underlying R value. *)
-
-(*type env*)
-(**  Phantom type representing the ENVSXP dynamic R sexptype. *)
-
-(*type lang*)
-(**  Phantom type representing the LANGSXP dynamic R sexptype. *)
-
-(*type 'a vec*)
-(**  Polymorphic phantom type representing R array sexptypes. *)
-
-(*type 'a vecsxp = 'a vec sxp*)
-(**  Type abreviation for R array values. *)
-
-type sexptype =
 (**  Algebraic datatype reflecting R's dynamic typing. *)
+type sexptype =
   | NilSxp
   | SymSxp
   | ListSxp
@@ -198,101 +152,188 @@ val sexptype : sexp -> sexptype
 (**  Returns the R dynamic typing of a wrapped R value. *)
 
 
+(** {2 Low-level SEXP typing.} *)
+
+type nilsxp         = [`Nil]                                      t
+type symsxp         = [`Sym]                                      t
+type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         t
+and 'a internallist = [`Nil | `List of [< `Pair | `Call] as 'a]   t
+type langsxp        = [`List of [`Call]]                          t
+type closxp         = [`Clo]                                      t
+type envsxp         = [`Env]                                      t
+type promsxp        = [`Prom]                                     t
+type builtinsxp     = [`Builtin]                                  t
+type charvecsxp     = [`Vec  of [`Char]]                          t
+type lglvecsxp      = [`Vec  of [`Lgl ]]                          t
+type intvecsxp      = [`Vec  of [`Int ]]                          t
+type realvecsxp     = [`Vec  of [`Real]]                          t
+type strvecsxp      = [`Vec  of [`Str ]]                          t
+type rawvecsxp      = [`Vec  of [`Raw ]]                          t
+type exprvecsxp     = [`Vec  of [`Raw ]]                          t
+
+
+
+(** {2 High-level SEXP typing.} *)
+
+class type ['a] ty = object
+  method repr : 'a
+end
+(** *)
+
+class type ['a] atomic_vector = object
+  inherit ['a list] ty
+  method length : int
+end
+
+class type ['a] scalar = object
+  inherit ['a] atomic_vector
+  method scalar : 'a
+end
+
+class type reals = object
+  inherit [float] atomic_vector
+end
+
+class type real = object
+  inherit [float] scalar
+end
+
+class type integers = object
+  inherit [int] atomic_vector
+end
+
+class type integer = object
+  inherit [int] scalar
+end
+
+class type strings = object
+  inherit [string] atomic_vector
+end
+
+class type string_ = object
+  inherit [string] scalar
+end
+
+class type logicals = object
+  inherit [bool] atomic_vector
+end
+
+class type logical = object
+  inherit [bool] scalar
+end
+
+class type ['a] s3 = object
+  inherit ['a] ty
+  method classes : string list
+end
+
+class type ['a] list_ = object
+  inherit ['a] s3 constraint 'a = < .. >
+  method ty : 'a
+  method length : int
+  method subset2_s : 'b. string -> 'b
+  method subset2_i : 'b. string -> 'b
+end
+
+class type ['a] data'frame  = object
+  inherit ['a] list_
+  method dim : int * int
+end
+
 (** {2 Symbol retrieval.} *)
 
-val symbol : ?generic:bool -> string -> sexp
+val symbol : ?generic:bool -> string -> symsxp
 (**  Retrieves an R symbol from the symbol table, given its name. *)
-
 
 (** {2 Conversion functions.} *)
 
-val bools_of_t : bool list t -> bool list
+val bools_of_t : logicals t -> bool list
 (**  Converts an R array of logical values into a list of Objective
   *  Caml booleans.
   *)
 
-val bool_of_t : bool t -> bool
+val bool_of_t : logical t -> bool
 (**  Converts an R array of logical values with one element into an
   *  Objective Caml boolean.
   *)
 
-val bool : bool -> bool t
+val bool : bool -> logical t
 (**  Converts an Objective Caml boolean value to an R boolean value,
   *  that is a mono-element array of booleans.
-  *) 
+  *)
 
-val bools : bool list -> bool list t
+val bools : bool list -> logicals t
 (**  Converts an Objective Caml list of booleans into an R array
   *  of logical values.
   *)
 
-val ints_of_t : int list t -> int list
+val ints_of_t : integers t -> int list
 (**  Converts an R array of integers into a list of Objective Caml
   *  integers.
   *)
 
-val int_of_t : int t -> int
+val int_of_t : integer t -> int
 (**  Converts an R array of integers with one element into an Objective
   *  Caml integer.
   *)
 
-val int : int -> int t
+val int : int -> integer t
 (**  Converts an Objective Caml integer to an R integer value, that
   *  is a mono-element array of integers.
   *)
 
-val ints : int list -> int list t
+val ints : int list -> integers t
 (**  Converts an Objective Caml list of integers into an R array of
   *  integers.
   *)
 
-val floats_of_t : float list t -> float list
+val floats_of_t : reals t -> float list
 (**  Converts an R array of real numbers into a list of Objective
   *  Caml floats.
   *)
 
-val float_of_t : float t -> float
+val float_of_t : real t -> float
 (**  Converts an R array of floats with one element into an Objective
   *  Caml float.
   *)
 
-val float : float -> float t
+val float : float -> real t
 (**  Converts an Objective Caml float to an R real value, that is a
   *  mono-element array of real numbers.
   *)
 
-val floats : float list -> float list t
+val floats : float list -> reals t
 (**  Converts a Objective Caml list of floats into an R array of
   *  real numbers.
   *)
 
-val optfloats : float option list -> float option list t
+val optfloats : float option list -> reals t
 (**  Converts a Objective Caml list of float options into an R array of
-  *  real numbers with possibly missing values. The value [None] is 
+  *  real numbers with possibly missing values. The value [None] is
   *  converted to [NA] on the R side.
   *)
 
-val strings_of_t : string list t -> string list
+val strings_of_t : strings t -> string list
 (**  Converts an R array of strings into a list of Objective Caml
   *  strings.
   *)
 
-val string_of_t : string t -> string
+val string_of_t : string_ t -> string
 (**  Converts an R array of strings with one element into an Objective
   *  Caml string.
   *)
 
-val string : string -> string t
+val string : string -> string_ t
 (**  Converts an Objective Caml string to an R string, that is a
   *  mono-element array of strings.
   *)
 
-val strings : string list -> string list t
+val strings : string list -> strings t
 (**  Converts an Objective Caml list of strings into an R array of
   *  strings.
   *)
 
-val sexps_of_t : sexp list t -> sexp list
+val sexps_of_t : rawvecsxp -> sexp list
 (**  Converts an R array of SEXPs into an Objective Caml list of
   *  SEXPs.
   *)
@@ -300,22 +341,16 @@ val sexps_of_t : sexp list t -> sexp list
 
 (**  {2 Inspection and specification of internals.} *)
 
-(** {5 Handling possibly null values} *)
-
-val is_nil : _ t -> bool
-val nil_map : 'a t -> f:('a t -> 'b) -> 'b option
-
-
-(**  Provides a module with strong data types and typing,
-  *  aiming to be an indirect specification of low-level
-  *  structure of SEXPs.
-  *)
 module Specification : sig
-
   (** Semantic description of [SYMSXP] structures. *)
   type symbol = (string * (sexp option)) option option
-
 end
+
+val notnil : 'a t -> 'a t option
+
+val attributes : sexp -> (Specification.symbol * sexp) list
+
+val classes : sexp -> string list
 
 (**  Provides facilities to inspect internal structure of
   *  SEXPs. Useful in the toplevel when you encounter
@@ -354,32 +389,6 @@ module Pretty : sig
   val t_of_sexp : sexp -> t
 
 end
-
-
-(** {2 S3 classes.} *)
-
-(**  Virtual class for S3 objects in R. *)
-class s3 : 'a t -> object
-  val __underlying : sexp
-  (**  Access to the underlying R data structure. *)
-
-  method private attribute  : 'a. string -> 'a t
-  (**  [attribute attr_name] returns the R data structure
-    *  which is the object's attribute of name [attr_name].
-    *  The typing of this method is deliberately unsafe, in
-    *  order to allow the user to type things correctly. *)
-
-  method attributes : (Specification.symbol * sexp) list
-  (**  Returns the whole list of attributes of an S3 object. *)
-
-  method classes    : string list
-  (**  Returns the list of S3 classes that the object is
-    *  an instance of. *)
-
-end
-
-(**  Constructor of an [s3] object from an R S3 object. *)
-val s3 : 'a t -> s3
 
 
 (** {2 Parsing R code.} *)
@@ -434,7 +443,7 @@ val opt : ('a -> 'b t) -> string -> 'a option -> (string option * sexp) option
 (**  Convenience function to wrap up optional arguments, when mapping R functions
   *  to Objective Caml functions. *)
 
-val eval : sexp -> (string option * sexp) option list -> 'a t
+val eval : symsxp -> (string option * sexp) option list -> 'a t
 (**  [eval f args] evaluates an the R function [f] with respect to a list of
   *  arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
   *  argument whose optional name is [name] and whose value is [sexp]. The
@@ -490,4 +499,3 @@ module Interpreter (Env : Environment) : Interpreter
 (**  Functor used to initialise statically an R interpreter, given initialisation
   *  details provided by the provided [Env] module.
   *)
-

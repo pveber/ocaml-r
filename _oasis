@@ -64,7 +64,7 @@ Library R_base
   FindlibName:          base
   FindlibParent:        R
   Path:                 src/base
-  Modules:              R_base
+  Modules:              R_base, R_base_stubs
   BuildDepends:         R.interpreter
 
 
@@ -90,7 +90,7 @@ Library R_stats
   FindlibName:          stats
   FindlibParent:        R
   Path:                 src/stats
-  Modules:              R_stats
+  Modules:              R_stats, R_stats_stubs
   BuildDepends:         R.interpreter, R.base
 
 
@@ -114,6 +114,7 @@ Executable test_suite
   MainIs:               test_suite.ml
   BuildDepends:         R.base
   Install:              false
+  CompiledObject:		best
 
 Document doclib
   Title:                API reference for OCaml-R

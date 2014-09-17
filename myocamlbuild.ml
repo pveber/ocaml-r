@@ -116,11 +116,11 @@ let () =
           flag ["link"] olibRmath_clibs ;
 
           (* A hack for using the syntax extension internally *)
-          flag ["ocaml"; "compile"; "pa_rscript"] & S[A"-ppopt"; A "src/syntax/R_syntax.cma" ];
+          flag ["ocaml"; "compile"; "pa_r"] & S[A"-ppopt"; A "src/syntax/R_syntax.cma" ];
           flag ["ocaml"; "link"; "pa_rscript"] & S[A "src/R_interpreter.cmo"; ];
-          flag ["ocaml"; "ocamldep"; "pa_rscript"] & S[A"-ppopt"; A "src/syntax/R_syntax.cma"];
+          flag ["ocaml"; "ocamldep"; "pa_r"] & S[A"-ppopt"; A "src/syntax/R_syntax.cma"];
           flag ["ocaml"; "doc"; "pa_rscript"] & S[A"-ppopt"; A "src/syntax/R_syntax.cma"];
-          dep ["ocaml"; "ocamldep"; "pa_rscript"] ["src/syntax/R_syntax.cma"]
+          dep ["ocaml"; "ocamldep"; "pa_r"] ["src/syntax/R_syntax.cma"]
 
 
       | _ ->

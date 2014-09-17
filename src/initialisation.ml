@@ -55,7 +55,7 @@ let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
         "OCaml-R generic error"
            (* The Runtime_error is initialised with a nilsxp casted to a langsxp.
               This is ugly, but not unsafe. *)
-        (Runtime_error ((cast_to_sxp ((null_creator ()) : nilsxp :> sexp ) : langsxp ), ""))
+        (Runtime_error ((cast ((null_creator ()) : nilsxp :> sexp ) : langsxp ), ""))
   | _ -> raise Initialisation_failed
 
 module type Interpreter = sig end

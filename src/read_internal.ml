@@ -35,7 +35,7 @@ open Data
 external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
 external length_of_vecsxp   : 'a vecsxp -> int  = "ocamlr_inspect_vecsxp_length"
 
-external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
+external inspect_primsxp_offset  : [< `Special | `Builtin ] t -> int = "ocamlr_inspect_primsxp_offset"
 external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
 external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
 external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"

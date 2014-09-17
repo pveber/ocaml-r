@@ -28,49 +28,105 @@
 (* The type system of OCaml-R. *)
 
 type sexp
-type +'a sxp = sexp constraint 'a =
-  [< `Nil
-  |  `Sym
-  |  `List of [< `Pair | `Call ]
-  |  `Clo
-  |  `Env
-  |  `Prom
-  |  `Special
-  |  `Builtin
-  |  `Vec of [< `Char | `Lgl | `Int | `Real | `Str | `Raw | `Expr ]
-  ]
+
 type +'a t = sexp
 
-external cast_to_sxp : sexp -> 'a sxp = "%identity"
 external cast : sexp -> 'a t = "%identity"
 
 
 (* Type aliases. *)
 
-type nilsxp         = [`Nil]                                      sxp
-type symsxp         = [`Sym]                                      sxp
-type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         sxp
-and 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] sxp  (**  Type of low-level internal list. In R, such
+type nilsxp         = [`Nil]                                      t
+type symsxp         = [`Sym]                                      t
+type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         t
+and 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] t    (**  Type of low-level internal list. In R, such
                                                                          *  internal lists may be empty, a pairlist or
                                                                          *  a call which is somewhat similar to closure
                                                                          *  ready for execution. *)
-type langsxp        = [`List of [`Call]]                          sxp
-type pairlistsxp    = [`List of [`Pair]]                          sxp
-and pairlist        = [`Nil | `List of [`Pair]]                   sxp
-type closxp         = [`Clo]                                      sxp
-type envsxp         = [`Env]                                      sxp
-type promsxp        = [`Prom]                                     sxp
-type specialsxp     = [`Special]                                  sxp
-type builtinsxp     = [`Builtin]                                  sxp
+type langsxp        = [`List of [`Call]]                          t
+type pairlistsxp    = [`List of [`Pair]]                          t
+and pairlist        = [`Nil | `List of [`Pair]]                   t
+type closxp         = [`Clo]                                      t
+type envsxp         = [`Env]                                      t
+type promsxp        = [`Prom]                                     t
+type specialsxp     = [`Special]                                  t
+type builtinsxp     = [`Builtin]                                  t
 type 'a vecsxp      = [`Vec  of
     [< `Char | `Lgl | `Int  | `Real
     | `Str  | `Raw | `Expr ] as 'a
-  ] sxp
-type charvecsxp  = [`Vec  of [`Char]]                             sxp
-type lglvecsxp   = [`Vec  of [`Lgl ]]                             sxp
-type intvecsxp   = [`Vec  of [`Int ]]                             sxp
-type realvecsxp  = [`Vec  of [`Real]]                             sxp
-type strvecsxp   = [`Vec  of [`Str ]]                             sxp
-type rawvecsxp   = [`Vec  of [`Raw ]]                             sxp
-type exprvecsxp  = [`Vec  of [`Raw ]]                             sxp
+  ] t
+type charvecsxp  = [`Vec  of [`Char]]                             t
+type lglvecsxp   = [`Vec  of [`Lgl ]]                             t
+type intvecsxp   = [`Vec  of [`Int ]]                             t
+type realvecsxp  = [`Vec  of [`Real]]                             t
+type strvecsxp   = [`Vec  of [`Str ]]                             t
+type rawvecsxp   = [`Vec  of [`Raw ]]                             t
+type exprvecsxp  = [`Vec  of [`Raw ]]                             t
+
+
+
+class type ['a] ty = object
+  method repr : 'a
+end
+(** *)
+
+class type ['a] atomic_vector = object
+  inherit ['a list] ty
+  method length : int
+end
+
+class type ['a] scalar = object
+  inherit ['a] atomic_vector
+  method scalar : 'a
+end
+
+class type reals = object
+  inherit [float] atomic_vector
+end
+
+class type real = object
+  inherit [float] scalar
+end
+
+class type integers = object
+  inherit [int] atomic_vector
+end
+
+class type integer = object
+  inherit [int] scalar
+end
+
+class type strings = object
+  inherit [string] atomic_vector
+end
+
+class type string_ = object
+  inherit [string] scalar
+end
+
+class type logicals = object
+  inherit [bool] atomic_vector
+end
+
+class type logical = object
+  inherit [bool] scalar
+end
+
+class type ['a] s3 = object
+  inherit ['a] ty
+  method classes : string list
+end
+
+class type ['a] list_ = object
+  inherit ['a] s3 constraint 'a = < .. >
+  method ty : 'a
+  method length : int
+  method subset2_s : 'b. string -> 'b
+  method subset2_i : 'b. string -> 'b
+end
+
+class type ['a] data'frame  = object
+  inherit ['a] list_
+  method dim : int * int
+end
 
