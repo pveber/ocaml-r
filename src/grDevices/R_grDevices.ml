@@ -24,7 +24,7 @@ let string_of_length_unit = function
 
 let r_length_unit x = R.string (string_of_length_unit x)
 
-let png ?width ?height ?unit ?pointsize path = 
+let png ?width ?height ?unit ?pointsize path =
   ignore (
     R.eval Stub.png [
       R.arg R.string                  path ;
@@ -34,7 +34,7 @@ let png ?width ?height ?unit ?pointsize path =
       R.opt R.int         "pointsize" pointsize
     ])
 
-let pdf ?width ?height ?pointsize path = 
+let pdf ?width ?height ?pointsize path =
   ignore (
     R.eval Stub.pdf [
       R.arg R.string                  path ;
@@ -43,7 +43,7 @@ let pdf ?width ?height ?pointsize path =
       R.opt R.int         "pointsize" pointsize
     ])
 
-let postscript ?width ?height ?pointsize path = 
+let postscript ?width ?height ?pointsize path =
   ignore (
     R.eval Stub.postscript [
       R.arg R.string                  path ;
@@ -52,15 +52,7 @@ let postscript ?width ?height ?pointsize path =
       R.opt R.int         "pointsize" pointsize
     ])
 
-let dev_off () = 
+let dev_off () =
   ignore (
     R.eval Stub.dev_off []
   )
-
-
-
-
-
-
-
-
