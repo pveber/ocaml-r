@@ -98,7 +98,7 @@ Library R_graphics
   FindlibName:          graphics
   FindlibParent:        R
   Path:                 src/graphics
-  Modules:              R_graphics
+  Modules:              R_graphics, R_graphics_stubs
   BuildDepends:         R.interpreter, R.base
 
 
