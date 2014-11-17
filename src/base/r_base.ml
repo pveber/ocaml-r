@@ -2,14 +2,24 @@ let ( |? ) o f = match o with
   | Some x -> Some (f x)
   | None -> None
 
-let rle_gen encoder decoder l =
-  R_base_stubs.rle (encoder l)
-  |> fun o -> R.ints_of_t (o ## lengths), decoder (o ## values)
+type 'a vector_conv = {
+  encode : 'a list -> 'a R.atomic_vector R.t ;
+  decode : 'a R.atomic_vector R.t -> 'a list
+}
 
-let rle_floats l = rle_gen R.floats R.floats_of_t l
-let rle_ints l = rle_gen R.ints R.ints_of_t l
-let rle_strings l = rle_gen R.strings R.strings_of_t l
-let rle_bools l = rle_gen R.bools R.bools_of_t l
+let ints_conv = {
+  encode = R.ints ;
+  decode = R.ints_of_t
+}
+
+let rle vc elts =
+  R_base_stubs.rle (vc.encode elts)
+  |> fun o -> R.ints_of_t (o ## lengths), vc.decode (o ## values)
+
+(* let rle_floats l = rle_gen R.floats R.floats_of_t l *)
+(* let rle_ints l = rle_gen R.ints R.ints_of_t l *)
+(* let rle_strings l = rle_gen R.strings R.strings_of_t l *)
+(* let rle_bools l = rle_gen R.bools R.bools_of_t l *)
 
 
 (* class t (x : _ R.t) = object (s) *)

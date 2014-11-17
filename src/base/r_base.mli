@@ -1,9 +1,18 @@
 (**  Runtime R base library. *)
 
-val rle_ints : int list -> (int list * int list)
-val rle_floats : float list -> (int list * float list)
-val rle_strings : string list -> (int list * string list)
-val rle_bools : bool list -> (int list * bool list)
+type 'a vector_conv = {
+  encode : 'a list -> 'a R.atomic_vector R.t ;
+  decode : 'a R.atomic_vector R.t -> 'a list
+}
+
+val ints_conv : int vector_conv
+
+val rle : 'a vector_conv -> 'a list -> (int list * 'a list)
+
+(* val rle_ints : int list -> (int list * int list) *)
+(* val rle_floats : float list -> (int list * float list) *)
+(* val rle_strings : string list -> (int list * string list) *)
+(* val rle_bools : bool list -> (int list * bool list) *)
 
 (* class type t = object *)
 (*   method sexp : R.sexp *)
