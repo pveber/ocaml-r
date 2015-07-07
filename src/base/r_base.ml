@@ -1,26 +1,17 @@
-let ( |? ) o f = match o with
-  | Some x -> Some (f x)
-  | None -> None
+open R_base_types
 
-type 'a vector_conv = {
-  encode : 'a list -> 'a R.atomic_vector R.t ;
-  decode : 'a R.atomic_vector R.t -> 'a list
-}
+let rle_k encode decode xs =
+  let o = R_base_stubs.rle (encode xs) in
+  R.ints_of_t (o ## lengths), decode (o ## values)
 
-let ints_conv = {
-  encode = R.ints ;
-  decode = R.ints_of_t
-}
-
-let rle vc elts =
-  R_base_stubs.rle (vc.encode elts)
-  |> fun o -> R.ints_of_t (o ## lengths), vc.decode (o ## values)
-
-(* let rle_floats l = rle_gen R.floats R.floats_of_t l *)
-(* let rle_ints l = rle_gen R.ints R.ints_of_t l *)
-(* let rle_strings l = rle_gen R.strings R.strings_of_t l *)
-(* let rle_bools l = rle_gen R.bools R.bools_of_t l *)
-
+let rle :
+  type s. s R.scalar_format -> s list -> (int list * s list) =
+  fun format xs ->
+    match format with
+    | R.Integer -> rle_k R.ints R.ints_of_t xs
+    | R.Real -> rle_k R.floats R.floats_of_t xs
+    | R.Logical -> rle_k R.bools R.bools_of_t xs
+    | R.String -> rle_k R.strings R.strings_of_t xs
 
 (* class t (x : _ R.t) = object (s) *)
 (*   method sexp = (x : _ R.t :> R.sexp) *)

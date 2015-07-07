@@ -64,7 +64,7 @@ Library R_base
   FindlibName:          base
   FindlibParent:        R
   Path:                 src/base
-  Modules:              R_base, R_base_stubs
+  Modules:              R_base, R_base_stubs, R_base_types
   BuildDepends:         R.interpreter
 
 

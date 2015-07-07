@@ -54,17 +54,17 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
 
   let fresh_type _loc = <:ctyp< '$random_var ()$ >>
 
-  let string_map f s = String.(
+  let string_map f s = Bytes.(
     let r = copy s in
     for i = 0 to length s - 1 do
-      r.[i] <- f s.[i]
+      Bytes.set r i (f s.[i])
     done ;
     r
   )
 
   let id_ml2r id =
     let r = string_map (function '\'' -> '.' | x -> x) id in
-    String.(
+    Bytes.(
       if length r > 0 && r.[0] = '_' then
         sub r 1 (length r - 1)
       else r
@@ -95,7 +95,7 @@ module Make (Syntax : Sig.Camlp4Syntax) = struct
       in
       <:expr< fun ($lid:y$ : $obj_type$) -> $body$ >>
     in
-    <:expr< let $lid:x$ = ($e$ : R.t (#R.list_ (< .. > as $obj_type$))) in
+    <:expr< let $lid:x$ = ($e$ : R.t (#R_base_types.list_ (< .. > as $obj_type$))) in
             let _ = $constr$ in
             (R_base_stubs.subset2_s $lid:x$ (R.string $str:id_ml2r m$) : $m_typ$) >>
 

@@ -1,65 +1,8 @@
 (**  Runtime R base library. *)
 
-type 'a vector_conv = {
-  encode : 'a list -> 'a R.atomic_vector R.t ;
-  decode : 'a R.atomic_vector R.t -> 'a list
-}
+open R
 
-val ints_conv : int vector_conv
-
-val rle : 'a vector_conv -> 'a list -> (int list * 'a list)
-
-(* val rle_ints : int list -> (int list * int list) *)
-(* val rle_floats : float list -> (int list * float list) *)
-(* val rle_strings : string list -> (int list * string list) *)
-(* val rle_bools : bool list -> (int list * bool list) *)
-
-(* class type t = object *)
-(*   method sexp : R.sexp *)
-(*   method attributes : (R.Specification.symbol * R.sexp) list *)
-(* end *)
-(* val t : _ R.t -> t *)
-
-(* class type atomic_vector = object *)
-(*   inherit t *)
-(*   method length : int *)
-(* end *)
-
-(* class type reals = object *)
-(*   inherit atomic_vector *)
-(*   method get : int -> float *)
-(*   method to_floats : float list *)
-(* end *)
-(* val reals : reals R.t -> reals *)
-
-(* class type real = object *)
-(*   inherit reals *)
-(*   method to_float : float *)
-(* end *)
-(* val real : real R.t -> real *)
-
-(* class type s3 = object *)
-(*   inherit t *)
-(*   method classes : string list *)
-(* end *)
-
-
-(* class type list_ = object *)
-(*   inherit s3 *)
-(*   method length : int *)
-
-(*   (\* Subsetting -- UNSAFE! *\) *)
-(*   method get   : 'b. int -> 'b R.t *)
-(*   method get_s : 'b. string -> 'b R.t *)
-(* end *)
-
-(* class type data'frame = object *)
-(*   inherit list_ *)
-(*   method dim : int * int *)
-
-(*   (\* Subsetting -- UNSAFE! *\) *)
-(*   method subset_ii : 'b. int -> int -> 'b R.t *)
-(* end *)
+val rle : 'a R.scalar_format -> 'a list -> (int list * 'a list)
 
 (* (\**  Sampling function. *\) *)
 (* val sample : 'a list R.t -> int -> ?replace: bool -> ?prob: float list -> unit -> 'a list R.t *)
