@@ -2,6 +2,14 @@
 
 open R_base_types
 
+val length : < length : int ; .. > R.t -> int
+val dim : < dim : R.integers R.t ; .. > R.t -> int * int
+
+val subset : < subset : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
+val subset_ii : < subset_ii : 'b. int -> int -> 'b R.t ; .. > R.t -> int -> int -> 'b R.t
+val subset2_s : < subset2_s : 'b. string -> 'b R.t ; .. > R.t -> string -> 'b R.t
+val subset2_i : < subset2_i : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
+
 val rle : 'a R.scalar_format -> 'a list -> (int list * 'a list)
 
 (**  Sampling function. *)
@@ -31,13 +39,6 @@ val sample :
 
 (* val matrix_by_rows : float list list -> matrix R.t *)
 
-
-val length : < length : int ; .. > R.t -> int
-
-(* val subset_ii : < subset_ii : 'b. int -> int -> 'b R.t ; .. > R.t -> int -> int -> 'b R.t *)
-val subset2_s : < subset2_s : 'b. string -> 'b R.t ; .. > R.t -> string -> 'b R.t
-val subset2_i : < subset2_i : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
-(* val dim : < dim : float list R.t ; .. > R.t -> float list R.t *)
 
 (* class type ['a] listing = object *)
 (*   method subset2_s : 'b. string -> 'b R.t *)

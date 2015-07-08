@@ -6,6 +6,15 @@ let ( |? ) o f = match o with
 
 let length l = R.int_of_t (R_base_stubs.length l)
 
+let dim x =
+  R_base_stubs.dim x
+  |> R.ints_of_t
+  |> (function
+      | [ x ; y ] -> x, y
+      | _ -> assert false)
+
+let subset x i = R_base_stubs.subset x (R.int i)
+let subset_ii x i j = R_base_stubs.subset_ii x (R.int i) (R.int j)
 let subset2_i x i = R_base_stubs.subset2_i x (R.int i)
 let subset2_s x s = R_base_stubs.subset2_s x (R.string s)
 
@@ -31,21 +40,6 @@ let sample x n ?replace ?prob () =
     ()
 
 
-(* let dim_sym = R.symbol "dim" *)
-
-(* let dim df = *)
-(*   R.eval dim_sym [ R.arg id df ] *)
-(*   |> R.ints_of_t *)
-(*   |> (function *)
-(*       | [ x ; y ] -> x, y *)
-(*       | _ -> assert false) *)
-
-
-(* let subset_ii x i j = R.eval subset_sym [ *)
-(*   R.arg id x ; *)
-(*   R.arg R.int i ; *)
-(*   R.arg R.int j ; *)
-(* ] *)
 
 (* class data'frame x = object *)
 (*   inherit list_ x *)
