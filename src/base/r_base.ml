@@ -1,5 +1,9 @@
 open R_base_types
 
+let ( |? ) o f = match o with
+  | Some x -> Some (f x)
+  | None -> None
+
 let rle_k encode decode xs =
   let o = R_base_stubs.rle (encode xs) in
   R.ints_of_t (o ## lengths), decode (o ## values)
@@ -13,12 +17,13 @@ let rle :
     | R.Logical -> rle_k R.bools R.bools_of_t xs
     | R.String -> rle_k R.strings R.strings_of_t xs
 
-(* class t (x : _ R.t) = object (s) *)
-(*   method sexp = (x : _ R.t :> R.sexp) *)
-(*   method attributes = R.attributes s#sexp *)
-(* end *)
-(* let t x = new t x *)
-
+let sample x n ?replace ?prob () =
+  R_base_stubs.sample
+    x
+    (R.int n)
+    ?replace:(replace |? R.bool)
+    ?prob
+    ()
 
 (* let subset_sym = R.symbol ~generic:true "[" *)
 
@@ -27,29 +32,6 @@ let rle :
 (*   R.arg R.int i ; *)
 (* ] *)
 
-(* class atomic_vector x = object *)
-(*   inherit t x *)
-(*   method length = length x *)
-(* end *)
-
-
-(* class reals x = object (s) *)
-(*   inherit atomic_vector x *)
-(*   method get i = R.float_of_t (subset x i) *)
-(*   method to_floats = R.floats_of_t (R.cast s#sexp) *)
-(* end *)
-(* let reals x = new reals x *)
-
-(* class real x = object (s) *)
-(*   inherit reals x *)
-(*   method to_float = R.float_of_t (R.cast s#sexp) *)
-(* end *)
-(* let real x = new real x *)
-
-(* class s3 x = object (s) *)
-(*   inherit t x *)
-(*   method classes = R.classes s#sexp *)
-(* end *)
 
 (* let subset2_sym = R.symbol ~generic:true "[[" *)
 
@@ -62,16 +44,6 @@ let rle :
 (*   R.arg id x  ; *)
 (*   R.arg R.string label *)
 (* ] *)
-
-
-(* class list_ x = object *)
-(*   inherit s3 x *)
-(*   method length = length x *)
-(*   method get : 'a. int -> 'a R.t = *)
-(*     fun i -> subset2_i x i *)
-(*   method get_s : 'a. string -> 'a R.t = *)
-(*     fun s -> subset2_s x s *)
-(* end *)
 
 (* let dim_sym = R.symbol "dim" *)
 
@@ -124,17 +96,6 @@ let rle :
 
 
 (* end *)
-
-(* let sample (x : 'a list R.t) size ?replace ?(prob: float list option) () : 'a list R.t = *)
-(*   (\* Note that size may be left out in this R function. This *)
-(*      behaviour does not fit the R.arg behaviour, nor does it *)
-(*      fit the R.opt behaviour (since the argument should be *)
-(*      named. This type of argument has to be worked out... *\) *)
-(*   R.eval Stub.sample [ *)
-(*     (R.arg (fun x -> x)             x)      ; *)
-(*     (R.arg R.int                    size)   ; *)
-(*     (R.opt R.bool         "replace" replace); *)
-(*     (R.opt R.floats       "prob"    prob)   ] *)
 
 (* let lapply (x : 'a list R.t) (func : 'b R.t) : 'c list R.t = *)
 (*   (\* It would be nice to solve once and for all the typing of *)
@@ -195,16 +156,6 @@ let rle :
 (*                             R.arg R.int i ] *)
 
 
-(* (\* class type ['a] compound = object *\) *)
-(* (\*   method component : 'b. string -> 'b R.t *\) *)
-(* (\* end *\) *)
-
-(* (\* class ['b] listing r = object (self) *\) *)
-(* (\*   inherit R.s3 r *\) *)
-(* (\*   method names = R.strings_of_t (self#attribute "names") *\) *)
-(* (\*   method component : 'a. string -> 'a R.t = component r *\) *)
-(* (\*   method compound : 'b compound = (self :> 'b compound) *\) *)
-(* (\* end *\) *)
 
 (* (\* let listing r = new listing r *\) *)
 
@@ -235,21 +186,8 @@ let rle :
 
 
 
-(* class type ['a] listing = object *)
-(*   method subset2_s : 'b. string -> 'b R.t *)
-(*   method subset2   : 'b. int -> 'b R.t *)
-(*   method length : int R.t *)
-(*   method ty : 'a *)
-(* end *)
-
 (* let to_list (listing : 'a list #listing R.t) = *)
 (*   List.map *)
 (*     R.cast *)
 (*     (R.sexps_of_t (R.cast (listing : 'c R.t :> R.sexp) : R.sexp list R.t)) *)
 
-
-(* class type ['a] dataframe = object *)
-(*   inherit ['a] listing *)
-(*   method subset_ii : 'b. int -> int -> 'b R.t *)
-(*   method dim : float list R.t *)
-(* end *)

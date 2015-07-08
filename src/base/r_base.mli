@@ -1,11 +1,17 @@
 (**  Runtime R base library. *)
 
-open R
+open R_base_types
 
 val rle : 'a R.scalar_format -> 'a list -> (int list * 'a list)
 
-(* (\**  Sampling function. *\) *)
-(* val sample : 'a list R.t -> int -> ?replace: bool -> ?prob: float list -> unit -> 'a list R.t *)
+(**  Sampling function. *)
+val sample :
+  (< length : int ; subset : 'b. int -> 'b ; .. > as 'c) R.t ->
+  int ->
+  ?replace:bool ->
+  ?prob:R.reals R.t ->
+  unit ->
+  'c R.t
 
 (* (\**  Lapply function, somewhat like List.map.*\) *)
 (* val lapply : 'a list R.t -> 'b R.t -> 'c list R.t *)

@@ -3,7 +3,7 @@ class type ['a] list_ = object
   method ty : 'a
   method length : int
   method subset2_s : 'b. string -> 'b
-  method subset2_i : 'b. string -> 'b
+  method subset2_i : 'b. int -> 'b
 end
 
 class type ['a] data'frame  = object
