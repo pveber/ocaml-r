@@ -78,12 +78,14 @@ type _ scalar_format =
 
 class type ['a] atomic_vector = object
   inherit ['a list] ty
-  method length : int
+  method length : int (* FIXME: this should be integer t, but the
+                         mutual definition of these classes does not work
+                         due to a spurious type constraint... *)
 end
 
 class type ['a] scalar = object
   inherit ['a] atomic_vector
-  method scalar : 'a
+  method scalar : unit
 end
 
 class type reals = object
@@ -121,4 +123,17 @@ end
 class type ['a] s3 = object
   inherit ['a] ty
   method classes : string list
+end
+
+class type ['a] list_ = object
+  inherit ['a] s3 constraint 'a = < .. >
+  method ty : 'a
+  method length : int
+  method subset2_s : 'b. string -> 'b
+  method subset2_i : 'b. string -> 'b
+end
+
+class type ['a] data'frame  = object
+  inherit ['a] list_
+  method dim : int * int
 end

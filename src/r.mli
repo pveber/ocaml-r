@@ -193,7 +193,7 @@ end
 
 class type ['a] scalar = object
   inherit ['a] atomic_vector
-  method scalar : 'a
+  method scalar : unit
 end
 
 class type reals = object

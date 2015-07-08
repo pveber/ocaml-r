@@ -4,6 +4,11 @@ let ( |? ) o f = match o with
   | Some x -> Some (f x)
   | None -> None
 
+let length l = R.int_of_t (R_base_stubs.length l)
+
+let subset2_i x i = R_base_stubs.subset2_i x (R.int i)
+let subset2_s x s = R_base_stubs.subset2_s x (R.string s)
+
 let rle_k encode decode xs =
   let o = R_base_stubs.rle (encode xs) in
   R.ints_of_t (o ## lengths), decode (o ## values)
@@ -25,25 +30,6 @@ let sample x n ?replace ?prob () =
     ?prob
     ()
 
-(* let subset_sym = R.symbol ~generic:true "[" *)
-
-(* let subset x i = R.eval subset_sym [ *)
-(*   R.arg id x ; *)
-(*   R.arg R.int i ; *)
-(* ] *)
-
-
-(* let subset2_sym = R.symbol ~generic:true "[[" *)
-
-(* let subset2_i x i = R.eval subset2_sym [ *)
-(*   R.arg id x  ; *)
-(*   R.arg R.int        i *)
-(* ] *)
-
-(* let subset2_s x label = R.eval subset2_sym [ *)
-(*   R.arg id x  ; *)
-(*   R.arg R.string label *)
-(* ] *)
 
 (* let dim_sym = R.symbol "dim" *)
 
@@ -182,7 +168,6 @@ let sample x n ?replace ?prob () =
 (* (\* end *\) *)
 
 
-(* let length l = R.int_of_t (R.eval Stub.length [ R.arg (fun x -> x) l ]) *)
 
 
 
