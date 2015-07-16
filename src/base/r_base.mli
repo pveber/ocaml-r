@@ -2,19 +2,19 @@
 
 open R_base_types
 
-val length : < length : int ; .. > R.t -> int
+val length : < length : R.integer R.t ; .. > R.t -> int
 val dim : < dim : R.integers R.t ; .. > R.t -> int * int
 
-val subset : < subset : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
-val subset_ii : < subset_ii : 'b. int -> int -> 'b R.t ; .. > R.t -> int -> int -> 'b R.t
-val subset2_s : < subset2_s : 'b. string -> 'b R.t ; .. > R.t -> string -> 'b R.t
-val subset2_i : < subset2_i : 'b. int -> 'b R.t ; .. > R.t -> int -> 'b R.t
+val subset : < subset : 'b. R.integer R.t -> 'b R.t ; .. > R.t -> int -> 'b R.t
+val subset_ii : < subset_ii : 'b. R.integer R.t -> R.integer R.t -> 'b R.t ; .. > R.t -> int -> int -> 'b R.t
+val subset2_s : < subset2_s : 'b. R.string_ R.t -> 'b R.t ; .. > R.t -> string -> 'b R.t
+val subset2_i : < subset2_i : 'b. R.integer R.t -> 'b R.t ; .. > R.t -> int -> 'b R.t
 
 val rle : 'a R.scalar_format -> 'a list -> (int list * 'a list)
 
 (**  Sampling function. *)
 val sample :
-  (< length : int ; subset : 'b. int -> 'b R.t ; .. > as 'c) R.t ->
+  (< length : R.integer R.t ; subset : 'b. R.integer R.t -> 'b R.t ; .. > as 'c) R.t ->
   int ->
   ?replace:bool ->
   ?prob:R.reals R.t ->

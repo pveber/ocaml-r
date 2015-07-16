@@ -186,14 +186,22 @@ type _ scalar_format =
   | Logical : bool scalar_format
   | String : string scalar_format
 
-class type ['a] atomic_vector = object
+class type ['a, 'int] atomic_vector0 = object
   inherit ['a list] ty
-  method length : int
+  method length : 'int
+end
+
+class type ['a, 'int] scalar0 = object
+  inherit ['a, 'int] atomic_vector0
+  method scalar : unit
 end
 
 class type ['a] scalar = object
-  inherit ['a] atomic_vector
-  method scalar : unit
+  inherit ['a, (int, int) scalar0] scalar0
+end
+
+class type ['a] atomic_vector = object
+  inherit ['a, int scalar] atomic_vector0
 end
 
 class type reals = object
