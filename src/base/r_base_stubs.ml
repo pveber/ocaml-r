@@ -12,6 +12,10 @@ module Symbol = struct
   let rle = R.symbol ~generic:true "rle"
 
   let sample = R.symbol ~generic:true "sample"
+
+  let min = R.symbol ~generic:true "min"
+
+  let max = R.symbol ~generic:true "max"
 end
 
 let length l = R.eval Symbol.length [ R.arg id l ]
@@ -48,3 +52,7 @@ let sample x n ?replace ?prob () =
     R.opt id "replace" replace ;
     R.opt id "prob" prob
   ]
+
+let min x = R.eval Symbol.min [ R.arg id x ]
+let max x = R.eval Symbol.max [ R.arg id x ]
+

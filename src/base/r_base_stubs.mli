@@ -24,3 +24,5 @@ val sample :
   unit ->
   'c R.t
 
+val min : 'a #R.atomic_vector R.t -> 'a R.scalar R.t
+val max : 'a #R.atomic_vector R.t -> 'a R.scalar R.t
