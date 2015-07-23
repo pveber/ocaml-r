@@ -18,4 +18,9 @@ val postscript :
   ?pointsize:int ->
   string -> unit
 
+val svg :
+  ?width:float -> ?height:float ->
+  ?pointsize:int ->
+  string -> unit
+
 val dev_off : unit -> unit

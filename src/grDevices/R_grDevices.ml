@@ -8,6 +8,8 @@ module Stub = struct
 
   let postscript = R.symbol "postscript"
 
+  let svg = R.symbol "svg"
+
   let dev_off = R.symbol "dev.off"
 
   (* TODO: This segfaults: let dev = R.symbol "dev" *)
@@ -46,6 +48,15 @@ let pdf ?width ?height ?pointsize path =
 let postscript ?width ?height ?pointsize path =
   ignore (
     R.eval Stub.postscript [
+      R.arg R.string                  path ;
+      R.opt R.float       "width"     width ;
+      R.opt R.float       "height"    height ;
+      R.opt R.int         "pointsize" pointsize
+    ])
+
+let svg ?width ?height ?pointsize path =
+  ignore (
+    R.eval Stub.svg [
       R.arg R.string                  path ;
       R.opt R.float       "width"     width ;
       R.opt R.float       "height"    height ;
