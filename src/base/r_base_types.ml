@@ -11,3 +11,9 @@ class type ['a] data'frame  = object
   method dim : R.integers R.t
 end
 
+class type ['a] matrix = object
+  inherit ['a] R.atomic_vector
+  method dim : R.integers R.t
+  method subset : 'b. R.integer R.t -> 'b R.t
+  method subset_ii : 'b. R.integer R.t -> R.integer R.t -> 'b R.t
+end
