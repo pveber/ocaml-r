@@ -1,1 +1,23 @@
-/home/pveber/w/opam-repository/packages/ocaml-r.999/opam
+opam-version: "1"
+maintainer: "philippe.veber@gmail.com"
+authors: [
+  "Guillaume Yzyquel"
+  "Maxence Guesdon"
+  "Philippe Veber"
+]
+
+build: [
+  ["make"]
+  ["make" "install"]
+]
+
+remove: [
+  ["ocamlfind" "remove" "R"]
+]
+
+depends: [
+  "ocamlfind"
+  "calendar"
+  "oasis" {>= "0.4.0"}
+  "menhir"
+]
