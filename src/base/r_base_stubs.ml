@@ -42,6 +42,11 @@ let subset2_i x i = R.eval Symbol.subset2 [
 
 let subset2_s = subset2_i
 
+module Matrix = struct
+  let subset = subset
+  let subset_ii = subset_ii
+  let subset2 = subset2_i
+end
 
 let rle x = R.eval Symbol.rle [ R.arg id x ]
 

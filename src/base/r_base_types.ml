@@ -14,6 +14,7 @@ end
 class type ['a] matrix = object
   inherit ['a] R.atomic_vector
   method dim : R.integers R.t
-  method subset : 'b. R.integer R.t -> 'b R.t
-  method subset_ii : 'b. R.integer R.t -> R.integer R.t -> 'b R.t
+  method subset : R.integer R.t -> 'a matrix R.t
+  method subset_ii : R.integer R.t -> R.integer R.t -> 'a R.scalar R.t
+  method subset2 : R.integer R.t -> 'a R.atomic_vector R.t
 end

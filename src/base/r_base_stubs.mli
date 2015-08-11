@@ -12,6 +12,12 @@ val subset2_s : < subset2_s : 'b. R.string_ R.t -> 'b R.t ; .. > R.t -> R.string
 val subset2_i : < subset2_i : 'b. R.integer R.t -> 'b R.t ; .. > R.t -> R.integer R.t -> 'a R.t
 val dim : < dim : R.integers R.t ; .. > R.t -> R.integers R.t
 
+module Matrix : sig
+  val subset : 'a matrix R.t -> R.integer R.t -> 'a matrix R.t
+  val subset_ii : 'a matrix R.t -> R.integer R.t -> R.integer R.t -> 'a R.scalar R.t
+  val subset2 : 'a matrix R.t -> R.integer R.t -> 'a R.atomic_vector R.t
+end
+
 val rle :
   (_ #R.atomic_vector as 'a) R.t ->
   < lengths : R.integers R.t ; values : 'a R.t > list_ R.t
