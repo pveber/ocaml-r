@@ -29,8 +29,8 @@ Library R
                         Environment,
                         Initialisation,
                         Internal,
-                        Parser,
                         Promise,
+                        R_parser,
                         Read_internal,
                         Reduction,
                         S3,
@@ -50,8 +50,8 @@ Library R
                         conversion_stub.c,
                         s3_stub.c,
                         s4_stub.c,
-                        reduction_stub.c,
-                        parser_stub.c
+                        r_parser_stub.c,
+                        reduction_stub.c
 
 
 Object R_interpreter
