@@ -98,6 +98,8 @@
    Currently, it works on Debian, and someone has reported me
    that it compiles without problems on Mac OS X 10 6.3.
 
+   If you use ocp-build, you should edit the top 'build.ocp' file,
+   and then call `ocp-build init && ocp-build`.
 
 -6-  How to use the library
 ===========================

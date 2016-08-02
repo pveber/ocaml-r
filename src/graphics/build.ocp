@@ -1,0 +1,6 @@
+
+
+begin library "R_graphics"
+    files = [ "r_graphics.ml" "r_graphics_stubs.ml" ]
+    requires = [ "R_interpreter" "R_base" ]
+end

@@ -1,0 +1,6 @@
+
+
+begin library "R_stats"
+    files = [ "r_stats_stubs.ml" "r_stats.ml" ]
+    requires = [ "R" "R_interpreter" "R_base" ]
+end
