@@ -18,14 +18,14 @@ let ocamlify n =
   let n = String.tr ~target:'.' ~replacement:'\'' n in
   if Char.is_uppercase n.[0] then "_" ^ n
   else (
-    if List.mem keywords n then n ^ "_"
+    if List.mem ~equal:Caml.( = ) keywords n then n ^ "_"
     else n
   )
 
 let transform_arg_name_list = function
   | "..." :: _ -> failwith ""
   | l ->
-    if List.mem l "..." then (
+    if List.mem ~equal:Caml.( = ) l "..." then (
       if List.last_exn l = "..." then List.slice l 0 (-1)
       else failwith ""
     )
@@ -66,4 +66,4 @@ let generate_stub_ml_for_package p =
     )
 
 let () =
-  generate_stub_ml_for_package "stats"
+  generate_stub_ml_for_package "graphics"
