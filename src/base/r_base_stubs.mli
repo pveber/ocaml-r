@@ -1,3 +1,5 @@
+open OCamlR
+
 open R_base_types
 
 val length : < length : R.integer R.t ; .. > R.t -> R.integer R.t

@@ -1,3 +1,5 @@
+open OCamlR
+
 open R_base_types
 
 let ( |? ) o f = match o with
@@ -18,18 +20,18 @@ let subset_ii x i j = R_base_stubs.subset_ii x (R.int i) (R.int j)
 let subset2_i x i = R_base_stubs.subset2_i x (R.int i)
 let subset2_s x s = R_base_stubs.subset2_s x (R.string s)
 
-let rle_k encode decode xs =
-  let o = R_base_stubs.rle (encode xs) in
-  R.ints_of_t (o ## lengths), decode (o ## values)
+(* let rle_k encode decode xs = *)
+(*   let o = R_base_stubs.rle (encode xs) in *)
+(*   R.ints_of_t (o ## lengths), decode (o ## values) *)
 
-let rle :
-  type s. s R.scalar_format -> s list -> (int list * s list) =
-  fun format xs ->
-    match format with
-    | R.Integer -> rle_k R.ints R.ints_of_t xs
-    | R.Real -> rle_k R.floats R.floats_of_t xs
-    | R.Logical -> rle_k R.bools R.bools_of_t xs
-    | R.String -> rle_k R.strings R.strings_of_t xs
+(* let rle : *)
+(*   type s. s R.scalar_format -> s list -> (int list * s list) = *)
+(*   fun format xs -> *)
+(*     match format with *)
+(*     | R.Integer -> rle_k R.ints R.ints_of_t xs *)
+(*     | R.Real -> rle_k R.floats R.floats_of_t xs *)
+(*     | R.Logical -> rle_k R.bools R.bools_of_t xs *)
+(*     | R.String -> rle_k R.strings R.strings_of_t xs *)
 
 let sample x n ?replace ?prob () =
   R_base_stubs.sample

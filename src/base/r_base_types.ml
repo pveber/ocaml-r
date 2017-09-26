@@ -1,3 +1,5 @@
+open OCamlR
+
 class type ['a] list_ = object
   inherit ['a] R.s3 constraint 'a = < .. >
   method ty : 'a

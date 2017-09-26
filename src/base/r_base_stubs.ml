@@ -1,3 +1,5 @@
+open OCamlR
+
 let id x = x
 
 module Symbol = struct

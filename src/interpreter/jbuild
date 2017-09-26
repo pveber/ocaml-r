@@ -1,0 +1,7 @@
+(jbuild_version 1)
+
+(library
+ ((name            OCamlR_interpreter)
+  (public_name     OCamlR.interpreter)
+  (libraries       (OCamlR))
+  (library_flags (-linkall))))

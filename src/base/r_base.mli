@@ -1,5 +1,7 @@
 (**  Runtime R base library. *)
 
+open OCamlR
+
 open R_base_types
 
 val length : < length : R.integer R.t ; .. > R.t -> int
@@ -10,7 +12,7 @@ val subset_ii : < subset_ii : 'b. R.integer R.t -> R.integer R.t -> 'b R.t ; .. 
 val subset2_s : < subset2_s : 'b. R.string_ R.t -> 'b R.t ; .. > R.t -> string -> 'b R.t
 val subset2_i : < subset2_i : 'b. R.integer R.t -> 'b R.t ; .. > R.t -> int -> 'b R.t
 
-val rle : 'a R.scalar_format -> 'a list -> (int list * 'a list)
+(* val rle : 'a R.scalar_format -> 'a list -> (int list * 'a list) *)
 
 (**  Sampling function. *)
 val sample :

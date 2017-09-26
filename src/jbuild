@@ -1,0 +1,31 @@
+(jbuild_version 1)
+
+(library
+ ((name            OCamlR)
+  (public_name     OCamlR)
+  (libraries       (calendar))
+  (c_names         (initialisation_stub
+                        sexp
+			databridge
+                        allocation_stub
+                        read_internal_stub
+                        write_internal_stub
+                        symbols_stub
+                        conversion_stub
+                        s3_stub
+                        s4_stub
+                        r_parser_stub
+                        reduction_stub))
+  (c_flags         (:include c_flags.sexp))
+  (c_library_flags (-L/usr/lib/R/lib -lR))))
+
+(rule
+ ((targets (c_flags.sexp
+            c_library_flags.sexp))
+  (deps    (config/discover.exe))
+  (action  (run ${<} -ocamlc ${OCAMLC}))))
+
+(rule
+ ((targets (standard.ml))
+  (deps    (standard.R))
+  (action  (with-stdout-to ${@} (run Rscript ${<})))))
