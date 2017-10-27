@@ -10,9 +10,6 @@ authors: [
   "Philippe Veber"
 ]
 build: ["jbuilder" "build" "-p" name "-j" jobs]
-remove: [
-  ["ocamlfind" "remove" "R"]
-]
 depends: [
   "camlp4" {build}
   "ocamlfind"
