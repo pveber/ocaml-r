@@ -1,4 +1,0 @@
-begin library "R_math"
-    cclib = R_cclib;
-    files = [ "r_math_stubs.c"; "r_math.ml" ]
-end

@@ -1,7 +1,0 @@
-
-
-begin library "R_methods"
-    files = [ "r_methods.ml" ]
-    requires = [ "R" ]
-    
-end
