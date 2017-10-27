@@ -9,12 +9,7 @@ authors: [
   "Maxence Guesdon"
   "Philippe Veber"
 ]
-build: [
-  [make]
-]
-install: [
-  [make "install"]
-]
+build: ["jbuilder" "build" "-p" name "-j" jobs]
 remove: [
   ["ocamlfind" "remove" "R"]
 ]
@@ -22,7 +17,7 @@ depends: [
   "camlp4" {build}
   "ocamlfind"
   "calendar"
-  "oasis" {>= "0.4.0"}
+  "jbuilder"
   "menhir"
 ]
 depexts: [
