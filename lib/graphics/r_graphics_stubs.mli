@@ -1,0 +1,17 @@
+open OCaml_R
+
+val plot :
+  ?main:R.string_ R.t ->
+  ?xlab:R.string_ R.t ->
+  ?ylab:R.string_ R.t ->
+  ?xlim:R.reals R.t ->
+  ?ylim:R.reals R.t ->
+  _ R.t -> R.nilsxp
+
+val plot2 :
+  ?main:R.string_ R.t ->
+  ?xlab:R.string_ R.t ->
+  ?ylab:R.string_ R.t ->
+  ?xlim:R.reals R.t ->
+  ?ylim:R.reals R.t ->
+  _ R.t -> _ R.t -> R.nilsxp

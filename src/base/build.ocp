@@ -1,7 +1,0 @@
-
-begin library "R_base"
-    pp = R_pp
-    pp_deps = R_pp_deps
-    files = [ "r_base_types.ml" "r_base_stubs.ml" "r_base.ml" ]
-    requires = [ "R_intepreter" "R_syntax" ]
-end

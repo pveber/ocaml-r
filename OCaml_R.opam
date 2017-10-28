@@ -1,0 +1,23 @@
+opam-version: "1.2"
+maintainer: "philippe.veber@gmail.com"
+homepage: "https://github.com/pveber/OCaml-R"
+bug-reports: "https://github.com/pveber/OCaml-R/issues"
+license: "GPL"
+dev-repo: "https://github.com/pveber/OCaml-R.git"
+authors: [
+  "Guillaume Yzyquel"
+  "Maxence Guesdon"
+  "Philippe Veber"
+]
+build: ["jbuilder" "build" "-p" name "-j" jobs]
+depends: [
+  "camlp4" {build}
+  "ocamlfind"
+  "calendar"
+  "jbuilder"
+  "menhir"
+]
+depexts: [
+  [["debian"] ["r-mathlib"]]
+  [["ubuntu"] ["r-mathlib"]]
+]

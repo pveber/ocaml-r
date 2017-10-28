@@ -1,4 +1,0 @@
-begin program "R_test_suite"
-    files = [ "test_suite.ml" ]
-    requires = [ "R_interpreter" ]
-end
