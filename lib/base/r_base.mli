@@ -1,6 +1,6 @@
 (**  Runtime R base library. *)
 
-open OCamlR
+open OCaml_R
 
 open R_base_types
 

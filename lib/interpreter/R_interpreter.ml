@@ -25,6 +25,6 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-open OCamlR
+open OCaml_R
 
 include R.Interpreter (R.Standard)

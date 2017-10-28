@@ -2,5 +2,5 @@
 
 (library
  ((name            R_math)
-  (public_name     OCamlR.math)
+  (public_name     OCaml_R.math)
   (c_names         (r_math_stubs))))

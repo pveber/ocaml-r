@@ -468,12 +468,12 @@ val eval : symsxp -> (string option * sexp) option list -> 'a t
   *  You provide initialisation details through a module of module type [Environment],
   *  and [Interpreter] will set it up correctly.
   *
-  *  This functorial facility is available from the OCamlR module: This OCamlR module
+  *  This functorial facility is available from the OCaml_R module: This OCaml_R module
   *  has the sole purpose of initialising the R interpreter with the [Standard]
   *  [Environment] module. No need to worry about initialisation details.
   *
   *  To create bindings for a dependent bunch of R packages, you simply have to make
-  *  them depend on the findlib [R.interpreter] package, which involves the OCamlR
+  *  them depend on the findlib [R.interpreter] package, which involves the OCaml_R
   *  module. This is also convenient on the toplevel, where you simply have to have
   *  to invoke the [#require "R.interpreter"] directive to set up the interpreter.
   *)

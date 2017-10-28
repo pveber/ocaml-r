@@ -6,7 +6,7 @@ let write_sexp fn sexp =
   Out_channel.write_all fn ~data:(Sexp.to_string sexp)
 
 let () =
-  C.main ~name:"OCamlR" (fun c ->
+  C.main ~name:"OCaml_R" (fun c ->
     let default : C.Pkg_config.package_conf =
       { libs   = ["-lR"]
       ; cflags = []

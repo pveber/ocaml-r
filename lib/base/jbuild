@@ -1,7 +1,7 @@
 (jbuild_version 1)
 
 (library
- ((name            OCamlR_base)
-  (public_name     OCamlR.base)
-  (libraries       (OCamlR OCamlR.interpreter))
+ ((name            OCaml_R_base)
+  (public_name     OCaml_R.base)
+  (libraries       (OCaml_R OCaml_R.interpreter))
   ))

@@ -1,8 +1,8 @@
 (jbuild_version 1)
 
 (library
- ((name            OCamlR)
-  (public_name     OCamlR)
+ ((name            OCaml_R)
+  (public_name     OCaml_R)
   (libraries       (calendar))
   (c_names         (initialisation_stub
                         sexp
