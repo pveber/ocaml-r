@@ -25,3 +25,7 @@ val plot :
   x:float list ->
   ?y:float list ->
   unit -> unit
+
+val par :
+  ?mfrow:(int * int) ->
+  unit -> unit

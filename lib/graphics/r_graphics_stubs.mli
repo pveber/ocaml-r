@@ -16,3 +16,7 @@ val plot2 :
   ?xlim:R.reals R.t ->
   ?ylim:R.reals R.t ->
   _ R.t -> _ R.t -> R.nilsxp
+
+val par :
+  ?mfrow:_ R.t ->
+  unit -> _ R.t

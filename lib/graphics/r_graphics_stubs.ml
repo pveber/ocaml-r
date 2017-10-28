@@ -7,6 +7,7 @@ let id x = x
 module Symbol = struct
 
   let plot = R.symbol ~generic:true "plot"
+  let par = R.symbol "par"
 
 end
 
@@ -31,4 +32,9 @@ let plot2
     R.opt id "ylab" ylab ;
     R.opt id "xlim" xlim ;
     R.opt id "ylim" ylim ;
+  ]
+
+let par ?mfrow () =
+  R.eval Symbol.par [
+    R.opt id "mfrow" mfrow ;
   ]

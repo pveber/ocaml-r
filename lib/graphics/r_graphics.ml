@@ -49,6 +49,8 @@ let (|?) x f = match x with
 
 let float_tup (x, y) = R.floats [ x ; y ]
 
+let int_tup (x, y) = R.ints [ x ; y ]
+
 let plot ?main ?xlab ?ylab ?xlim ?ylim ~x ?y () =
   R_graphics_stubs.plot
     ?main:(main |? R.string)
@@ -58,4 +60,10 @@ let plot ?main ?xlab ?ylab ?xlim ?ylim ~x ?y () =
     ?ylim:(ylim |? float_tup)
     ?y:(y |? R.floats)
     (R.floats x)
+  |> ignore
+
+let par ?mfrow () =
+  R_graphics_stubs.par
+    ?mfrow:(mfrow |? int_tup)
+    ()
   |> ignore
