@@ -6,6 +6,8 @@ let () = ignore (R.eval_string "require(graphics, quietly=TRUE)")
 module Symbol = struct
 
   let hist = R.symbol "hist"
+  let plot = R.symbol ~generic:true "plot"
+  let par = R.symbol "par"
 
 end
 
@@ -51,19 +53,58 @@ let float_tup (x, y) = R.floats [ x ; y ]
 
 let int_tup (x, y) = R.ints [ x ; y ]
 
-let plot ?main ?xlab ?ylab ?xlim ?ylim ~x ?y () =
-  R_graphics_stubs.plot
-    ?main:(main |? R.string)
-    ?xlab:(xlab |? R.string)
-    ?ylab:(ylab |? R.string)
-    ?xlim:(xlim |? float_tup)
-    ?ylim:(ylim |? float_tup)
-    ?y:(y |? R.floats)
-    (R.floats x)
+type plot_type = [
+  | `Points
+  | `Lines
+  | `Both
+  | `Overplotted
+  | `Histogram
+  | `Stair_steps
+  | `Other_steps
+  | `Nothing
+]
+
+type log_scale = [ `X | `Y | `XY ]
+
+let r_plot_type t =
+  R.string (
+    match t with
+    | `Points -> "p"
+    | `Lines -> "l"
+    | `Both -> "b"
+    | `Overplotted -> "o"
+    | `Histogram -> "h"
+    | `Stair_steps -> "s"
+    | `Other_steps -> "S"
+    | `Nothing -> "n"
+  )
+
+let r_log_scale t =
+  R.string (
+    match t with
+    | `X -> "x"
+    | `Y -> "y"
+    | `XY -> "xy"
+  )
+
+let plot ?main ?xlab ?ylab ?xlim ?ylim ?plot_type ?lwd ?col ?log ~x ?y () =
+  R.eval Symbol.plot [
+    R.arg R.floats x ;
+    R.opt R.floats "y" y ;
+    R.opt R.string "main" main ;
+    R.opt R.string "xlab" xlab ;
+    R.opt R.string "ylab" ylab ;
+    R.opt float_tup "xlim" xlim ;
+    R.opt float_tup "ylim" ylim ;
+    R.opt r_plot_type "type" plot_type ;
+    R.opt R.int "lwd" lwd ;
+    R.opt R.string "col" col ;
+    R.opt r_log_scale "log" log ;
+  ]
   |> ignore
 
 let par ?mfrow () =
-  R_graphics_stubs.par
-    ?mfrow:(mfrow |? int_tup)
-    ()
+  R.eval Symbol.par [
+    R.opt int_tup "mfrow" mfrow ;
+  ]
   |> ignore

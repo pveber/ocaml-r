@@ -16,12 +16,29 @@ val hist :
   ?plot:bool ->
   float list -> hist
 
+type plot_type = [
+  | `Points
+  | `Lines
+  | `Both
+  | `Overplotted
+  | `Histogram
+  | `Stair_steps
+  | `Other_steps
+  | `Nothing
+]
+
+type log_scale = [ `X | `Y | `XY ]
+
 val plot :
   ?main:string ->
   ?xlab:string ->
   ?ylab:string ->
   ?xlim:(float * float) ->
   ?ylim:(float * float) ->
+  ?plot_type:plot_type ->
+  ?lwd:int ->
+  ?col:string ->
+  ?log:log_scale ->
   x:float list ->
   ?y:float list ->
   unit -> unit
