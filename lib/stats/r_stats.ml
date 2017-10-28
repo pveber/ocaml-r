@@ -1,4 +1,5 @@
-open R_base
+open OCaml_R
+open OCaml_R_base.R_base
 
 let id x = x
 let ( |? ) o f = match o with
@@ -25,19 +26,19 @@ let string_of_test_kind = function
   | `less -> "less"
 
 class fisher'test o = object
-  method p'value = R.float_of_t (o ## p'value)
+  method p'value = R.float_of_t (subset2_s o "p.value")
   method conf'int =
-    R.notnil (o ## conf'int)
+    R.notnil (subset2_s o "conf.int")
     |? (fun x ->
         match R.floats_of_t x with
         | [ x ; y ] -> (x, y)
         | _ -> assert false
       )
-  method estimate = R.float_of_t (o ## estimate)
-  method null'value = R.float_of_t (o ## null'value)
-  method alternative = R.string_of_t (o ## alternative)
-  method method_ = R.string_of_t (R_base_stubs.subset2_s o (R.string "method"))
-  method data'name = R.string_of_t (o ## data'name)
+  method estimate = R.float_of_t (subset2_s o "estimate")
+  method null'value = R.float_of_t (subset2_s o "null.value")
+  method alternative = R.string_of_t (subset2_s o "alternative")
+  method method_ = R.string_of_t (subset2_s o "method")
+  method data'name = R.string_of_t (subset2_s o "data.name")
 end
 
 let fisher'test ?alternative v v' =
@@ -49,11 +50,11 @@ let fisher'test ?alternative v v' =
 
 
 class ks'test o = object
-  method p'value = R.float_of_t (o ## p'value)
-  method statistic = R.float_of_t (o ## statistic)
-  method alternative = R.string_of_t (o ## alternative)
-  method method_ = R.string_of_t (R_base_stubs.subset2_s o (R.string "method"))
-  method data'name = R.string_of_t (o ## data'name)
+  method p'value = R.float_of_t (subset2_s o "p.value")
+  method statistic = R.float_of_t (subset2_s o "statistic")
+  method alternative = R.string_of_t (subset2_s o "alternative")
+  method method_ = R.string_of_t (subset2_s o "method")
+  method data'name = R.string_of_t (subset2_s o "data.name")
 end
 
 let ks'test ?alternative v v' =
@@ -80,21 +81,3 @@ let p'adjust ?method_ data =
       R.opt (fun x -> R.string (string_of_p'adjust_method x)) "method" method_
     ]
   )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

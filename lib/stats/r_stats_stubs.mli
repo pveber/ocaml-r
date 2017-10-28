@@ -1,4 +1,5 @@
-open R_base_types
+open OCaml_R
+open OCaml_R_base.R_base_types
 
 val rnorm : ?mean:R.real R.t -> ?sd:R.real R.t -> R.integer R.t -> R.reals R.t
 

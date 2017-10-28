@@ -1,3 +1,5 @@
+open OCaml_R
+
 val plot :
   ?main:R.string_ R.t ->
   ?xlab:R.string_ R.t ->

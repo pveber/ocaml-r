@@ -1,0 +1,7 @@
+(jbuild_version 1)
+
+(library
+ ((name            OCaml_R_methods)
+  (public_name     OCaml_R.methods)
+  (libraries       (OCaml_R OCaml_R.interpreter))
+  ))

@@ -1,3 +1,5 @@
+open OCaml_R
+
 let () = ignore (R.eval_string "require(methods, quietly=TRUE)")
 
 module Stub = struct

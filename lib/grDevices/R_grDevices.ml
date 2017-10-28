@@ -1,3 +1,5 @@
+open OCaml_R
+
 let () = ignore (R.eval_string "require(grDevices, quietly=TRUE)")
 
 module Stub = struct
