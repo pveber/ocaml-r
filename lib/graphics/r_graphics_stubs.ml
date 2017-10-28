@@ -10,9 +10,10 @@ module Symbol = struct
 
 end
 
-let plot ?main ?xlab ?ylab ?xlim ?ylim x =
+let plot ?main ?xlab ?ylab ?xlim ?ylim ?y x =
   R.eval Symbol.plot [
     R.arg id x ;
+    R.opt id "y" y ;
     R.opt id "main" main ;
     R.opt id "xlab" xlab ;
     R.opt id "ylab" ylab ;

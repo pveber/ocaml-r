@@ -6,6 +6,7 @@ val plot :
   ?ylab:R.string_ R.t ->
   ?xlim:R.reals R.t ->
   ?ylim:R.reals R.t ->
+  ?y:_ R.t ->
   _ R.t -> R.nilsxp
 
 val plot2 :

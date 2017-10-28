@@ -15,3 +15,13 @@ val hist :
   ?xlim:float -> ?ylim:float ->
   ?plot:bool ->
   float list -> hist
+
+val plot :
+  ?main:string ->
+  ?xlab:string ->
+  ?ylab:string ->
+  ?xlim:(float * float) ->
+  ?ylim:(float * float) ->
+  x:float list ->
+  ?y:float list ->
+  unit -> unit

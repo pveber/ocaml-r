@@ -42,3 +42,20 @@ let hist ?breaks ?freq ?include_lowest ?right ?main ?xlab ?ylab ?xlim ?ylim ?plo
     R.opt R.bool       "plot"           plot ;
   ]
   |> new hist
+
+let (|?) x f = match x with
+  | None -> None
+  | Some x -> Some (f x)
+
+let float_tup (x, y) = R.floats [ x ; y ]
+
+let plot ?main ?xlab ?ylab ?xlim ?ylim ~x ?y () =
+  R_graphics_stubs.plot
+    ?main:(main |? R.string)
+    ?xlab:(xlab |? R.string)
+    ?ylab:(ylab |? R.string)
+    ?xlim:(xlim |? float_tup)
+    ?ylim:(ylim |? float_tup)
+    ?y:(y |? R.floats)
+    (R.floats x)
+  |> ignore
