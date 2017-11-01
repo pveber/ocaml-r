@@ -1,4 +1,4 @@
-open OCaml_R
+open OCamlR
 
 val plot :
   ?main:R.string_ R.t ->

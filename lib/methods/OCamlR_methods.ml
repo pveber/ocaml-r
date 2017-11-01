@@ -1,4 +1,4 @@
-open OCaml_R
+open OCamlR
 
 let () = ignore (R.eval_string "require(methods, quietly=TRUE)")
 

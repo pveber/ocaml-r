@@ -1,6 +1,7 @@
 (jbuild_version 1)
 
 (library
- ((name            R_math)
-  (public_name     OCaml_R.math)
+ ((name            OCamlR_math)
+  (public_name     ocaml-r.math)
+  (wrapped         false)
   (c_names         (r_math_stubs))))

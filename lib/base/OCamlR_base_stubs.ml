@@ -1,4 +1,4 @@
-open OCaml_R
+open OCamlR
 
 let id x = x
 

@@ -1,7 +1,8 @@
 (jbuild_version 1)
 
 (library
- ((name            OCaml_R_stats)
-  (public_name     OCaml_R.stats)
-  (libraries       (OCaml_R.base OCaml_R.interpreter))
+ ((name            OCamlR_stats)
+  (public_name     ocaml-r.stats)
+  (wrapped         false)
+  (libraries       (ocaml-r.base ocaml-r.interpreter))
   ))

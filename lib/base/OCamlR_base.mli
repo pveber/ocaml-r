@@ -1,8 +1,8 @@
 (**  Runtime R base library. *)
 
-open OCaml_R
+open OCamlR
 
-open R_base_types
+open OCamlR_base_types
 
 val length : < length : R.integer R.t ; .. > R.t -> int
 val dim : < dim : R.integers R.t ; .. > R.t -> int * int

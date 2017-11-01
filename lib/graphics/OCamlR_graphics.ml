@@ -1,5 +1,5 @@
-open OCaml_R
-open OCaml_R_base
+open OCamlR
+open OCamlR_base
 
 let () = ignore (R.eval_string "require(graphics, quietly=TRUE)")
 
@@ -12,12 +12,12 @@ module Symbol = struct
 end
 
 class hist o = object
-  method breaks = R.floats_of_t (R_base.subset2_s o "breaks")
-  method counts = R.floats_of_t (R_base.subset2_s o "counts")
-  method density = R.floats_of_t (R_base.subset2_s o "density")
-  method mids = R.floats_of_t (R_base.subset2_s o "mids")
-  method xname = R.string_of_t (R_base.subset2_s o "xname")
-  method equidist = R.bool_of_t (R_base.subset2_s o "equidist")
+  method breaks = R.floats_of_t (subset2_s o "breaks")
+  method counts = R.floats_of_t (subset2_s o "counts")
+  method density = R.floats_of_t (subset2_s o "density")
+  method mids = R.floats_of_t (subset2_s o "mids")
+  method xname = R.string_of_t (subset2_s o "xname")
+  method equidist = R.bool_of_t (subset2_s o "equidist")
 end
 
 let any x = (x : _ #R.ty R.t :> < > R.t)

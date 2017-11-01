@@ -1,27 +1,28 @@
-open OCaml_R
+open OCamlR
 
-open R_base_types
+open OCamlR_base_types
+module Stubs = OCamlR_base_stubs
 
 let ( |? ) o f = match o with
   | Some x -> Some (f x)
   | None -> None
 
-let length l = R.int_of_t (R_base_stubs.length l)
+let length l = R.int_of_t (Stubs.length l)
 
 let dim x =
-  R_base_stubs.dim x
+  Stubs.dim x
   |> R.ints_of_t
   |> (function
       | [| x ; y |] -> x, y
       | _ -> assert false)
 
-let subset x i = R_base_stubs.subset x (R.int i)
-let subset_ii x i j = R_base_stubs.subset_ii x (R.int i) (R.int j)
-let subset2_i x i = R_base_stubs.subset2_i x (R.int i)
-let subset2_s x s = R_base_stubs.subset2_s x (R.string s)
+let subset x i = Stubs.subset x (R.int i)
+let subset_ii x i j = Stubs.subset_ii x (R.int i) (R.int j)
+let subset2_i x i = Stubs.subset2_i x (R.int i)
+let subset2_s x s = Stubs.subset2_s x (R.string s)
 
 (* let rle_k encode decode xs = *)
-(*   let o = R_base_stubs.rle (encode xs) in *)
+(*   let o = Stubs.rle (encode xs) in *)
 (*   R.ints_of_t (o ## lengths), decode (o ## values) *)
 
 (* let rle : *)
@@ -34,7 +35,7 @@ let subset2_s x s = R_base_stubs.subset2_s x (R.string s)
 (*     | R.String -> rle_k R.strings R.strings_of_t xs *)
 
 let sample x n ?replace ?prob () =
-  R_base_stubs.sample
+  Stubs.sample
     x
     (R.int n)
     ?replace:(replace |? R.bool)

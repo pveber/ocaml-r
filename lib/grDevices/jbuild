@@ -1,7 +1,8 @@
 (jbuild_version 1)
 
 (library
- ((name            OCaml_R_grDevices)
-  (public_name     OCaml_R.grDevices)
-  (libraries       (OCaml_R OCaml_R.interpreter))
+ ((name            OCamlR_grDevices)
+  (public_name     ocaml-r.grDevices)
+  (wrapped         false)
+  (libraries       (ocaml-r.interpreter))
   ))

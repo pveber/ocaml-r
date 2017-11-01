@@ -1,5 +1,7 @@
-open OCaml_R
-open OCaml_R_base.R_base
+open OCamlR
+open OCamlR_base
+
+module Stubs = OCamlR_stats_stubs
 
 let id x = x
 let ( |? ) o f = match o with
@@ -13,7 +15,7 @@ end
 
 
 let rnorm ?mean ?sd n =
-  R_stats_stubs.rnorm
+  Stubs.rnorm
     ?mean:(mean |? R.float)
     ?sd:(sd |? R.float)
     (n |> R.int)
@@ -42,7 +44,7 @@ class fisher'test o = object
 end
 
 let fisher'test ?alternative v v' =
-  R_stats_stubs.fisher'test
+  Stubs.fisher'test
     ?alternative:(alternative |? string_of_test_kind |? R.string)
     (R.floats v)
     (R.floats v')
