@@ -1,10 +1,12 @@
-#require "R.grDevices"
-#require "R.graphics"
-#require "R.stats"
+#require "OCaml_R.grDevices"
+#require "OCaml_R.graphics"
+#require "OCaml_R.stats"
 
-open RgrDevices
+open OCaml_R_grDevices
+open OCaml_R_stats
+open OCaml_R_graphics
 
-let () = png ~width:500. ~height:500. "delme.png"
-let x = Rstats.rnorm 100
-let h = Rgraphics.hist x
-let () = dev_off ()
+let () = R_grDevices.png ~width:500. ~height:500. "delme.png"
+let x = R_stats.rnorm 100
+let h = R_graphics.hist ~main:"" ~xlab:"x" x
+let () = R_grDevices.dev_off ()
