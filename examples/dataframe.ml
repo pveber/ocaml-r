@@ -6,8 +6,8 @@ open Rbase
 
 let res = Rstats.fisher_test_2x2 ~ff:2 ~ft:3 ~tf:4 ~tt:5 ()
 
-let () = 
-  Printf.printf 
+let () =
+  Printf.printf
     "%f %f\n%s\n"
     (R.float_of_t (res ## estimatee))
     (R.float_of_t (res ## p'value))
@@ -15,16 +15,3 @@ let () =
 ;;
 
 let _ = (R.int (res ## p'value)) = 0
-
-
-
-
-
-
-
-
-
-
-
-
-

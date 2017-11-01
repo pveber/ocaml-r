@@ -23,11 +23,11 @@ end
 let any x = (x : _ #R.ty R.t :> < > R.t)
 
 let r_breaks = function
-| `n n -> any (R.int n)
-| `l v -> any (R.floats v)
-| `m `Sturges -> any (R.string "Sturges")
-| `m `Scott -> any (R.string "Scott")
-| `m `FD -> any (R.string "FD")
+  | `n n -> any (R.int n)
+  | `l v -> any (R.floats v)
+  | `m `Sturges -> any (R.string "Sturges")
+  | `m `Scott -> any (R.string "Scott")
+  | `m `FD -> any (R.string "FD")
 
 let hist ?breaks ?freq ?include_lowest ?right ?main ?xlab ?ylab ?xlim ?ylim ?plot x =
   R.eval Symbol.hist [
@@ -49,9 +49,9 @@ let (|?) x f = match x with
   | None -> None
   | Some x -> Some (f x)
 
-let float_tup (x, y) = R.floats [ x ; y ]
+let float_tup (x, y) = R.floats [| x ; y |]
 
-let int_tup (x, y) = R.ints [ x ; y ]
+let int_tup (x, y) = R.ints [| x ; y |]
 
 type plot_type = [
   | `Points

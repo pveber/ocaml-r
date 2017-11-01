@@ -187,7 +187,7 @@ type _ scalar_format =
   | String : string scalar_format
 
 class type ['a, 'int] atomic_vector0 = object
-  inherit ['a list] ty
+  inherit ['a array] ty
   method length : 'int
 end
 
@@ -249,10 +249,9 @@ val symbol : ?generic:bool -> string -> symsxp
 
 (** {2 Conversion functions.} *)
 
-val bools_of_t : logicals t -> bool list
-(**  Converts an R array of logical values into a list of Objective
-  *  Caml booleans.
-  *)
+val bools_of_t : logicals t -> bool array
+(** Converts an R array of logical values into an array of OCaml
+    booleans.  *)
 
 val bool_of_t : logical t -> bool
 (**  Converts an R array of logical values with one element into an
@@ -264,15 +263,13 @@ val bool : bool -> logical t
   *  that is a mono-element array of booleans.
   *)
 
-val bools : bool list -> logicals t
-(**  Converts an Objective Caml list of booleans into an R array
-  *  of logical values.
-  *)
+val bools : bool array -> logicals t
+(** Converts an OCaml array of booleans into an R array of logical
+    values.  *)
 
-val ints_of_t : integers t -> int list
-(**  Converts an R array of integers into a list of Objective Caml
-  *  integers.
-  *)
+val ints_of_t : integers t -> int array
+(** Converts an R array of integers into an array of OCaml
+    integers.  *)
 
 val int_of_t : integer t -> int
 (**  Converts an R array of integers with one element into an Objective
@@ -284,59 +281,53 @@ val int : int -> integer t
   *  is a mono-element array of integers.
   *)
 
-val ints : int list -> integers t
-(**  Converts an Objective Caml list of integers into an R array of
-  *  integers.
-  *)
+val ints : int array -> integers t
+(** Converts an OCaml array of integers into an R array of
+    integers.  *)
 
-val floats_of_t : reals t -> float list
-(**  Converts an R array of real numbers into a list of Objective
-  *  Caml floats.
-  *)
+val floats_of_t : reals t -> float array
+(** Converts an R array of real numbers into an array of OCaml
+    floats.  *)
 
 val float_of_t : real t -> float
-(**  Converts an R array of floats with one element into an Objective
-  *  Caml float.
-  *)
+(** Converts an R array of floats with one element into an OCaml
+    float.  *)
 
 val float : float -> real t
-(**  Converts an Objective Caml float to an R real value, that is a
+(**  Converts an OCaml float to an R real value, that is a
   *  mono-element array of real numbers.
   *)
 
-val floats : float list -> reals t
-(**  Converts a Objective Caml list of floats into an R array of
+val floats : float array -> reals t
+(**  Converts an OCaml array of floats into an R array of
   *  real numbers.
   *)
 
-val optfloats : float option list -> reals t
-(**  Converts a Objective Caml list of float options into an R array of
+val optfloats : float option array -> reals t
+(**  Converts a OCaml array of float options into an R array of
   *  real numbers with possibly missing values. The value [None] is
   *  converted to [NA] on the R side.
   *)
 
-val strings_of_t : strings t -> string list
-(**  Converts an R array of strings into a list of Objective Caml
-  *  strings.
-  *)
+val strings_of_t : strings t -> string array
+(** Converts an R array of strings into a list of OCaml strings. *)
 
 val string_of_t : string_ t -> string
-(**  Converts an R array of strings with one element into an Objective
-  *  Caml string.
-  *)
+(** Converts an R array of strings with one element into an OCaml
+    string.  *)
 
 val string : string -> string_ t
-(**  Converts an Objective Caml string to an R string, that is a
+(**  Converts an OCaml string to an R string, that is a
   *  mono-element array of strings.
   *)
 
-val strings : string list -> strings t
-(**  Converts an Objective Caml list of strings into an R array of
+val strings : string array -> strings t
+(**  Converts an OCaml array of strings into an R array of
   *  strings.
   *)
 
 val sexps_of_t : rawvecsxp -> sexp list
-(**  Converts an R array of SEXPs into an Objective Caml list of
+(**  Converts an R array of SEXPs into an OCaml array of
   *  SEXPs.
   *)
 

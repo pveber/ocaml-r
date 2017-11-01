@@ -2,7 +2,7 @@
 
 (** {5 Random number generation} *)
 
-val rnorm : ?mean:float -> ?sd:float -> int -> float list
+val rnorm : ?mean:float -> ?sd:float -> int -> float array
 (** Random generation for the normal distribution. [mean] and [sd] default to [0.]
     and [1.] respectively. *)
 
@@ -11,8 +11,8 @@ val rnorm : ?mean:float -> ?sd:float -> int -> float list
 
 val fisher'test :
   ?alternative:[`two_sided | `greater | `less] ->
-  float list ->
-  float list ->
+  float array ->
+  float array ->
   < p'value : float ;
     conf'int : (float * float) option  ;
     estimate : float ;
@@ -23,7 +23,7 @@ val fisher'test :
 
 val ks'test :
   ?alternative:[`two_sided | `greater | `less] ->
-  float list -> float list ->
+  float array -> float array ->
   < statistic : float ;
     p'value : float ;
     alternative : string ;
@@ -32,7 +32,7 @@ val ks'test :
 
 val p'adjust :
   ?method_ : [`holm | `hochberg | `hommel | `bonferroni | `BH | `BY | `fdr] ->
-  float list -> float list
+  float array -> float array
 
 (* val fisher'test_2x2 : *)
 (*   ?alternative:[`two_sided | `greater | `less] -> *)

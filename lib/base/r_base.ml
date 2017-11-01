@@ -12,7 +12,7 @@ let dim x =
   R_base_stubs.dim x
   |> R.ints_of_t
   |> (function
-      | [ x ; y ] -> x, y
+      | [| x ; y |] -> x, y
       | _ -> assert false)
 
 let subset x i = R_base_stubs.subset x (R.int i)

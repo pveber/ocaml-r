@@ -117,7 +117,7 @@ type _ scalar_format =
   https://groups.google.com/forum/#!topic/fa.caml/-7yCBMx7xxw
 *)
 class type ['a, 'int] atomic_vector0 = object
-  inherit ['a list] ty
+  inherit ['a array] ty
   method length : 'int
 end
 
@@ -540,44 +540,64 @@ let vecsxp_of_list (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'b -
     let () = assign s offset hd in aux (1 + offset) tl
   in aux 0 l; s
 
+let array_of_vecsxp (access : 'a vecsxp -> int -> 'b) (s : 'a vecsxp) =
+  let lngth = length_of_vecsxp s in
+  Array.init lngth (access s)
+
+let vecsxp_of_array (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'b -> unit) (t : 'b array) =
+  let s = alloc (Array.length t) in
+  Array.iteri (assign s) t ;
+  s
+
 let bool_list_of_lglvecsxp x = list_of_vecsxp access_lglvecsxp x
 let lglvecsxp_of_bool_list x = vecsxp_of_list alloc_lgl_vector assign_lglvecsxp x
-let bools_of_t tau = bool_list_of_lglvecsxp (cast (tau : lglvecsxp :> sexp) : lglvecsxp)
+let bool_array_of_lglvecsxp x = array_of_vecsxp access_lglvecsxp x
+let lglvecsxp_of_bool_array x = vecsxp_of_array alloc_lgl_vector assign_lglvecsxp x
+let bools_of_t tau = bool_array_of_lglvecsxp (cast (tau : lglvecsxp :> sexp) : lglvecsxp)
 let bool_of_t tau = access_lglvecsxp (cast (tau : lglvecsxp :> sexp) : lglvecsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the lgl vecsxp contains only one element. *)
-let bool b = (cast ((lglvecsxp_of_bool_list [b]) : lglvecsxp :> sexp) : lglvecsxp)
-let bools bl = (cast ((lglvecsxp_of_bool_list bl) : lglvecsxp :> sexp) : lglvecsxp)
+let bool b = (cast ((lglvecsxp_of_bool_array [| b |]) : lglvecsxp :> sexp) : lglvecsxp)
+let bools bl = (cast ((lglvecsxp_of_bool_array bl) : lglvecsxp :> sexp) : lglvecsxp)
 
 let int_list_of_intvecsxp x  = list_of_vecsxp access_intvecsxp x
 let intvecsxp_of_int_list x  = vecsxp_of_list alloc_int_vector assign_intvecsxp x
-let ints_of_t tau = int_list_of_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp)
+let int_array_of_intvecsxp x  = array_of_vecsxp access_intvecsxp x
+let intvecsxp_of_int_array x  = vecsxp_of_array alloc_int_vector assign_intvecsxp x
+let ints_of_t tau = int_array_of_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp)
 let int_of_t tau = access_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the int vecsxp contains only one element. *)
-let int i = (cast ((intvecsxp_of_int_list [i]) : intvecsxp :> sexp) : intvecsxp)
-let ints il = (cast ((intvecsxp_of_int_list il) : intvecsxp :> sexp) : intvecsxp)
+let int i = (cast ((intvecsxp_of_int_array [| i |]) : intvecsxp :> sexp) : intvecsxp)
+let ints il = (cast ((intvecsxp_of_int_array il) : intvecsxp :> sexp) : intvecsxp)
 
 let float_list_of_realvecsxp x = list_of_vecsxp access_realvecsxp x
 let realvecsxp_of_float_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp x
-let floats_of_t tau = float_list_of_realvecsxp (cast (tau : realvecsxp :> sexp) : realvecsxp)
+let float_array_of_realvecsxp x = array_of_vecsxp access_realvecsxp x
+let realvecsxp_of_float_array x = vecsxp_of_array alloc_real_vector assign_realvecsxp x
+let floats_of_t tau = float_array_of_realvecsxp (cast (tau : realvecsxp :> sexp) : realvecsxp)
 let float_of_t tau = access_realvecsxp (cast (tau : realvecsxp :> sexp) : realvecsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the real vecsxp contains only one element. *)
-let float x = (cast ((realvecsxp_of_float_list [x]) : realvecsxp :> sexp) : realvecsxp)
-let floats xl = (cast ((realvecsxp_of_float_list xl) : realvecsxp :> sexp) : realvecsxp)
+let float x = (cast ((realvecsxp_of_float_array [| x |]) : realvecsxp :> sexp) : realvecsxp)
+let floats xl = (cast ((realvecsxp_of_float_array xl) : realvecsxp :> sexp) : realvecsxp)
 
 let realvecsxp_of_float_option_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp_opt x
 let optfloats xl = (cast ((realvecsxp_of_float_option_list xl) : realvecsxp :> sexp) : realvecsxp)
+let realvecsxp_of_float_option_array x = vecsxp_of_array alloc_real_vector assign_realvecsxp_opt x
+let optfloats xl = (cast ((realvecsxp_of_float_option_array xl) : realvecsxp :> sexp) : realvecsxp)
 
 let string_list_of_strvecsxp x = list_of_vecsxp access_strvecsxp x
 let strvecsxp_of_string_list x = vecsxp_of_list alloc_str_vector assign_strvecsxp x
-let strings_of_t tau = string_list_of_strvecsxp (cast (tau : strvecsxp :> sexp) : strvecsxp)
+let string_array_of_strvecsxp x = array_of_vecsxp access_strvecsxp x
+let strvecsxp_of_string_array x = vecsxp_of_array alloc_str_vector assign_strvecsxp x
+let string_list_of_t tau = string_list_of_strvecsxp (cast (tau : strvecsxp :> sexp) : strvecsxp)
+let strings_of_t tau = string_array_of_strvecsxp (cast (tau : strvecsxp :> sexp) : strvecsxp)
 let string_of_t tau = access_strvecsxp (cast (tau : strvecsxp :> sexp) : strvecsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the str vecsxp contains only one element. *)
 external string : string -> strvecsxp = "ocamlr_strsxp_of_string"
-let strings sl = (cast ((strvecsxp_of_string_list sl) : strvecsxp :> sexp) : strvecsxp)
+let strings sl = (cast ((strvecsxp_of_string_array sl) : strvecsxp :> sexp) : strvecsxp)
 
 let sexp_list_of_rawvecsxp x = list_of_vecsxp access_rawvecsxp x
 let sexps_of_t tau = sexp_list_of_rawvecsxp (cast (tau : rawvecsxp :> sexp) : rawvecsxp)
@@ -913,7 +933,7 @@ external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
 
 
 let classes sexp =
-  strings_of_t (cast (get_attrib sexp "class") : string list t)
+  string_list_of_t (cast (get_attrib sexp "class") : string list t)
 
 (* === S4 ===== *)
 

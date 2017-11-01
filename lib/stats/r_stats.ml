@@ -31,7 +31,7 @@ class fisher'test o = object
     R.notnil (subset2_s o "conf.int")
     |? (fun x ->
         match R.floats_of_t x with
-        | [ x ; y ] -> (x, y)
+        | [| x ; y |] -> (x, y)
         | _ -> assert false
       )
   method estimate = R.float_of_t (subset2_s o "estimate")
