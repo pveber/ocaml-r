@@ -1,4 +1,4 @@
-(*********************************************************************************)
+(* ***************************************************************************** *)
 (*                OCaml-R                                                        *)
 (*                                                                               *)
 (*    Copyright (C) 2008-2010 Institut National de Recherche en                  *)
@@ -23,7 +23,7 @@
 (*                                                                               *)
 (*    Contact: Maxence.Guesdon@inria.fr                                          *)
 (*             guillaume.yziquel@citycable.ch                                    *)
-(*********************************************************************************)
+(* ***************************************************************************** *)
 
 (**  Binding for the R interpreter. It encapsulates the
   *  functionalities of the [libR.so] shared library provided by the R
