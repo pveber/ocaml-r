@@ -621,21 +621,23 @@ module Specification = struct
     let pname    = inspect_symsxp_pname    s
     and value    = inspect_symsxp_value    s
     and internal = inspect_symsxp_internal s in
-    match (sexptype pname), (sexptype value), (sexptype internal) with
+    match sexptype pname, sexptype value, sexptype internal with
     | (NilSxp,  _, NilSxp) when sexp_equality (s : symsxp :> sexp) value -> None
-    | (CharSxp, SymSxp, NilSxp) ->
-        begin match (sexp_equality (s : symsxp :> sexp) value) &&
-                    ("" = string_of_charsxp (cast pname : charvecsxp)) with
-        | true -> Some None | false ->
-        begin match (sexp_equality value (inspect_symsxp_value (cast value : symsxp)))  &&
-                    (NilSxp = sexptype (inspect_symsxp_pname (cast value : symsxp)))    &&
-                    (NilSxp = sexptype (inspect_symsxp_internal (cast value : symsxp))) with
-        | true -> Some (Some ((string_of_charsxp (cast pname : charvecsxp)), None))
-        | false -> assert false
-        end end
+    | (CharSxp, SymSxp, NilSxp) -> (
+        match (sexp_equality (s : symsxp :> sexp) value) &&
+              ("" = string_of_charsxp (cast pname : charvecsxp)) with
+        | true -> Some None
+        | false -> (
+            match (sexp_equality value (inspect_symsxp_value (cast value : symsxp)))  &&
+                  (NilSxp = sexptype (inspect_symsxp_pname (cast value : symsxp)))    &&
+                  (NilSxp = sexptype (inspect_symsxp_internal (cast value : symsxp))) with
+            | true -> Some (Some ((string_of_charsxp (cast pname : charvecsxp)), None))
+            | false -> assert false
+          )
+      )
     | (CharSxp, _, NilSxp) ->
-        let symbol_name = string_of_charsxp (cast pname : charvecsxp) in
-        Some (Some (symbol_name, (Some value)))
+      let symbol_name = string_of_charsxp (cast pname : charvecsxp) in
+      Some (Some (symbol_name, (Some value)))
     | _ -> assert false
 
 end
@@ -816,13 +818,12 @@ module PrettyTypes = struct
   exception Esoteric of sexp
 
   let symbol_of_symsxp builder (s : symsxp) =
-    match begin try Some (Specification.of_symbol s) with
-                | Assert_failure _ -> None end with
-    | None -> raise (Esoteric (s : symsxp :> sexp))
-    | Some None -> SYMBOL None
-    | Some (Some None) -> PLACE
-    | Some (Some (Some (symbol_name, None))) -> ARG symbol_name
-    | Some (Some (Some (symbol_name, Some v))) -> SYMBOL (Some (symbol_name, (builder v)))
+    match Specification.of_symbol s with
+    | exception Assert_failure _ -> raise (Esoteric (s : symsxp :> sexp))
+    | None -> SYMBOL None
+    | Some None -> PLACE
+    | Some (Some (symbol_name, None)) -> ARG symbol_name
+    | Some (Some (symbol_name, Some v)) -> SYMBOL (Some (symbol_name, (builder v)))
 
   let rec list_of_listsxp builder (s : 'a listsxp) =
     let carval = inspect_listsxp_carval s
