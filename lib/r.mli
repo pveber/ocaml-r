@@ -170,6 +170,11 @@ type realvecsxp     = [`Vec  of [`Real]]                          t
 type strvecsxp      = [`Vec  of [`Str ]]                          t
 type rawvecsxp      = [`Vec  of [`Raw ]]                          t
 type exprvecsxp     = [`Vec  of [`Raw ]]                          t
+type pairlist       = [`Nil | `List of [`Pair]]                   t
+type 'a vecsxp      = [`Vec  of
+    [< `Char | `Lgl | `Int  | `Real
+    | `Str  | `Raw | `Expr ] as 'a
+  ] t
 
 
 
@@ -339,6 +344,8 @@ module Specification : sig
   type symbol = (string * (sexp option)) option option
 end
 
+val is_nil : _ t -> bool
+val nil_map : _ t -> f:(_ t -> 'a) -> 'a option
 val notnil : 'a t -> 'a t option
 
 val attributes : sexp -> (Specification.symbol * sexp) list
@@ -387,12 +394,12 @@ end
 (** {2 Parsing R code.} *)
 
 type parse_status =
-(**  Outcome of a parsing request. *)
   | Parse_Null
   | Parse_OK
   | Parse_Incomplete
   | Parse_Error
   | Parse_EOF
+(**  Outcome of a parsing request. *)
 
 exception Parsing_failure of parse_status * string
 (**  Exception raised when parsing fails. *)
@@ -492,3 +499,54 @@ module Interpreter (Env : Environment) : Interpreter
 (**  Functor used to initialise statically an R interpreter, given initialisation
   *  details provided by the provided [Env] module.
   *)
+
+
+(**  {2 Low-level inspection} *)
+
+external s3_class : sexp -> sexp = "ocamlr_s3_class"
+external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
+external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
+external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
+
+external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
+external length_of_vecsxp   : 'a vecsxp -> int  = "ocamlr_inspect_vecsxp_length"
+
+external inspect_primsxp_offset  : [< `Special | `Builtin ] t -> int = "ocamlr_inspect_primsxp_offset"
+external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
+external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
+external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"
+external inspect_listsxp_carval  : 'a listsxp     -> sexp          = "ocamlr_inspect_listsxp_carval"
+external inspect_listsxp_cdrval  : 'a listsxp     -> sexp          = "ocamlr_inspect_listsxp_cdrval"
+external inspect_listsxp_tagval  : 'a listsxp     -> sexp          = "ocamlr_inspect_listsxp_tagval"
+external inspect_envsxp_frame    : envsxp         -> sexp          = "ocamlr_inspect_envsxp_frame"
+external inspect_envsxp_enclos   : envsxp         -> sexp          = "ocamlr_inspect_envsxp_enclos"
+external inspect_envsxp_hashtab  : envsxp         -> sexp          = "ocamlr_inspect_envsxp_hashtab"
+external inspect_closxp_formals  : closxp         -> sexp          = "ocamlr_inspect_closxp_formals"
+external inspect_closxp_body     : closxp         -> sexp          = "ocamlr_inspect_closxp_body"
+external inspect_closxp_env      : closxp         -> sexp          = "ocamlr_inspect_closxp_env"
+external inspect_promsxp_value   : promsxp        -> sexp          = "ocamlr_inspect_promsxp_value"
+external inspect_promsxp_expr    : promsxp        -> sexp          = "ocamlr_inspect_promsxp_expr"
+external inspect_promsxp_env     : promsxp        -> sexp          = "ocamlr_inspect_promsxp_env"
+
+external access_lglvecsxp  : lglvecsxp  -> int -> bool     = "ocamlr_access_lgl_vecsxp"
+external access_intvecsxp  : intvecsxp  -> int -> int      = "ocamlr_access_int_vecsxp"
+external access_realvecsxp : realvecsxp -> int -> float    = "ocamlr_access_real_vecsxp"
+external access_strvecsxp  : strvecsxp  -> int -> string   = "ocamlr_access_str_vecsxp"
+external access_rawvecsxp  : rawvecsxp  -> int -> sexp     = "ocamlr_access_sexp_vecsxp"
+external access_exprvecsxp : exprvecsxp -> int -> langsxp  = "ocamlr_access_sexp_vecsxp"
+
+val pairlist_of_list : (_ t * _ t) list -> pairlist
+val lglvecsxp_of_bool_list : bool list -> lglvecsxp
+val intvecsxp_of_int_list : int list -> intvecsxp
+val realvecsxp_of_float_list : float list -> realvecsxp
+val strvecsxp_of_string_list : string list -> strvecsxp
+val realvecsxp_of_float_option_list : float option list -> realvecsxp
+
+external null_creator : unit -> nilsxp = "ocamlr_null"
+external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
+external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
+external base_env_creator : unit -> sexp = "ocamlr_base_env"
+
+external global_env : unit -> sexp = "ocamlr_global_env"
+
+val string_of_sexptype : sexptype -> string

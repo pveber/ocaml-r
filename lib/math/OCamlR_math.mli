@@ -94,6 +94,7 @@ val qgamma :
 
 val rgamma : ?scale:float -> float -> float
 
+val lgamma1p : float -> float
 val logspace_add : float -> float -> float
 val logspace_sub : float -> float -> float
 

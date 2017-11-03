@@ -74,10 +74,12 @@ external cast : sexp -> 'a t = "%identity"
 type nilsxp         = [`Nil]                                      t
 type symsxp         = [`Sym]                                      t
 type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         t
-and 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] t    (**  Type of low-level internal list. In R, such
-                                                                         *  internal lists may be empty, a pairlist or
-                                                                         *  a call which is somewhat similar to closure
-                                                                         *  ready for execution. *)
+type 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] t
+(**  Type of low-level internal list. In R, such
+  *  internal lists may be empty, a pairlist or
+  *  a call which is somewhat similar to closure
+  *  ready for execution. *)
+
 type langsxp        = [`List of [`Call]]                          t
 type pairlistsxp    = [`List of [`Pair]]                          t
 and pairlist        = [`Nil | `List of [`Pair]]                   t
@@ -169,19 +171,6 @@ end
 class type ['a] s3 = object
   inherit ['a] ty
   method classes : string list
-end
-
-class type ['a] list_ = object
-  inherit ['a] s3 constraint 'a = < .. >
-  method ty : 'a
-  method length : int
-  method subset2_s : 'b. string -> 'b
-  method subset2_i : 'b. string -> 'b
-end
-
-class type ['a] data'frame  = object
-  inherit ['a] list_
-  method dim : int * int
 end
 
 
@@ -583,7 +572,6 @@ let float x = (cast ((realvecsxp_of_float_array [| x |]) : realvecsxp :> sexp) :
 let floats xl = (cast ((realvecsxp_of_float_array xl) : realvecsxp :> sexp) : realvecsxp)
 
 let realvecsxp_of_float_option_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp_opt x
-let optfloats xl = (cast ((realvecsxp_of_float_option_list xl) : realvecsxp :> sexp) : realvecsxp)
 let realvecsxp_of_float_option_array x = vecsxp_of_array alloc_real_vector assign_realvecsxp_opt x
 let optfloats xl = (cast ((realvecsxp_of_float_option_array xl) : realvecsxp :> sexp) : realvecsxp)
 
@@ -814,7 +802,6 @@ module PrettyTypes = struct
 
   let recursive x = Recursive (lazy (Lazy.force x))
 
-  exception Sexp_to_inspect of sexp
   exception Esoteric of sexp
 
   let symbol_of_symsxp builder (s : symsxp) =
@@ -825,7 +812,7 @@ module PrettyTypes = struct
     | Some (Some (symbol_name, None)) -> ARG symbol_name
     | Some (Some (symbol_name, Some v)) -> SYMBOL (Some (symbol_name, (builder v)))
 
-  let rec list_of_listsxp builder (s : 'a listsxp) =
+  let list_of_listsxp builder (s : 'a listsxp) =
     let carval = inspect_listsxp_carval s
     and cdrval = inspect_listsxp_cdrval s
     and tagval = inspect_listsxp_tagval s in
