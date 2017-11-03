@@ -1,7 +1,7 @@
 open OCamlR
 open OCamlR_base
 
-module Stubs = OCamlR_stats_stubs
+module S = OCamlR_stats_stubs2
 
 let id x = x
 let ( |? ) o f = match o with
@@ -15,10 +15,11 @@ end
 
 
 let rnorm ?mean ?sd n =
-  Stubs.rnorm
+  S.rnorm
     ?mean:(mean |? R.float)
     ?sd:(sd |? R.float)
-    (n |> R.int)
+    ~n:(n |> R.int)
+    ()
   |> R.floats_of_t
 
 
@@ -44,10 +45,11 @@ class fisher'test o = object
 end
 
 let fisher'test ?alternative v v' =
-  Stubs.fisher'test
+  S.fisher'test
     ?alternative:(alternative |? string_of_test_kind |? R.string)
-    (R.floats v)
-    (R.floats v')
+    ~x:(R.floats v)
+    ~y:(R.floats v')
+    ()
   |> new fisher'test
 
 

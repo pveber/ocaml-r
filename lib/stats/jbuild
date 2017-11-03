@@ -4,5 +4,11 @@
  ((name            OCamlR_stats)
   (public_name     ocaml-r.stats)
   (wrapped         false)
+  (modules         (OCamlR_stats OCamlR_stats_stubs OCamlR_stats_stubs2))
   (libraries       (ocaml-r.base ocaml-r.interpreter))
   ))
+
+(rule         
+ ((targets (OCamlR_stats_stubs2.ml))
+  (deps    (../../stubgen/stubgen.exe))
+  (action  (with-stdout-to ${@} (run ${<} stats)))))
