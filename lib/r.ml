@@ -635,7 +635,7 @@ module Specification = struct
             | false -> assert false
           )
       )
-    | (CharSxp, _, NilSxp) ->
+    | (CharSxp, _, (NilSxp | BuiltinSxp)) ->
       let symbol_name = string_of_charsxp (cast pname : charvecsxp) in
       Some (Some (symbol_name, (Some value)))
     | _ -> assert false
