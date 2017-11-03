@@ -84,7 +84,6 @@ external r_rgamma : shape:float -> scale:float -> float = "ml_rgamma";;
 let rgamma ?(scale=1.0) shape = r_rgamma ~shape ~scale;;
 
 (*    external log1mpx : float -> float = "ml_log1mpx";;*)
-external lgamma1p : float -> float = "ml_lgamma1p";;
 external logspace_add : float -> float -> float = "ml_logspace_add";;
 external logspace_sub : float -> float -> float = "ml_logspace_sub";;
 

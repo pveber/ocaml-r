@@ -3,7 +3,6 @@ open OCamlR_base
 
 module S = OCamlR_stats_stubs2
 
-let id x = x
 let ( |? ) o f = match o with
   | Some x -> Some (f x)
   | None -> None

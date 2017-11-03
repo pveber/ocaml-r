@@ -1,6 +1,5 @@
 open OCamlR
 
-open OCamlR_base_types
 module Stubs = OCamlR_base_stubs
 
 let ( |? ) o f = match o with

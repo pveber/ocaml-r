@@ -45,10 +45,6 @@ let hist ?breaks ?freq ?include_lowest ?right ?main ?xlab ?ylab ?xlim ?ylim ?plo
   ]
   |> new hist
 
-let (|?) x f = match x with
-  | None -> None
-  | Some x -> Some (f x)
-
 let float_tup (x, y) = R.floats [| x ; y |]
 
 let int_tup (x, y) = R.ints [| x ; y |]

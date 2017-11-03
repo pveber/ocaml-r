@@ -42,22 +42,13 @@ let ocamlify n =
     else n
   )
 
-let transform_arg_name_list = function
-  | "..." :: _ -> failwith ""
-  | l ->
-    if List.mem ~equal:Caml.( = ) l "..." then (
-      if String.(List.last_exn l = "...") then List.slice l 0 (-1)
-      else failwith ""
-    )
-    else l
-
 let transform_arg_name_list l =
   List.filter l ~f:String.(fun x -> x <> "...")
 
 let generate_stub_ml name str =
   let open R.Pretty in
   match str with
-  | CLOSURE { formals = LIST args } ->
+  | CLOSURE { formals = LIST args ; _ } ->
     let name_of_arg = function
       | ARG name, _ -> name
       | SYMBOL (Some (name,_)), _ -> name
