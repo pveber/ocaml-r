@@ -3,7 +3,7 @@
 (library
  ((name            OCamlR)
   (public_name     ocaml-r)
-  (libraries       (calendar))
+  (libraries       (unix))
   (c_names         (initialisation_stub
                         sexp
 			databridge
