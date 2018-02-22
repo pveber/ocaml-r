@@ -290,6 +290,12 @@ val ints : int array -> integers t
 (** Converts an OCaml array of integers into an R array of
     integers.  *)
 
+val optints : int option array -> integers t
+(**  Converts a OCaml array of int options into an R array of
+  *  integer numbers with possibly missing values. The value [None] is
+  *  converted to [NA] on the R side.
+  *)
+
 val floats_of_t : reals t -> float array
 (** Converts an R array of real numbers into an array of OCaml
     floats.  *)

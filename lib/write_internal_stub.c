@@ -91,6 +91,23 @@ CAMLprim value ocamlr_assign_intvecsxp (value intsxp, value offset, value i) {
   return Val_unit;
 }
 
+/**  
+ * Sets the element of a vector of integer numbers with possibly
+ * missing values.
+ *
+ * ocamlr_assign_intvecsxp_opt takes a vector of integer numbers as
+ * first argument, an offset as second argument, and a possibly
+ * missing integer number as third argument, and sets the vector's
+ * offset element to the real number's value, or NA if not available.
+ */
+
+CAMLprim value ocamlr_assign_intvecsxp_opt (value intsxp, value offset, value io) {
+  int ri = (io == Val_int(0)) ? NA_INTEGER : Int_val(Field(io,0)) ;
+    
+  INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)] = ri;
+  return Val_unit;
+}
+
 
 /**  Sets the element of a vector of real numbers.
   *

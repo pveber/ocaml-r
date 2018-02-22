@@ -437,6 +437,18 @@ external assign_lglvecsxp  : lglvecsxp -> int -> bool -> unit = "ocamlr_assign_l
 external assign_intvecsxp  : intvecsxp -> int -> int -> unit = "ocamlr_assign_intvecsxp"
 
 
+(**  Sets the element of a vector of integers.
+  *
+  *  assign_int_vecsxp takes a vector of integers as first argument,
+  *  an offset as second argument, and an integer as third argument,
+  *  and sets the vector's offset element to the integer's value.
+  *
+  *  Question: should we rather map R's integers to int32s?
+  *)
+
+external assign_intvecsxp_opt  : intvecsxp -> int -> int option -> unit = "ocamlr_assign_intvecsxp_opt"
+
+
 (**  Sets the element of a vector of real numbers.
   *
   *  assign_real_vecsxp takes a vector of real numbers as first argument,
@@ -553,12 +565,14 @@ let int_list_of_intvecsxp x  = list_of_vecsxp access_intvecsxp x
 let intvecsxp_of_int_list x  = vecsxp_of_list alloc_int_vector assign_intvecsxp x
 let int_array_of_intvecsxp x  = array_of_vecsxp access_intvecsxp x
 let intvecsxp_of_int_array x  = vecsxp_of_array alloc_int_vector assign_intvecsxp x
+let intvecsxp_of_int_option_array x = vecsxp_of_array alloc_int_vector assign_intvecsxp_opt x
 let ints_of_t tau = int_array_of_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp)
 let int_of_t tau = access_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the int vecsxp contains only one element. *)
 let int i = (cast ((intvecsxp_of_int_array [| i |]) : intvecsxp :> sexp) : intvecsxp)
 let ints il = (cast ((intvecsxp_of_int_array il) : intvecsxp :> sexp) : intvecsxp)
+let optints xl = (cast ((intvecsxp_of_int_option_array xl) : intvecsxp :> sexp) : intvecsxp)
 
 let float_list_of_realvecsxp x = list_of_vecsxp access_realvecsxp x
 let realvecsxp_of_float_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp x
