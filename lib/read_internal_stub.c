@@ -88,7 +88,7 @@ CAMLprim value ocamlr_inspect_attributes (value sexp) {
   *  @return Its length, i.e. the number of elements.
   */
 CAMLprim value ocamlr_inspect_vecsxp_length (value vecsexp) {
-  return(Val_int(LENGTH(Vecsexp_val(vecsexp))));
+  return(Val_int(LENGTH(Sexp_val(vecsexp))));
 }
 
 
