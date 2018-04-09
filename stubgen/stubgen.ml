@@ -33,8 +33,9 @@ let keywords = [
 
 let ocamlify n =
   let n = String.substr_replace_all n ~pattern:"<-" ~with_:"__" in
-  let n = if Char.(n.[0] = '.') then (let n = String.copy n in n.[0] <- '_' ;
- n) else n in
+  let n = if Char.(n.[0] = '.')
+    then String.mapi n ~f:(fun i c -> if i = 0 then '_' else c)
+    else n in
   let n = String.tr ~target:'.' ~replacement:'\'' n in
   if Char.is_uppercase n.[0] then "_" ^ n
   else (
