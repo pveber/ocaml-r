@@ -71,6 +71,8 @@ let generate_stub_ml name str =
   | _ -> failwithf "not supported: %s" name ()
 
 let generate_stub_ml_for_package p =
+  let () = ignore @@ R.eval_string {|require(utils, quietly=TRUE)|} in
+  let () = ignore @@ R.eval_string (sprintf {|require(%s, quietly=TRUE)|} p) in
   let r_list = R.eval_string (sprintf {|ls("package:%s")|} p) in
   let funs = R.strings_of_t r_list in
   Caml.print_endline "open OCamlR" ;
