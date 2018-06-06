@@ -275,7 +275,7 @@ CAMLprim value ocamlr_inspect_promsxp_env (value sexp) {
   *  @return The boolean at this offset in the R logical vector.
   */
 CAMLprim value ocamlr_access_lgl_vecsxp (value lglsxp, value offset) {
-  return(Val_bool(LOGICAL((int *) Vecsexp_val(lglsxp))[Int_val(offset)]));
+  return(Val_bool(LOGICAL(Sexp_val(lglsxp))[Int_val(offset)]));
 }
 
 
@@ -291,7 +291,7 @@ CAMLprim value ocamlr_access_int_vecsxp (value intsxp, value offset) {
      Should use Val_int, or int32s? More generally, the typing
      is here somewhat confusing (or confused)... Is offset an int? */
 
-  return(Val_int(INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)]));
+  return(Val_int(INTEGER(Sexp_val(intsxp))[Int_val(offset)]));
 }
 
 
@@ -302,7 +302,7 @@ CAMLprim value ocamlr_access_int_vecsxp (value intsxp, value offset) {
   *  @return The real number at this offset in the R vector of real numbers.
   */
 CAMLprim value ocamlr_access_real_vecsxp (value realsxp, value offset) {
-  return(caml_copy_double(REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)]));
+  return(caml_copy_double(REAL(Sexp_val(realsxp))[Int_val(offset)]));
 }
 
 
@@ -317,8 +317,7 @@ CAMLprim value ocamlr_access_str_vecsxp (value strsxp, value offset) {
   /* Same comments as for r_access_int_vecsxp and for
      r_internal_string_of_charsxp. */
 
-  return(caml_copy_string(CHAR(STRING_ELT((char **)
-    Vecsexp_val(strsxp), (Int_val(offset))))));
+  return(caml_copy_string(CHAR(STRING_ELT(Sexp_val(strsxp), (Int_val(offset))))));
 }
 
 
@@ -339,5 +338,5 @@ CAMLprim value ocamlr_access_str_vecsxp (value strsxp, value offset) {
   *  @return The SEXP at this offset in the R vector of SEXPs.
   */
 CAMLprim value ocamlr_access_sexp_vecsxp (value sexpsxp, value offset) {
-  return(Val_sexp(VECTOR_ELT(Vecsexp_val(sexpsxp), Int_val(offset))));
+  return(Val_sexp(VECTOR_ELT(Sexp_val(sexpsxp), Int_val(offset))));
 }
