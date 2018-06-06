@@ -72,7 +72,7 @@ CAMLprim value ocamlr_write_lisplist_tagval (value lisplist, value tag) {
   */
 
 CAMLprim value ocamlr_assign_lglvecsxp (value lglsxp, value offset, value b) {
-  LOGICAL((int *) Vecsexp_val(lglsxp))[Int_val(offset)] = Bool_val(b);
+  LOGICAL(Sexp_val(lglsxp))[Int_val(offset)] = Bool_val(b);
   return Val_unit;
 }
 
@@ -87,7 +87,7 @@ CAMLprim value ocamlr_assign_lglvecsxp (value lglsxp, value offset, value b) {
   */
 
 CAMLprim value ocamlr_assign_intvecsxp (value intsxp, value offset, value i) {
-  INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)] = Int_val(i);
+  INTEGER(Sexp_val(intsxp))[Int_val(offset)] = Int_val(i);
   return Val_unit;
 }
 
@@ -104,7 +104,7 @@ CAMLprim value ocamlr_assign_intvecsxp (value intsxp, value offset, value i) {
 CAMLprim value ocamlr_assign_intvecsxp_opt (value intsxp, value offset, value io) {
   int ri = (io == Val_int(0)) ? NA_INTEGER : Int_val(Field(io,0)) ;
     
-  INTEGER((int *) Vecsexp_val(intsxp))[Int_val(offset)] = ri;
+  INTEGER(Sexp_val(intsxp))[Int_val(offset)] = ri;
   return Val_unit;
 }
 
@@ -117,7 +117,7 @@ CAMLprim value ocamlr_assign_intvecsxp_opt (value intsxp, value offset, value io
   */
 
 CAMLprim value ocamlr_assign_realvecsxp (value realsxp, value offset, value x) {
-  REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)] = Double_val(x);
+  REAL(Sexp_val(realsxp))[Int_val(offset)] = Double_val(x);
   return Val_unit;
 }
 
@@ -133,7 +133,7 @@ CAMLprim value ocamlr_assign_realvecsxp (value realsxp, value offset, value x) {
 CAMLprim value ocamlr_assign_realvecsxp_opt (value realsxp, value offset, value x) {
   double rx = (x == Val_int(0)) ? NA_REAL : Double_val(Field(x,0)) ;
     
-  REAL((double *) Vecsexp_val(realsxp))[Int_val(offset)] = rx;
+  REAL(Sexp_val(realsxp))[Int_val(offset)] = rx;
   return Val_unit;
 }
 
@@ -146,6 +146,6 @@ CAMLprim value ocamlr_assign_realvecsxp_opt (value realsxp, value offset, value 
   */
 
 CAMLprim value ocamlr_assign_strvecsxp (value strsxp, value offset, value s) {
-  STRING_PTR((int *) Vecsexp_val(strsxp))[Int_val(offset)] = mkChar(String_val(s));
+  STRING_PTR(Sexp_val(strsxp))[Int_val(offset)] = mkChar(String_val(s));
   return Val_unit;
 }
