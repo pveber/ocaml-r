@@ -18,4 +18,6 @@ depends: [
 depexts: [
   [["debian"] ["r-mathlib"]]
   [["ubuntu"] ["r-mathlib"]]
+  [["alpine"] ["R"]]
+  [["centos"] ["epel-release" "R"]]
 ]
