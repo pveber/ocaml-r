@@ -11,13 +11,10 @@ authors: [
 ]
 build: ["jbuilder" "build" "-p" name "-j" jobs]
 depends: [
-  "base"      { build }
-  "jbuilder"  { build }
-  "ocamlfind"
-]
-depexts: [
-  [["debian"] ["r-mathlib"]]
-  [["ubuntu"] ["r-mathlib"]]
-  [["alpine"] ["R"]]
-  [["centos"] ["epel-release" "R"]]
+  "base"           { build }
+  "configurator"   { build }
+  "conf-r"         { build }
+  "conf-r-mathlib" { build }
+  "jbuilder"       { build }
+  "stdio"          { build }
 ]
