@@ -1,6 +1,11 @@
 OCaml-R release notes
 =====================
 
+ocaml-r-0.1.1 2018-11-18
+------------------------
+
+jbuilder-to-dune transition
+
 ocaml-r-0.1.0 2018-06-06
 ------------------------
 
