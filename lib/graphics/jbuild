@@ -1,8 +1,0 @@
-(jbuild_version 1)
-
-(library
- ((name            OCamlR_graphics)
-  (public_name     ocaml-r.graphics)
-  (wrapped         false)
-  (libraries       (ocaml-r.base))
-  ))

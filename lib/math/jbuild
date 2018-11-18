@@ -1,8 +1,0 @@
-(jbuild_version 1)
-
-(library
- ((name            OCamlR_math)
-  (public_name     ocaml-r.math)
-  (wrapped         false)
-  (c_names         (r_math_stubs))
-  (c_flags         (:include ../c_flags.sexp))))

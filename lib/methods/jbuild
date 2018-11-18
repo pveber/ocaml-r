@@ -1,8 +1,0 @@
-(jbuild_version 1)
-
-(library
- ((name            OCamlR_methods)
-  (public_name     ocaml-r.methods)
-  (wrapped         false)
-  (libraries       (ocaml-r.interpreter))
-  ))

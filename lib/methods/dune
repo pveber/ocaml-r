@@ -1,0 +1,5 @@
+(library
+ (name            OCamlR_methods)
+ (public_name     ocaml-r.methods)
+ (wrapped         false)
+ (libraries       ocaml-r.interpreter))

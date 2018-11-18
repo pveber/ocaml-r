@@ -1,0 +1,6 @@
+(library
+ (name            OCamlR_interpreter)
+ (public_name     ocaml-r.interpreter)
+ (wrapped         false)
+ (libraries       ocaml-r)
+ (library_flags -linkall))

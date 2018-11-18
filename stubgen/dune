@@ -1,0 +1,3 @@
+(executable
+ (name stubgen)
+ (libraries base ocaml-r.interpreter))

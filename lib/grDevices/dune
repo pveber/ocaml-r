@@ -1,0 +1,5 @@
+(library
+ (name            OCamlR_grDevices)
+ (public_name     ocaml-r.grDevices)
+ (wrapped         false)
+ (libraries       ocaml-r.interpreter))
