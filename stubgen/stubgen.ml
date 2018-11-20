@@ -29,6 +29,7 @@ let keywords = [
   "mod" ;
   "lsl" ;
   "lsr" ;
+  "val" ;
 ]
 
 let ocamlify n =
@@ -43,13 +44,28 @@ let ocamlify n =
     else n
   )
 
+let filter_names names =
+  Array.filter names ~f:(function
+      | "" -> false
+      | n -> (
+          match n.[0] with
+          | 'a'..'z' | 'A'..'Z' | '_' -> true
+          | _ -> false
+        )
+    )
+
 let transform_arg_name_list l =
   List.filter l ~f:String.(fun x -> x <> "...")
 
 let generate_stub_ml name str =
   let open R.Pretty in
   match str with
-  | CLOSURE { formals = LIST args ; _ } ->
+  | CLOSURE { formals ; _ } ->
+    let args = match formals with
+      | LIST args -> args
+      | NULL -> []
+      | _ -> failwith "closure arguments not supported"
+    in
     let name_of_arg = function
       | ARG name, _ -> name
       | SYMBOL (Some (name,_)), _ -> name
@@ -68,13 +84,20 @@ let generate_stub_ml name str =
       (String.concat ~sep:" ; " (List.map args ~f:r_arg_of_arg))
   | STRINGS _ ->
     sprintf {|let %s : string array R.t = R.eval_string "%s"|} (ocamlify name) name
+  | BOOLS _ ->
+    sprintf {|let %s : bool array R.t = R.eval_string "%s"|} (ocamlify name) name
+  | FLOATS _ ->
+    sprintf {|let %s : float array R.t = R.eval_string "%s"|} (ocamlify name) name
+  | VECSXP _ -> "" (* TODO *)
+  | BUILTIN
+  | SPECIAL _ -> "" (* FIXME: how to handle this case? *)
   | _ -> failwithf "not supported: %s" name ()
 
 let generate_stub_ml_for_package p =
   let () = ignore @@ R.eval_string {|require(utils, quietly=TRUE)|} in
   let () = ignore @@ R.eval_string (sprintf {|require(%s, quietly=TRUE)|} p) in
   let r_list = R.eval_string (sprintf {|ls("package:%s")|} p) in
-  let funs = R.strings_of_t r_list in
+  let funs = filter_names (R.strings_of_t r_list) in
   Caml.print_endline "open OCamlR" ;
   Caml.print_endline (
     sprintf
