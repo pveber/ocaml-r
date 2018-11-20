@@ -16,6 +16,7 @@ license: "GPL"
 homepage: "https://github.com/pveber/ocaml-r"
 bug-reports: "https://github.com/pveber/ocaml-r/issues"
 dev-repo: "git+https://github.com/pveber/ocaml-r.git"
+doc: "https://pveber.github.io/ocaml-r/api"
 depends: [
   "ocaml"
   "base" {build}
