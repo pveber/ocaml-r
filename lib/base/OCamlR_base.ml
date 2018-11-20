@@ -1,46 +1,54 @@
 open OCamlR
 
-module Stubs = OCamlR_base_stubs
+type any
+
+module LL = OCamlR_base_stubs
+module Stubs = OCamlR_base_generated_stubs
 
 let ( |? ) o f = match o with
   | Some x -> Some (f x)
   | None -> None
 
-let length l = R.int_of_t (Stubs.length l)
+let subset x i = LL.subset x (R.int i)
+let subset_ii x i j = LL.subset_ii x (R.int i) (R.int j)
+let subset2_i x i = LL.subset2_i x (R.int i)
+let subset2_s x s = LL.subset2_s x (R.string s)
 
-let dim x =
-  Stubs.dim x
-  |> R.ints_of_t
-  |> (function
-      | [| x ; y |] -> x, y
-      | _ -> assert false)
+module Environment = struct
+  type t = any R.t
+  let create () = Stubs.new'env ()
+  let unsafe_get env ~class_ x =
+    let y = LL.subset2_s env (R.string x) in
+    let cls = R.classes (y : _ R.t :> R.sexp) in
+    if List.mem class_ cls then
+      Some y
+    else None
+end
 
-let subset x i = Stubs.subset x (R.int i)
-let subset_ii x i j = Stubs.subset_ii x (R.int i) (R.int j)
-let subset2_i x i = Stubs.subset2_i x (R.int i)
-let subset2_s x s = Stubs.subset2_s x (R.string s)
+module Dataframe_common = struct
+  let dim x =
+    match Stubs.dim'data'frame ~x () |> R.ints_of_t with
+    | [| i ; j |] -> (i, j)
+    | _ -> assert false
+end
 
-(* let rle_k encode decode xs = *)
-(*   let o = Stubs.rle (encode xs) in *)
-(*   R.ints_of_t (o ## lengths), decode (o ## values) *)
+module Dataframe = struct
+  type t = any R.t
 
-(* let rle : *)
-(*   type s. s R.scalar_format -> s list -> (int list * s list) = *)
-(*   fun format xs -> *)
-(*     match format with *)
-(*     | R.Integer -> rle_k R.ints R.ints_of_t xs *)
-(*     | R.Real -> rle_k R.floats R.floats_of_t xs *)
-(*     | R.Logical -> rle_k R.bools R.bools_of_t xs *)
-(*     | R.String -> rle_k R.strings R.strings_of_t xs *)
+  let of_env env x =
+    Environment.unsafe_get env ~class_:"data.frame" x
 
-let sample x n ?replace ?prob () =
+  include Dataframe_common
+end
+
+let sample ?replace ?prob ~size x =
   Stubs.sample
-    x
-    (R.int n)
+    ~x:(R.floats x)
+    ~size:(R.int size)
     ?replace:(replace |? R.bool)
-    ?prob
+    ?prob:(prob |? R.floats)
     ()
-
+  |> R.floats_of_t
 
 
 (* class data'frame x = object *)

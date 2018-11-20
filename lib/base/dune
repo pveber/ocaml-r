@@ -3,3 +3,8 @@
  (public_name     ocaml-r.base)
  (wrapped         false)
  (libraries       ocaml-r.interpreter))
+
+(rule
+ (targets OCamlR_base_generated_stubs.ml)
+ (deps    (:exe ../../stubgen/stubgen.exe))
+ (action  (with-stdout-to %{targets} (run %{exe} base))))
