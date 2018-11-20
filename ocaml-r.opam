@@ -1,6 +1,5 @@
 opam-version: "2.0"
 name: "ocaml-r"
-version: "0.1.1"
 synopsis: "Objective Caml bindings for the R interpreter"
 description: """
 OCaml-R is a library that can be used to construct R values in memory,
