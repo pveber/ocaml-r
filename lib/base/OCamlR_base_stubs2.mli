@@ -1,7 +1,5 @@
 open OCamlR
 
-open OCamlR_base_types
-
 val length : _ R.t -> R.integer R.t
 
 val subset : _ R.t -> R.integer R.t -> 'a R.t
@@ -15,14 +13,14 @@ val subset2_i : _ R.t -> R.integer R.t -> 'a R.t
 val dim : < dim : R.integers R.t ; .. > R.t -> R.integers R.t
 
 module Matrix : sig
-  val subset : 'a matrix R.t -> R.integer R.t -> 'a matrix R.t
-  val subset_ii : 'a matrix R.t -> R.integer R.t -> R.integer R.t -> 'a R.scalar R.t
-  val subset2 : 'a matrix R.t -> R.integer R.t -> 'a R.atomic_vector R.t
+  val subset : _ R.t -> R.integer R.t -> _ R.t
+  val subset_ii : _ R.t -> R.integer R.t -> R.integer R.t -> 'a R.scalar R.t
+  val subset2 : _ R.t -> R.integer R.t -> 'a R.atomic_vector R.t
 end
 
 val rle :
   (_ #R.atomic_vector as 'a) R.t ->
-  < lengths : R.integers R.t ; values : 'a R.t > list_ R.t
+  < lengths : R.integers R.t ; values : 'a R.t > R.t
 
 val sample :
   (< length : R.integer R.t ; subset : 'b. R.integer R.t -> 'b R.t ; .. > as 'c) R.t ->

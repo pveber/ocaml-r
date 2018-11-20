@@ -2,23 +2,23 @@ open OCamlR
 
 type any
 
-module LL = OCamlR_base_stubs
-module Stubs = OCamlR_base_generated_stubs
+module Stubs = OCamlR_base_stubs
+module Stubs2 = OCamlR_base_stubs2
 
 let ( |? ) o f = match o with
   | Some x -> Some (f x)
   | None -> None
 
-let subset x i = LL.subset x (R.int i)
-let subset_ii x i j = LL.subset_ii x (R.int i) (R.int j)
-let subset2_i x i = LL.subset2_i x (R.int i)
-let subset2_s x s = LL.subset2_s x (R.string s)
+let subset x i = Stubs2.subset x (R.int i)
+let subset_ii x i j = Stubs2.subset_ii x (R.int i) (R.int j)
+let subset2_i x i = Stubs2.subset2_i x (R.int i)
+let subset2_s x s = Stubs2.subset2_s x (R.string s)
 
 module Environment = struct
   type t = any R.t
   let create () = Stubs.new'env ()
   let unsafe_get env ~class_ x =
-    let y = LL.subset2_s env (R.string x) in
+    let y = Stubs2.subset2_s env (R.string x) in
     let cls = R.classes (y : _ R.t :> R.sexp) in
     if List.mem class_ cls then
       Some y
