@@ -1,0 +1,24 @@
+{2 Library ocaml-r}
+The entry point of this library is the module:
+{!module-OCamlR}.
+{2 Library ocaml-r.base}
+This library exposes the following toplevel modules:
+{!modules:OCamlR_base OCamlR_base_stubs OCamlR_base_stubs2}
+{2 Library ocaml-r.grDevices}
+The entry point of this library is the module:
+{!module-OCamlR_grDevices}.
+{2 Library ocaml-r.graphics}
+This library exposes the following toplevel modules:
+{!modules:OCamlR_graphics OCamlR_graphics_stubs}
+{2 Library ocaml-r.interpreter}
+The entry point of this library is the module:
+{!module-OCamlR_interpreter}.
+{2 Library ocaml-r.math}
+The entry point of this library is the module:
+{!module-OCamlR_math}.
+{2 Library ocaml-r.methods}
+The entry point of this library is the module:
+{!module-OCamlR_methods}.
+{2 Library ocaml-r.stats}
+This library exposes the following toplevel modules:
+{!modules:OCamlR_stats OCamlR_stats_stubs OCamlR_stats_stubs2}
