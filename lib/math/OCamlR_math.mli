@@ -50,11 +50,11 @@ val exp_rand : unit -> float
 (** {2 Normal distribution} *)
 
 val dnorm : ?mean:float -> ?sd:float -> ?log:bool -> float -> float
-(**  [dnorm ~mean:mu ~sd:sigma ~log:give_log x] computes the density
-  *  of the normal distribution.
-  *  @param mean Mean of the normal distribution.
-  *  @param sd Standard deviation of the normal distribution.
-  *  @param log If true, returns the logarithm of the density. *)
+(** [dnorm ~mean:mu ~sd:sigma ~log:give_log x] computes the density
+    of the normal distribution.
+    @param mean Mean of the normal distribution.
+    @param sd Standard deviation of the normal distribution.
+    @param log If true, returns the logarithm of the density. *)
 
 val pnorm :
   ?mean:float ->
@@ -301,7 +301,7 @@ val qwilcox :
 
 val rwilcox : m:float -> n:float -> float
 
-(** {2 Wilcoxon Sign Rank distribution} *)
+(** {2 Wilcoxon Sign Rank distribution} *)
 
 val dsignrank : ?log:bool -> n:float -> float -> float
 

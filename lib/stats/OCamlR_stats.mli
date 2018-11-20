@@ -1,13 +1,13 @@
 (** Runtime R statistics library. *)
 
-(** {5 Random number generation} *)
+(** {2 Random number generation} *)
 
 val rnorm : ?mean:float -> ?sd:float -> int -> float array
 (** Random generation for the normal distribution. [mean] and [sd] default to [0.]
     and [1.] respectively. *)
 
 
-(** {5 Tests} *)
+(** {2 Tests} *)
 
 val fisher'test :
   ?alternative:[`two_sided | `greater | `less] ->

@@ -25,77 +25,74 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (* ***************************************************************************** *)
 
-(**  Binding for the R interpreter. It encapsulates the
-  *  functionalities of the [libR.so] shared library provided by the R
-  *  software. This enables us to {b embed the R interpreter} into Objective
-  *  Caml, to execute R code from Objective Caml and to exchange data
-  *  structures between R and Objective Caml.
-  *)
+(** Binding for the R interpreter. It encapsulates the functionalities
+    of the [libR.so] shared library provided by the R software. This
+    enables us to {b embed the R interpreter} into Objective Caml, to
+    execute R code from Objective Caml and to exchange data structures
+    between R and Objective Caml.
 
-(**  {b THREAD SAFETY}
-  *
-  *  It is important to understand that this binding is a rather low-level
-  *  binding of R functionality. As such, it is no more thread-safe than R
-  *  itself, which is not thread-safe at all. Therefore, avoid real threading
-  *  unless you know what you're doing...
-  *)
+    {4 THREAD SAFETY}
 
-(**  {b DATA CONVERSION}
-  *
-  *  R is an array-oriented language. Therefore, simple values such as
-  *  a boolean, a string, a number, are in fact encapsulated, in R, in an
-  *  array of booleans, an array of strings, an array of numbers. For a
-  *  simple value, the array has only one element.
-  *
-  *  Moreover, as R is scientific software, it is important that data types
-  *  be correctly matched between Objective Caml and R. At the moment, they
-  *  are not. I am thinking here of the 31/32 bit issues, or 63/64 bit issue,
-  *  or, for instance, of the fact that we are converting R arrays to
-  *  Objective Caml lists, which isn't necessarily the smartest choice of
-  *  data structures.
-  *)
+    It is important to understand that this binding is a rather
+    low-level binding of R functionality. As such, it is no more
+    thread-safe than R itself, which is not thread-safe at
+    all. Therefore, avoid real threading unless you know what you're
+    doing...
+
+    {4 DATA CONVERSION}
+
+    R is an array-oriented language. Therefore, simple values such as
+    a boolean, a string, a number, are in fact encapsulated, in R, in
+    an array of booleans, an array of strings, an array of
+    numbers. For a simple value, the array has only one element.
+
+    Moreover, as R is scientific software, it is important that data
+    types be correctly matched between Objective Caml and R. At the
+    moment, they are not. I am thinking here of the 31/32 bit issues,
+    or 63/64 bit issue, or, for instance.
+*)
 
 
 (** {2 Declaration of environment - Initialisation.} *)
 
 module type Environment = sig
-(**  [Environment] is the type of a module containing all necessary
-  *  informations and data in order to set up the R interpreter
-  *  properly. *)
+  (**  [Environment] is the type of a module containing all necessary
+       informations and data in order to set up the R interpreter
+       properly. *)
 
   val name : string
   (**  This is the [name] of the first argument of [argv] for R.
-    *  Mandatory, otherwise [libR.so] segfaults immediately. *)
+       Mandatory, otherwise [libR.so] segfaults immediately. *)
 
   val options : string list
   (**  Other command line options passed to the [libR.so] library when
-    *  initialising R.
-    *
-    *  @see "R reference manual" File refman.pdf, page 452, section intitled
-    *  'Startup - Initialization at Start of an R Session' for details
-    *  about the most important command line options.
-    *  @see <http://cran.r-project.org/doc/manuals/R-intro.html#Invoking-R>
-    *  For command line options.
-    *)
+       initialising R.
+
+       @see "R reference manual" File refman.pdf, page 452, section intitled
+       'Startup - Initialization at Start of an R Session' for details
+       about the most important command line options.
+       @see <http://cran.r-project.org/doc/manuals/R-intro.html#Invoking-R>
+       For command line options.
+  *)
 
   val signal_handlers : bool
   (**  If set to [false], asks R not to install its signal handlers. I've
-    *  been experiencing weird issues with R signal handlers, since, for
-    *  instance, a [SIGSEGV] is sometimes caught by [libR.so], and R then
-    *  asks whether or not you want to save your workspace, et ceteræ... By
-    *  default, set to false.
-    *)
+       been experiencing weird issues with R signal handlers, since, for
+       instance, a [SIGSEGV] is sometimes caught by [libR.so], and R then
+       asks whether or not you want to save your workspace, et ceteræ... By
+       default, set to false.
+  *)
 
   val env : (string * string) list
   (**  These are environment variables that needs to be set before
-    *  initialising the R interpreter. In the [Standard] module, these
-    *  values are determined when the binding itself is compiled.
-    *)
+       initialising the R interpreter. In the [Standard] module, these
+       values are determined when the binding itself is compiled.
+  *)
 
   val packages : string list option
   (**  Packages loaded on startup. If set to [None], load the usual standard
-    *  library. Otherwise, if set to [Some p], load packages [p] in place of
-    *  the standard library. In the [Standard] module, this is set to [Some []]. *)
+       library. Otherwise, if set to [Some p], load packages [p] in place of
+       the standard library. In the [Standard] module, this is set to [Some []]. *)
 
 end
 
@@ -104,8 +101,8 @@ end
 
 module Standard : Environment
 (**  The [Standard] module contains initialisation details for libR.so.
-  *  These informations are determined when the binding is being compiled.
-  *)
+     These informations are determined when the binding is being compiled.
+*)
 
 
 (** {2 Internal representation of R values.} *)
@@ -172,9 +169,9 @@ type rawvecsxp      = [`Vec  of [`Raw ]]                          t
 type exprvecsxp     = [`Vec  of [`Raw ]]                          t
 type pairlist       = [`Nil | `List of [`Pair]]                   t
 type 'a vecsxp      = [`Vec  of
-    [< `Char | `Lgl | `Int  | `Real
-    | `Str  | `Raw | `Expr ] as 'a
-  ] t
+                         [< `Char | `Lgl | `Int  | `Real
+                         | `Str  | `Raw | `Expr ] as 'a
+                      ] t
 
 
 
@@ -260,13 +257,13 @@ val bools_of_t : logicals t -> bool array
 
 val bool_of_t : logical t -> bool
 (**  Converts an R array of logical values with one element into an
-  *  Objective Caml boolean.
-  *)
+     Objective Caml boolean.
+*)
 
 val bool : bool -> logical t
 (**  Converts an Objective Caml boolean value to an R boolean value,
-  *  that is a mono-element array of booleans.
-  *)
+     that is a mono-element array of booleans.
+*)
 
 val bools : bool array -> logicals t
 (** Converts an OCaml array of booleans into an R array of logical
@@ -278,13 +275,13 @@ val ints_of_t : integers t -> int array
 
 val int_of_t : integer t -> int
 (**  Converts an R array of integers with one element into an Objective
-  *  Caml integer.
-  *)
+     Caml integer.
+*)
 
 val int : int -> integer t
 (**  Converts an Objective Caml integer to an R integer value, that
-  *  is a mono-element array of integers.
-  *)
+     is a mono-element array of integers.
+*)
 
 val ints : int array -> integers t
 (** Converts an OCaml array of integers into an R array of
@@ -292,9 +289,9 @@ val ints : int array -> integers t
 
 val optints : int option array -> integers t
 (**  Converts a OCaml array of int options into an R array of
-  *  integer numbers with possibly missing values. The value [None] is
-  *  converted to [NA] on the R side.
-  *)
+     integer numbers with possibly missing values. The value [None] is
+     converted to [NA] on the R side.
+*)
 
 val floats_of_t : reals t -> float array
 (** Converts an R array of real numbers into an array of OCaml
@@ -306,19 +303,19 @@ val float_of_t : real t -> float
 
 val float : float -> real t
 (**  Converts an OCaml float to an R real value, that is a
-  *  mono-element array of real numbers.
-  *)
+     mono-element array of real numbers.
+*)
 
 val floats : float array -> reals t
 (**  Converts an OCaml array of floats into an R array of
-  *  real numbers.
-  *)
+     real numbers.
+*)
 
 val optfloats : float option array -> reals t
 (**  Converts a OCaml array of float options into an R array of
-  *  real numbers with possibly missing values. The value [None] is
-  *  converted to [NA] on the R side.
-  *)
+     real numbers with possibly missing values. The value [None] is
+     converted to [NA] on the R side.
+*)
 
 val strings_of_t : strings t -> string array
 (** Converts an R array of strings into a list of OCaml strings. *)
@@ -329,18 +326,18 @@ val string_of_t : string_ t -> string
 
 val string : string -> string_ t
 (**  Converts an OCaml string to an R string, that is a
-  *  mono-element array of strings.
-  *)
+     mono-element array of strings.
+*)
 
 val strings : string array -> strings t
 (**  Converts an OCaml array of strings into an R array of
-  *  strings.
-  *)
+     strings.
+*)
 
 val sexps_of_t : rawvecsxp -> sexp list
 (**  Converts an R array of SEXPs into an OCaml array of
-  *  SEXPs.
-  *)
+     SEXPs.
+*)
 
 
 (**  {2 Inspection and specification of internals.} *)
@@ -359,8 +356,8 @@ val attributes : sexp -> (Specification.symbol * sexp) list
 val classes : sexp -> string list
 
 (**  Provides facilities to inspect internal structure of
-  *  SEXPs. Useful in the toplevel when you encounter
-  *  unexpected R values. *)
+     SEXPs. Useful in the toplevel when you encounter
+     unexpected R values. *)
 module Pretty : sig
 
   (**  Semantic interpretation and description of SEXPs. *)
@@ -405,18 +402,18 @@ type parse_status =
   | Parse_Incomplete
   | Parse_Error
   | Parse_EOF
-(**  Outcome of a parsing request. *)
+  (**  Outcome of a parsing request. *)
 
 exception Parsing_failure of parse_status * string
 (**  Exception raised when parsing fails. *)
 
 val parse_string : ?max:int -> string -> langsxp list
 (**  Parse a string of R code into R calls.
-  *
-  *  @param max If omitted, parse the whole R code, even if
-  *  there are multiple statements. Otherwise, maximum
-  *  number of statements to parse.
-  *  @raise Parsing_failure When parsing fails. *)
+
+     @param max If omitted, parse the whole R code, even if
+     there are multiple statements. Otherwise, maximum
+     number of statements to parse.
+     @raise Parsing_failure When parsing fails. *)
 
 val parse : string -> langsxp
 (**  Parse the first R statement in the given R code. *)
@@ -428,72 +425,76 @@ exception Runtime_error of langsxp * string
 
 val eval_langsxp : langsxp -> 'a t
 (**  [eval_langsxp] takes a R value containing an R executable expression.
-  *  Also known as a [LANGSXP]. You get the resulting value back. *)
+     Also known as a [LANGSXP]. You get the resulting value back. *)
 
 val eval_string : string -> 'a t
 (**  [eval_string] takes a string containing R code, and feeds it to the
-  *  R interpreter. You get the resulting value back. The typing of this
-  *  function is deliberately unsafe in order to allow the user to type
-  *  it precisely.
+     R interpreter. You get the resulting value back. The typing of this
+     function is deliberately unsafe in order to allow the user to type
+     it precisely.
   *
-  *  Bug: currently, if you try to execute a statement that refers to
-  *  symbols that haven't been loaded, you get a segfault. For instance,
-  *  evaluating a string containing the [rbinom] symbol without the
-  *  [R.stats] package being loaded raises a segfault. *)
+     Bug: currently, if you try to execute a statement that refers to
+     symbols that haven't been loaded, you get a segfault. For instance,
+     evaluating a string containing the [rbinom] symbol without the
+     [R.stats] package being loaded raises a segfault. *)
 
 val arg : ('a -> 'b t) -> ?name:string -> 'a -> (string option * sexp) option
 (**  Convenience function to wrap up arguments, when mapping R functions
-  *  to Objective Caml functions. *)
+     to Objective Caml functions. *)
 
 val opt : ('a -> 'b t) -> string -> 'a option -> (string option * sexp) option
 (**  Convenience function to wrap up optional arguments, when mapping R functions
-  *  to Objective Caml functions. *)
+     to Objective Caml functions. *)
 
 val eval : symsxp -> (string option * sexp) option list -> 'a t
 (**  [eval f args] evaluates an the R function [f] with respect to a list of
-  *  arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
-  *  argument whose optional name is [name] and whose value is [sexp]. The
-  *  typing of this function is deliberately unsafe in order to allow the
-  *  user to type it precisely. *)
+     arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
+     argument whose optional name is [name] and whose value is [sexp]. The
+     typing of this function is deliberately unsafe in order to allow the
+     user to type it precisely. *)
 
 
-(**  {2 Initialisation.}
-  *
-  *  We provide two mechanisms to activate an R interpreter from OCaml-R:
-  *
-  *  The first mechanism consists of low-level bindings to the initialisation
-  *  and termination functions of the [libR.so] shared library. While this is
-  *  a rather flexible approach, it has the downside of not being a very static
-  *  approach, specifically if your intention if to write Objective Caml bindings
-  *  for a dependent bunch of R packages.
-  *
-  *  The second mechanism is a static, functorial approach: You just have to
-  *  create a module with the [Interpreter] functor to initialise the R interpreter.
-  *  You provide initialisation details through a module of module type [Environment],
-  *  and [Interpreter] will set it up correctly.
-  *
-  *  This functorial facility is available from the OCaml_R module: This OCaml_R module
-  *  has the sole purpose of initialising the R interpreter with the [Standard]
-  *  [Environment] module. No need to worry about initialisation details.
-  *
-  *  To create bindings for a dependent bunch of R packages, you simply have to make
-  *  them depend on the findlib [R.interpreter] package, which involves the OCaml_R
-  *  module. This is also convenient on the toplevel, where you simply have to have
-  *  to invoke the [#require "R.interpreter"] directive to set up the interpreter.
-  *)
+(** {2 Initialisation}
+
+    We provide two mechanisms to activate an R interpreter from OCaml-R:
+
+    The first mechanism consists of low-level bindings to the
+    initialisation and termination functions of the [libR.so] shared
+    library. While this is a rather flexible approach, it has the
+    downside of not being a very static approach, specifically if your
+    intention if to write Objective Caml bindings for a dependent
+    bunch of R packages.
+
+    The second mechanism is a static, functorial approach: You just
+    have to create a module with the [Interpreter] functor to
+    initialise the R interpreter.  You provide initialisation details
+    through a module of module type [Environment], and [Interpreter]
+    will set it up correctly.
+
+    This functorial facility is available from the OCaml_R module:
+    This OCaml_R module has the sole purpose of initialising the R
+    interpreter with the [Standard] [Environment] module. No need to
+    worry about initialisation details.
+
+    To create bindings for a dependent bunch of R packages, you simply
+    have to make them depend on the findlib [R.interpreter] package,
+    which involves the OCaml_R module. This is also convenient on the
+    toplevel, where you simply have to have to invoke the
+    [#require "R.interpreter"] directive to set up the interpreter.
+*)
 
 exception Initialisation_failed
 (**  Denotes failure to initialise the R interpreter. *)
 
 val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> ?packages:string list option -> ?sigs:bool -> unit -> unit
 (**  [init] initialises the embedded R interpreter.
-  *
-  *  @param name Name of program. Defaults to Sys.argv.(0).
-  *  @param argv Command line options given to [libR.so]. Defaults to rest of Sys.argv.
-  *  @param env Environment variables to be set for R. Defaults to reasonable values.
-  *  @param packages Packages to be loaded at startup. If [None], load the usual standard library.
-  *  @param sigs If [false], stops R from setting his signal handlers. Defaults to [false].
-  *  @raise Initialisation_failed In case R could not be started. *)
+
+     @param name Name of program. Defaults to Sys.argv.(0).
+     @param argv Command line options given to [libR.so]. Defaults to rest of Sys.argv.
+     @param env Environment variables to be set for R. Defaults to reasonable values.
+     @param packages Packages to be loaded at startup. If [None], load the usual standard library.
+     @param sigs If [false], stops R from setting his signal handlers. Defaults to [false].
+     @raise Initialisation_failed In case R could not be started. *)
 
 val terminate : unit -> unit
 (**  Terminates the R session. *)
@@ -503,8 +504,8 @@ module type Interpreter = sig end
 
 module Interpreter (Env : Environment) : Interpreter
 (**  Functor used to initialise statically an R interpreter, given initialisation
-  *  details provided by the provided [Env] module.
-  *)
+     details provided by the provided [Env] module.
+*)
 
 
 (**  {2 Low-level inspection} *)
