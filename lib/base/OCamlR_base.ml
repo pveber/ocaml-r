@@ -13,6 +13,26 @@ let subset_ii x i j = Stubs2.subset_ii x (R.int i) (R.int j)
 let subset2_i x i = Stubs2.subset2_i x (R.int i)
 let subset2_s x s = Stubs2.subset2_s x (R.string s)
 
+module type Atomic_vector = sig
+  type t
+  type elt
+  val length : t -> int
+end
+
+module Atomic_vector_impl = struct
+  type t = t R.t
+
+  let length =
+    let symbol = R.symbol "length" in
+    fun (x : t) ->
+      R.int_of_t (R.eval symbol [ R.arg ident x ])
+end
+
+module Numeric = struct
+  include Atomic_vector_impl
+end
+
+
 module S3 = struct
   type t = t R.t
   let r x = x
@@ -183,4 +203,3 @@ let sample ?replace ?prob ~size x =
 (*   List.map *)
 (*     R.cast *)
 (*     (R.sexps_of_t (R.cast (listing : 'c R.t :> R.sexp) : R.sexp list R.t)) *)
-

@@ -17,6 +17,14 @@ module Environment : sig
   (** wrapper for [new.env] *)
 end
 
+module type Atomic_vector = sig
+  type t
+  type elt
+  val length : t -> int
+end
+
+module Numeric : Atomic_vector with type elt := float
+
 module Dataframe : sig
   type t
   include module type of S3 with type t := t
