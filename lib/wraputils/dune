@@ -1,0 +1,4 @@
+(library
+ (name            OCamlR_wraputils)
+ (public_name     ocaml-r.wraputils)
+ (libraries       ocaml-r.interpreter))
