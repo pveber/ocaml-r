@@ -2,8 +2,16 @@
 
 open OCamlR
 
+module S3 : sig
+  type t
+
+  val r : t -> t R.t
+  val _class_ : t -> string array
+end
+
 module Environment : sig
   type t
+  include module type of S3 with type t := t
 
   val create : unit -> t
   (** wrapper for [new.env] *)
@@ -11,6 +19,8 @@ end
 
 module Dataframe : sig
   type t
+  include module type of S3 with type t := t
+
   val of_env : Environment.t -> string -> t option
   val dim : t -> int * int
 end

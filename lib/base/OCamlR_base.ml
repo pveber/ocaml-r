@@ -1,6 +1,5 @@
 open OCamlR
-
-type any
+open OCamlR_wraputils
 
 module Stubs = OCamlR_base_stubs
 module Stubs2 = OCamlR_base_stubs2
@@ -14,8 +13,17 @@ let subset_ii x i j = Stubs2.subset_ii x (R.int i) (R.int j)
 let subset2_i x i = Stubs2.subset2_i x (R.int i)
 let subset2_s x s = Stubs2.subset2_s x (R.string s)
 
+module S3 = struct
+  type t = t R.t
+  let r x = x
+  let _class_ =
+    let symbol = R.symbol "class" in
+    fun (x : t) ->
+      R.strings_of_t (R.eval symbol [ R.arg ident x ])
+end
+
 module Environment = struct
-  type t = any R.t
+  include S3
   let create () = Stubs.new'env ()
   let unsafe_get env ~class_ x =
     let y = Stubs2.subset2_s env (R.string x) in
@@ -25,20 +33,16 @@ module Environment = struct
     else None
 end
 
-module Dataframe_common = struct
+module Dataframe = struct
+  include S3
+
   let dim x =
     match Stubs.dim'data'frame ~x () |> R.ints_of_t with
     | [| i ; j |] -> (i, j)
     | _ -> assert false
-end
-
-module Dataframe = struct
-  type t = any R.t
 
   let of_env env x =
     Environment.unsafe_get env ~class_:"data.frame" x
-
-  include Dataframe_common
 end
 
 let sample ?replace ?prob ~size x =

@@ -2,7 +2,7 @@
  (name            OCamlR_base)
  (public_name     ocaml-r.base)
  (wrapped         false)
- (libraries       ocaml-r.interpreter))
+ (libraries       ocaml-r.interpreter ocaml-r.wraputils))
 
 (rule
  (targets OCamlR_base_stubs.ml)
