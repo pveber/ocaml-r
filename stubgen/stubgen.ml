@@ -77,10 +77,15 @@ let generate_stub_ml name str =
     in
     let args = List.map args ~f:name_of_arg in
     let args = transform_arg_name_list args in
-    sprintf "let %s %s () = R.eval (R.symbol \"%s\") [ %s ]\n"
-      (ocamlify name)
-      (String.concat ~sep:" " (List.map args ~f:param_of_arg))
+    let ocaml_name = ocamlify name in
+    sprintf {|
+let %s_symbol = R.symbol "%s"
+let %s %s () = R.eval %s_symbol [ %s ]|}
+      ocaml_name
       name
+      ocaml_name
+      (String.concat ~sep:" " (List.map args ~f:param_of_arg))
+      ocaml_name
       (String.concat ~sep:" ; " (List.map args ~f:r_arg_of_arg))
   | STRINGS _ ->
     sprintf {|let %s : string array R.t = R.eval_string "%s"|} (ocamlify name) name
