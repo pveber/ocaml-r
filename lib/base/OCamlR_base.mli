@@ -19,11 +19,18 @@ end
 
 module type Atomic_vector = sig
   type t
+  type format
   type elt
+  val r : t -> format R.t
   val length : t -> int
+  val to_array : t -> elt array
 end
 
-module Numeric : Atomic_vector with type elt := float
+module Numeric : Atomic_vector with type elt = float and type format = R.reals
+module Logical : Atomic_vector with type elt = bool and type format = R.logicals
+module Integer : Atomic_vector with type elt = int and type format = R.integers
+module Character : Atomic_vector with type elt = string and type format = R.strings
+module Factor : Atomic_vector with type elt = string and type format = R.strings
 
 module Dataframe : sig
   type t

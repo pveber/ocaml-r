@@ -15,13 +15,23 @@ let subset2_s x s = Stubs2.subset2_s x (R.string s)
 
 module type Atomic_vector = sig
   type t
+  type format
   type elt
+  val r : t -> format R.t
   val length : t -> int
+  val to_array : t -> elt array
 end
 
-module Atomic_vector_impl = struct
-  type t = t R.t
+module Atomic_vector_impl(X : sig
+    type format
+    type elt
+    val to_array : format R.t -> elt array
+  end) = struct
+  include X
+  type t = X.format R.t
 
+  let r x = x
+  let to_array = X.to_array
   let length =
     let symbol = R.symbol "length" in
     fun (x : t) ->
@@ -29,9 +39,44 @@ module Atomic_vector_impl = struct
 end
 
 module Numeric = struct
-  include Atomic_vector_impl
+  module E = struct
+    type format = R.reals
+    type elt = float
+    let to_array = R.floats_of_t
+  end
+  include Atomic_vector_impl(E)
 end
 
+module Integer = struct
+  module E = struct
+    type format = R.integers
+    type elt = int
+    let to_array = R.ints_of_t
+  end
+  include Atomic_vector_impl(E)
+end
+
+module Logical = struct
+  module E = struct
+    type format = R.logicals
+    type elt = bool
+    let to_array = R.bools_of_t
+  end
+  include Atomic_vector_impl(E)
+end
+
+module Character = struct
+  module E = struct
+    type format = R.strings
+    type elt = string
+    let to_array = R.strings_of_t
+  end
+  include Atomic_vector_impl(E)
+end
+
+module Factor = struct
+  include Character
+end
 
 module S3 = struct
   type t = t R.t
