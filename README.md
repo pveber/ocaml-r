@@ -9,6 +9,9 @@ library, and has embryonic support for R's standard libraries.
 It can be used to build R datastructures in memory, call R functions
 and convert the returned value to OCaml datastructures.
 
+The API is available
+[online](http://pveber.github.io/ocaml-r/api/_html/ocaml-r/index.html).
+
 ## Installation
 
 ```sh
