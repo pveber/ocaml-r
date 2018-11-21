@@ -22,3 +22,9 @@ The entry point of this library is the module:
 {2 Library ocaml-r.stats}
 This library exposes the following toplevel modules:
 {!modules:OCamlR_stats OCamlR_stats_stubs OCamlR_stats_stubs2}
+{2 Library ocaml-r.utils}
+This library exposes the following toplevel modules:
+{!modules:OCamlR_utils OCamlR_utils_stubs}
+{2 Library ocaml-r.wraputils}
+The entry point of this library is the module:
+{!module-OCamlR_wraputils}.
