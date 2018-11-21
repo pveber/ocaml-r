@@ -29,19 +29,19 @@ let r_breaks = function
   | `m `Scott -> any (R.string "Scott")
   | `m `FD -> any (R.string "FD")
 
-let hist ?breaks ?freq ?include_lowest ?right ?main ?xlab ?ylab ?xlim ?ylim ?plot x =
+let hist ?breaks ?freq ?include_lowest ?right ?(main = "") ?(xlab = "") ?ylab ?xlim ?ylim ?plot x =
   R.eval Symbol.hist [
-    R.arg R.floats                  x ;
-    R.opt r_breaks     "breaks"         breaks ;
-    R.opt R.bool       "freq"           freq ;
-    R.opt R.bool       "include_lowest" include_lowest ;
-    R.opt R.bool       "right"          right ;
-    R.opt R.string     "main"           main;
-    R.opt R.string     "xlab"           xlab ;
-    R.opt R.string     "ylab"           ylab ;
-    R.opt R.float      "xlim"           xlim ;
-    R.opt R.float      "ylim"           ylim ;
-    R.opt R.bool       "plot"           plot ;
+    R.arg R.floats x ;
+    R.opt r_breaks "breaks" breaks ;
+    R.opt R.bool "freq" freq ;
+    R.opt R.bool "include_lowest" include_lowest ;
+    R.opt R.bool "right"right ;
+    R.arg R.string ~name:"main" main;
+    R.arg R.string ~name:"xlab" xlab ;
+    R.opt R.string "ylab" ylab ;
+    R.opt R.float  "xlim" xlim ;
+    R.opt R.float "ylim" ylim ;
+    R.opt R.bool "plot" plot ;
   ]
   |> new hist
 
