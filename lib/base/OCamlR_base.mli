@@ -24,6 +24,7 @@ module type Atomic_vector = sig
   val r : t -> format R.t
   val length : t -> int
   val to_array : t -> elt array
+  val of_array : elt array -> t
 end
 
 module Numeric : Atomic_vector with type elt = float and type format = R.reals
