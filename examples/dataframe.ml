@@ -2,16 +2,17 @@
 (* #require "R.syntax";; *)
 (* #require "R.stats";; *)
 
-open Rbase
+open OCamlR_base
 
-let res = Rstats.fisher_test_2x2 ~ff:2 ~ft:3 ~tf:4 ~tt:5 ()
+let res =
+  OCamlR_stats.fisher'test 
+    (Logical.of_array [| true ; true ; false ; false ; true ; false|])
+    (Logical.of_array [| true ; true ; true ; false ; true ; false|])
 
 let () =
   Printf.printf
     "%f %f\n%s\n"
-    (R.float_of_t (res ## estimatee))
-    (R.float_of_t (res ## p'value))
-    (R.string_of_t (res ## alternative))
+    res#estimate
+    res#p'value
+    res#alternative
 ;;
-
-let _ = (R.int (res ## p'value)) = 0

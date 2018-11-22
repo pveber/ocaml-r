@@ -1,4 +1,3 @@
-(executable
- (name test_suite)
- (modules test_suite)
- (libraries ocaml-r.base))
+(executables
+ (names test_suite dataframe)
+ (libraries ocaml-r.base ocaml-r.stats))
