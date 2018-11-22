@@ -1,11 +1,8 @@
 open OCamlR
 open OCamlR_base
+open OCamlR_wraputils
 
 module S = OCamlR_stats_stubs2
-
-let ( |? ) o f = match o with
-  | Some x -> Some (f x)
-  | None -> None
 
 module Symbol = struct
   let ks'test = R.symbol "ks.test"
@@ -15,8 +12,8 @@ end
 
 let rnorm ?mean ?sd n =
   S.rnorm
-    ?mean:(mean |? R.float)
-    ?sd:(sd |? R.float)
+    ?mean:(mean |?> R.float)
+    ?sd:(sd |?> R.float)
     ~n:(n |> R.int)
     ()
   |> R.floats_of_t
@@ -31,7 +28,7 @@ class fisher'test o = object
   method p'value = R.float_of_t (subset2_s o "p.value")
   method conf'int =
     R.notnil (subset2_s o "conf.int")
-    |? (fun x ->
+    |?> (fun x ->
         match R.floats_of_t x with
         | [| x ; y |] -> (x, y)
         | _ -> assert false
@@ -45,9 +42,9 @@ end
 
 let fisher'test ?alternative v v' =
   S.fisher'test
-    ?alternative:(alternative |? string_of_test_kind |? R.string)
-    ~x:(R.floats v)
-    ~y:(R.floats v')
+    ?alternative:(alternative |?> string_of_test_kind |?> R.string)
+    ~x:(Logical.r v)
+    ~y:(Logical.r v')
     ()
   |> new fisher'test
 

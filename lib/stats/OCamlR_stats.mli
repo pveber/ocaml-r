@@ -1,5 +1,7 @@
 (** Runtime R statistics library. *)
 
+open OCamlR_base
+
 (** {2 Random number generation} *)
 
 val rnorm : ?mean:float -> ?sd:float -> int -> float array
@@ -11,8 +13,8 @@ val rnorm : ?mean:float -> ?sd:float -> int -> float array
 
 val fisher'test :
   ?alternative:[`two_sided | `greater | `less] ->
-  float array ->
-  float array ->
+  Logical.t ->
+  Logical.t ->
   < p'value : float ;
     conf'int : (float * float) option  ;
     estimate : float ;
@@ -20,6 +22,18 @@ val fisher'test :
     alternative : string ;
     method_ : string ;
     data'name : string >
+
+(* val fisher'test_2x2 :
+ *   ?alternative:[`two_sided | `greater | `less] ->
+ *   ff:int -> ft:int -> tf:int -> tt:int -> unit ->
+ *   < p'value : float ;
+ *     conf'int : (float * float) option  ;
+ *     estimate : float ;
+ *     null'value : float ;
+ *     alternative : string ;
+ *     method_ : string ;
+ *     data'name : string > *)
+
 
 val ks'test :
   ?alternative:[`two_sided | `greater | `less] ->
@@ -34,19 +48,10 @@ val p'adjust :
   ?method_ : [`holm | `hochberg | `hommel | `bonferroni | `BH | `BY | `fdr] ->
   float array -> float array
 
-(* val fisher'test_2x2 : *)
-(*   ?alternative:[`two_sided | `greater | `less] -> *)
-(*   ff:int -> ft:int -> tf:int -> tt:int -> unit -> fisher'test listing R.t *)
-
 
 
 
 (* module Stub : sig *)
-
-(*   (\** {5 Random number generation} *\) *)
-
-(*   val rnorm : ?mean:float R.t -> ?sd:float R.t -> int R.t -> float list R.t *)
-
 
 
 
