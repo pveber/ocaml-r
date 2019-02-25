@@ -39,6 +39,15 @@ module Dataframe : sig
 
   val of_env : Environment.t -> string -> t option
   val dim : t -> int * int
+
+  type column
+  val numeric : string -> Numeric.t -> column
+  val integer : string -> Integer.t -> column
+  val logical : string -> Logical.t -> column
+  val character : string -> Character.t -> column
+  val factor : string -> Factor.t -> column
+
+  val create : column list -> t
 end
 
 val sample :

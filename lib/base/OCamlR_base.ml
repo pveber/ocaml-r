@@ -115,6 +115,37 @@ module Dataframe = struct
 
   let of_env env x =
     Environment.unsafe_get env ~class_:"data.frame" x
+
+  type column_data =
+    | Numeric of Numeric.t
+    | Logical of Logical.t
+    | Character of Character.t
+    | Factor of Factor.t
+    | Integer of Integer.t
+
+  type column = string * column_data
+
+  let rarg_of_column_data name =
+    let f x = R.arg (fun x -> x) ~name x in
+    function
+    | Numeric x -> f x
+    | Logical x -> f x
+    | Character x -> f x
+    | Integer x -> f x
+    | Factor x -> f x
+
+  let numeric name x = name, Numeric x
+  let integer name x = name, Integer x
+  let logical name x = name, Logical x
+  let character name x = name, Character  x
+  let factor name x = name, Factor x
+
+
+  let create cols =
+    List.map
+      (fun (label, col) -> rarg_of_column_data label col)
+      cols
+    |> R.eval (R.symbol "data.frame")
 end
 
 let sample ?replace ?prob ~size x =
