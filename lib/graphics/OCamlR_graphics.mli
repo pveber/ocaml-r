@@ -46,3 +46,11 @@ val plot :
 val par :
   ?mfrow:(int * int) ->
   unit -> unit
+
+val dataframe_boxplot :
+  ?main:string ->
+  ?xlab:string ->
+  ?ylab:string ->
+  OCamlR_stats.Formula.t ->
+  OCamlR_base.Dataframe.t ->
+  unit

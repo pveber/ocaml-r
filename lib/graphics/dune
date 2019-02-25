@@ -2,4 +2,4 @@
  (name            OCamlR_graphics)
  (public_name     ocaml-r.graphics)
  (wrapped         false)
- (libraries       ocaml-r.base))
+ (libraries       ocaml-r.base ocaml-r.stats))

@@ -1,5 +1,6 @@
 open OCamlR
 open OCamlR_base
+open OCamlR_stats
 
 let () = ignore (R.eval_string "require(graphics, quietly=TRUE)")
 
@@ -7,6 +8,7 @@ module Symbol = struct
 
   let hist = R.symbol "hist"
   let plot = R.symbol ~generic:true "plot"
+  let boxplot = R.symbol "boxplot"
   let par = R.symbol "par"
 
 end
@@ -102,5 +104,15 @@ let plot ?main ?xlab ?ylab ?xlim ?ylim ?plot_type ?lwd ?col ?log ~x ?y () =
 let par ?mfrow () =
   R.eval Symbol.par [
     R.opt int_tup "mfrow" mfrow ;
+  ]
+  |> ignore
+
+let dataframe_boxplot ?main ?xlab ?ylab formula data =
+  R.eval Symbol.boxplot [
+    R.arg Formula.r formula ;
+    R.arg Dataframe.r ~name:"data" data ;
+    R.opt R.string "main" main ;
+    R.opt R.string "xlab" xlab ;
+    R.opt R.string "ylab" ylab ;
   ]
   |> ignore
