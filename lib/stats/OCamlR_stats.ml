@@ -9,6 +9,13 @@ module Symbol = struct
   let p'adjust = R.symbol "p.adjust"
 end
 
+module Formula = struct
+  include S3
+  let of_string x =
+    S.formula ~x:(R.string x) ()
+    |> unsafe_of_r
+end
+
 
 let rnorm ?mean ?sd n =
   S.rnorm

@@ -2,6 +2,13 @@
 
 open OCamlR_base
 
+module Formula : sig
+  type t
+  include module type of S3 with type t := t
+
+  val of_string : string -> t
+end
+
 (** {2 Random number generation} *)
 
 val rnorm : ?mean:float -> ?sd:float -> int -> float array
