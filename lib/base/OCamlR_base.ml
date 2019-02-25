@@ -92,6 +92,7 @@ module S3 = struct
     let symbol = R.symbol "class" in
     fun (x : t) ->
       R.strings_of_t (R.eval symbol [ R.arg ident x ])
+  let unsafe_of_r x = R.cast (x : _ R.t :> R.sexp)
 end
 
 module Environment = struct

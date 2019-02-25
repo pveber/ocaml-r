@@ -7,6 +7,7 @@ module S3 : sig
 
   val r : t -> t R.t
   val _class_ : t -> string array
+  val unsafe_of_r : _ R.t -> t
 end
 
 module Environment : sig
