@@ -85,13 +85,13 @@ let r_log_scale t =
     | `XY -> "xy"
   )
 
-let plot ?main ?xlab ?ylab ?xlim ?ylim ?plot_type ?lwd ?col ?log ~x ?y () =
+let plot ?main ?(xlab = "") ?(ylab = "") ?xlim ?ylim ?plot_type ?lwd ?col ?log ~x ?y () =
   R.eval Symbol.plot [
     R.arg R.floats x ;
     R.opt R.floats "y" y ;
     R.opt R.string "main" main ;
-    R.opt R.string "xlab" xlab ;
-    R.opt R.string "ylab" ylab ;
+    R.arg R.string ~name:"xlab" xlab ;
+    R.arg R.string ~name:"ylab" ylab ;
     R.opt float_tup "xlim" xlim ;
     R.opt float_tup "ylim" ylim ;
     R.opt r_plot_type "type" plot_type ;
