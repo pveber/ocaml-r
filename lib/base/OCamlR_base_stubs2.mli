@@ -10,7 +10,7 @@ val subset_ii :
   'b R.t
 val subset2_s : _ R.t -> R.string_ R.t -> 'a R.t
 val subset2_i : _ R.t -> R.integer R.t -> 'a R.t
-val dim : < dim : R.integers R.t ; .. > R.t -> R.integers R.t
+val dim : _ R.t -> R.integers R.t
 
 module Matrix : sig
   val subset : _ R.t -> R.integer R.t -> _ R.t

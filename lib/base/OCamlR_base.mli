@@ -51,6 +51,13 @@ module Dataframe : sig
   val create : column list -> t
 end
 
+module Matrix : sig
+  type t
+  include module type of S3 with type t := t
+  val dim : t -> int * int
+  val of_arrays : float array array -> t
+end
+
 val sample :
   ?replace:bool ->
   ?prob:float array ->

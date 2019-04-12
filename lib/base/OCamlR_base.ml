@@ -149,6 +149,23 @@ module Dataframe = struct
     |> R.eval (R.symbol "data.frame")
 end
 
+module Matrix = struct
+  include S3
+
+  let dim (x : t) =
+    match Stubs2.dim x |> R.ints_of_t with
+    | [| i ; j |] -> (i, j)
+    | _ -> assert false
+
+  let of_arrays m =
+    let data =
+      Array.to_list m
+      |> Array.concat
+      |> R.floats
+    in
+    Stubs.matrix ~data ~nrow:(R.int (Array.length m)) ~byrow:(R.bool true) ()
+end
+
 let sample ?replace ?prob ~size x =
   Stubs.sample
     ~x:(R.floats x)
@@ -158,13 +175,6 @@ let sample ?replace ?prob ~size x =
     ()
   |> R.floats_of_t
 
-
-(* class data'frame x = object *)
-(*   inherit list_ x *)
-(*   method dim = dim x *)
-(*   method subset_ii : 'b. int -> int -> 'b R.t = *)
-(*     subset_ii x *)
-(* end *)
 
 (* module Stub = struct *)
 
