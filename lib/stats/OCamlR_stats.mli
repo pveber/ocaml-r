@@ -41,6 +41,15 @@ val fisher'test :
  *     method_ : string ;
  *     data'name : string > *)
 
+val chisq'test_contingency_table :
+  ?correct:bool ->
+  ?simulate'p'value:bool ->
+  ?b:int ->
+  Matrix.t ->
+  < statistic : float ;
+    p'value : float ;
+    method_ : string ;
+    data'name : string >
 
 val ks'test :
   ?alternative:[`two_sided | `greater | `less] ->
@@ -76,6 +85,3 @@ val p'adjust :
 
 
 (* end *)
-
-
-

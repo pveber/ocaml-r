@@ -4,6 +4,10 @@ open OCamlR_wraputils
 
 module S = OCamlR_stats_stubs2
 
+let o x f = match x with
+  | None -> None
+  | Some x -> Some (f x)
+
 module Symbol = struct
   let ks'test = R.symbol "ks.test"
   let p'adjust = R.symbol "p.adjust"
@@ -31,8 +35,14 @@ let string_of_test_kind = function
   | `greater -> "greater"
   | `less -> "less"
 
-class fisher'test o = object
+class test_result o = object
   method p'value = R.float_of_t (subset2_s o "p.value")
+  method method_ = R.string_of_t (subset2_s o "method")
+  method data'name = R.string_of_t (subset2_s o "data.name")
+end
+
+class fisher'test o = object
+  inherit test_result o
   method conf'int =
     R.notnil (subset2_s o "conf.int")
     |?> (fun x ->
@@ -43,8 +53,6 @@ class fisher'test o = object
   method estimate = R.float_of_t (subset2_s o "estimate")
   method null'value = R.float_of_t (subset2_s o "null.value")
   method alternative = R.string_of_t (subset2_s o "alternative")
-  method method_ = R.string_of_t (subset2_s o "method")
-  method data'name = R.string_of_t (subset2_s o "data.name")
 end
 
 let fisher'test ?alternative v v' =
@@ -55,13 +63,24 @@ let fisher'test ?alternative v v' =
     ()
   |> new fisher'test
 
+class chipsq'test o = object
+  inherit test_result o
+  method statistic = R.float_of_t (subset2_s o "statistic")
+end
+
+let chisq'test_contingency_table ?correct ?simulate'p'value ?b mat =
+  S.chisq'test
+    ~x:(Matrix.r mat)
+    ?correct:(o correct R.bool)
+    ?simulate'p'value:(o simulate'p'value R.bool)
+    ?_B:(o b R.int)
+    ()
+  |> new chipsq'test
 
 class ks'test o = object
-  method p'value = R.float_of_t (subset2_s o "p.value")
+  inherit test_result o
   method statistic = R.float_of_t (subset2_s o "statistic")
   method alternative = R.string_of_t (subset2_s o "alternative")
-  method method_ = R.string_of_t (subset2_s o "method")
-  method data'name = R.string_of_t (subset2_s o "data.name")
 end
 
 let ks'test ?alternative v v' =
