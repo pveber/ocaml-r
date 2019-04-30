@@ -43,12 +43,34 @@ val plot :
   ?y:float array ->
   unit -> unit
 
+type line_type = [
+  | `blank
+  | `solid
+  | `dashed
+  | `dotted
+  | `dotdash
+  | `longdash
+  | `twodash
+]
+
 val lines :
+  ?lty:line_type ->
   ?lwd:int ->
   ?col:string ->
   x:float array ->
   ?y:float array ->
   unit ->
+  unit
+
+val legend :
+  ?col:string array ->
+  ?lty:line_type array ->
+  ?lwd:float array ->
+  ?pch:int array ->
+  [ `bottomright | `bottom | `bottomleft
+  | `left | `topleft | `top | `topright
+  | `right | `center ] ->
+  string array ->
   unit
 
 val par :

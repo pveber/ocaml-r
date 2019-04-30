@@ -101,12 +101,54 @@ let plot ?main ?(xlab = "") ?(ylab = "") ?xlim ?ylim ?plot_type ?lwd ?col ?log ~
   ]
   |> ignore
 
-let lines ?lwd ?col ~x ?y () =
+type line_type = [
+  | `blank
+  | `solid
+  | `dashed
+  | `dotted
+  | `dotdash
+  | `longdash
+  | `twodash
+]
+
+let int_of_line_type = function
+  | `blank -> 0
+  | `solid -> 1
+  | `dashed -> 2
+  | `dotted -> 3
+  | `dotdash -> 4
+  | `longdash -> 5
+  | `twodash -> 6
+
+let lines ?lty ?lwd ?col ~x ?y () =
   R.eval OCamlR_graphics_stubs2.lines_symbol [
     R.arg R.floats x ;
     R.opt R.floats "y" y ;
+    R.opt (fun x -> R.int (int_of_line_type x)) "lty" lty ;
     R.opt R.int "lwd" lwd ;
     R.opt R.string "col" col ;
+  ]
+  |> ignore
+
+let string_of_position = function
+  | `bottomright -> "bottomright"
+  | `bottom -> "bottom"
+  | `bottomleft -> "bottomleft"
+  | `left -> "left"
+  | `topleft -> "topleft"
+  | `top -> "top"
+  | `topright -> "topright"
+  | `right -> "right"
+  | `center -> "center"
+
+let legend ?col ?lty ?lwd ?pch x legend =
+  R.eval OCamlR_graphics_stubs2.legend_symbol [
+    R.arg (fun x -> R.string (string_of_position x)) x ;
+    R.arg R.strings legend ;
+    R.opt R.strings "col" col ;
+    R.opt (fun x -> R.ints (Array.map int_of_line_type x)) "lty" lty ;
+    R.opt R.floats "lwd" lwd ;
+    R.opt R.ints "pch" pch ;
   ]
   |> ignore
 
