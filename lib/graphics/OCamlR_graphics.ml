@@ -101,6 +101,15 @@ let plot ?main ?(xlab = "") ?(ylab = "") ?xlim ?ylim ?plot_type ?lwd ?col ?log ~
   ]
   |> ignore
 
+let lines ?lwd ?col ~x ?y () =
+  R.eval OCamlR_graphics_stubs2.lines_symbol [
+    R.arg R.floats x ;
+    R.opt R.floats "y" y ;
+    R.opt R.int "lwd" lwd ;
+    R.opt R.string "col" col ;
+  ]
+  |> ignore
+
 let par ?mfrow () =
   R.eval Symbol.par [
     R.opt int_tup "mfrow" mfrow ;

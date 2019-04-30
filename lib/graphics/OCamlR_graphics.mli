@@ -43,6 +43,14 @@ val plot :
   ?y:float array ->
   unit -> unit
 
+val lines :
+  ?lwd:int ->
+  ?col:string ->
+  x:float array ->
+  ?y:float array ->
+  unit ->
+  unit
+
 val par :
   ?mfrow:(int * int) ->
   unit -> unit

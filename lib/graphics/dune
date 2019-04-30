@@ -3,3 +3,8 @@
  (public_name     ocaml-r.graphics)
  (wrapped         false)
  (libraries       ocaml-r.base ocaml-r.stats))
+
+(rule         
+ (targets OCamlR_graphics_stubs2.ml)
+ (deps    (:exe ../../stubgen/stubgen.exe))
+ (action  (with-stdout-to %{targets} (run %{exe} graphics))))
