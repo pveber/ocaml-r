@@ -8,7 +8,6 @@ ocaml-r-0.2.0 2019-06-07
 - a few more wrappers in base, stats and graphics
 - improved stub generation
 - API documentation
-- topkg packaging
 
 ocaml-r-0.1.1 2018-11-18
 ------------------------
