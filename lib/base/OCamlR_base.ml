@@ -175,6 +175,17 @@ let sample ?replace ?prob ~size x =
     ()
   |> R.floats_of_t
 
+let readRDS fn =
+  Stubs.readRDS ~file:(R.string fn) ()
+
+let saveRDS ?ascii ?compress ~file obj =
+  Stubs.saveRDS
+    ~object_:obj
+    ~file:(R.string file)
+    ?ascii:(ascii |? R.bool)
+    ?compress:(compress |? R.bool)
+    ()
+  |> ignore
 
 (* module Stub = struct *)
 

@@ -65,6 +65,13 @@ val sample :
   float array ->
   float array
 
+val readRDS : string -> _ R.t
+val saveRDS :
+  ?ascii:bool ->
+  ?compress:bool ->
+  file:string ->
+  _ R.t -> unit
+
 (** {2 Low-level access}
 
     Use with great care!
