@@ -147,6 +147,18 @@ module Dataframe = struct
       (fun (label, col) -> rarg_of_column_data label col)
       cols
     |> R.eval (R.symbol "data.frame")
+
+  let rbind x y =
+    R.eval Stubs.rbind_symbol [
+      R.arg (fun x -> x) x ;
+      R.arg (fun x -> x) y
+    ]
+
+  let cbind x y =
+    R.eval Stubs.cbind_symbol [
+      R.arg (fun x -> x) x ;
+      R.arg (fun x -> x) y
+    ]
 end
 
 module Matrix = struct

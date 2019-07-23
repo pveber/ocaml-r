@@ -49,6 +49,8 @@ module Dataframe : sig
   val factor : string -> Factor.t -> column
 
   val create : column list -> t
+  val rbind : t -> t -> t
+  val cbind : t -> t -> t
 end
 
 module Matrix : sig
