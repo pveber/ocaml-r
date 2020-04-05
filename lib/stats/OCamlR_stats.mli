@@ -1,3 +1,4 @@
+
 (** Runtime R statistics library. *)
 
 open OCamlR_base
@@ -7,6 +8,16 @@ module Formula : sig
   include module type of S3 with type t := t
 
   val of_string : string -> t
+end
+
+module Ecdf : sig
+  type t
+  val make : Numeric.t -> t
+  val plot :
+    ?main:string ->
+    ?ylab:string ->
+    t ->
+    unit
 end
 
 (** {2 Random number generation} *)
