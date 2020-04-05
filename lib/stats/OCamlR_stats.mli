@@ -17,6 +17,8 @@ module Ecdf : sig
     ?main:string ->
     ?xlab:string ->
     ?ylab:string ->
+    ?xlim:(float * float) ->
+    ?ylim:(float * float) ->
     t ->
     unit
 end

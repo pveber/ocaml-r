@@ -8,6 +8,8 @@ let o x f = match x with
   | None -> None
   | Some x -> Some (f x)
 
+let float_tup (x, y) = R.floats [| x ; y |]
+
 module Symbol = struct
   let ks'test = R.symbol "ks.test"
   let p'adjust = R.symbol "p.adjust"
@@ -111,12 +113,14 @@ let p'adjust ?method_ data =
 module Ecdf = struct
   type t = < > R.t
   let make x = OCamlR_stats_stubs2.ecdf ~x:(Numeric.r x) ()
-  let plot ?(main = "") ?xlab ?ylab o =
+  let plot ?(main = "") ?xlab ?ylab ?xlim ?ylim o =
     R.eval OCamlR_stats_stubs2.plot'ecdf_symbol [
       R.arg ~name:"x" ident o ;
       R.opt R.string "xlab" xlab ;
       R.opt R.string "ylab" ylab ;
       R.arg R.string ~name:"main" main ;
+      R.opt float_tup "xlim" xlim ;
+      R.opt float_tup "ylim" ylim ;
     ]
     |> ignore
 end
