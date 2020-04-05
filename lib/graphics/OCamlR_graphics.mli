@@ -73,6 +73,16 @@ val legend :
   string array ->
   unit
 
+val abline :
+  ?a:float ->
+  ?b:float ->
+  ?h:float ->
+  ?v:float ->
+  ?lty:line_type ->
+  ?lwd:int ->
+  ?col:string ->
+  unit -> unit
+
 val par :
   ?mfrow:(int * int) ->
   unit -> unit

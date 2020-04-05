@@ -167,3 +167,15 @@ let dataframe_boxplot ?main ?xlab ?ylab formula data =
     R.opt R.string "ylab" ylab ;
   ]
   |> ignore
+
+let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
+  R.eval OCamlR_graphics_stubs2.abline_symbol [
+    R.opt R.float "a" a ;
+    R.opt R.float "b" b ;
+    R.opt R.float "h" h ;
+    R.opt R.float "v" v ;
+    R.opt (fun x -> R.int (int_of_line_type x)) "lty" lty ;
+    R.opt R.int "lwd" lwd ;
+    R.opt R.string "col" col ;
+  ]
+  |> ignore
