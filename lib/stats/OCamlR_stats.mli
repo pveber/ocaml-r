@@ -15,6 +15,7 @@ module Ecdf : sig
   val make : Numeric.t -> t
   val plot :
     ?main:string ->
+    ?xlab:string ->
     ?ylab:string ->
     t ->
     unit

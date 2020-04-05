@@ -111,9 +111,10 @@ let p'adjust ?method_ data =
 module Ecdf = struct
   type t = < > R.t
   let make x = OCamlR_stats_stubs2.ecdf ~x:(Numeric.r x) ()
-  let plot ?(main = "") ?ylab o =
+  let plot ?(main = "") ?xlab ?ylab o =
     R.eval OCamlR_stats_stubs2.plot'ecdf_symbol [
       R.arg ~name:"x" ident o ;
+      R.opt R.string "xlab" xlab ;
       R.opt R.string "ylab" ylab ;
       R.arg R.string ~name:"main" main ;
     ]
