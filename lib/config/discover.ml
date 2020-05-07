@@ -14,7 +14,7 @@ let () =
         match C.Pkg_config.get c with
         | None -> default
         | Some pc ->
-          Option.value (C.Pkg_config.query pc ~package:"libR") ~default
+          Option.value (C.Pkg_config.query pc ~package:"libR libRmath") ~default
       in
       write_sexp "c_flags.sexp"         (sexp_of_string (String.concat ~sep:" " conf.cflags)) ;
       write_sexp "c_library_flags.sexp" (sexp_of_string (String.concat ~sep:" " conf.libs))
