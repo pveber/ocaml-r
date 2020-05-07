@@ -1,6 +1,14 @@
 OCaml-R release notes
 =====================
 
+ocaml-r-0.3.0 2020-05-07
+------------------------
+
+- base: added readRDS, saveRDS, cbind, rbind
+- graphics: abline
+- stats: ecdf
+- fixed compilation bug
+
 ocaml-r-0.2.0 2019-06-07
 ------------------------
 
