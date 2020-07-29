@@ -1,6 +1,12 @@
 OCaml-R release notes
 =====================
 
+ocaml-r-0.3.1 2020-07-29
+------------------------
+
+- replaced configurator by dune.configurator
+- fixed compilation warnings
+
 ocaml-r-0.3.0 2020-05-07
 ------------------------
 
