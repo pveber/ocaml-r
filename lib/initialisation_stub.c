@@ -67,7 +67,7 @@ CAMLprim value ocamlr_initEmbeddedR (value ml_argv, value ml_sigs) {
   int i;
 
   // We duplicate the OCaml array into a C array.
-  for (i=0; i<length; i++) argv[i]=String_val(Field(ml_argv, i));
+  for (i=0; i<length; i++) argv[i] = (char*) Bytes_val(Field(ml_argv, i));
 
   /* Don't let R set up its own signal handlers when sigs = 1.
      This requires R >= 2.3.1. */
