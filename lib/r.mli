@@ -273,6 +273,10 @@ val ints_of_t : integers t -> int array
 (** Converts an R array of integers into an array of OCaml
     integers.  *)
 
+val optints_of_t : integers t -> int option array
+(** Converts an R array of integers possibly containing [NA] values to
+   optional ints. *)
+
 val int_of_t : integer t -> int
 (**  Converts an R array of integers with one element into an Objective
      Caml integer.
@@ -296,6 +300,10 @@ val optints : int option array -> integers t
 val floats_of_t : reals t -> float array
 (** Converts an R array of real numbers into an array of OCaml
     floats.  *)
+
+val optfloats_of_t : reals t -> float option array
+(** Converts an R array of floats possibly containing [NA] values to
+   optional floats. *)
 
 val float_of_t : real t -> float
 (** Converts an R array of floats with one element into an OCaml

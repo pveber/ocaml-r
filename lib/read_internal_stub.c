@@ -294,6 +294,21 @@ CAMLprim value ocamlr_access_int_vecsxp (value intsxp, value offset) {
   return(Val_int(INTEGER(Sexp_val(intsxp))[Int_val(offset)]));
 }
 
+/**  Returns an element of a vector of integers, accounting for NAs
+  *
+  *  @param intsxp An R vector of integers, of sexptype INTSXP.
+  *  @param offset An integer, offset in the R vector of real numbers.
+  *  @return an int option, [None] if [NA] or [Some x] where [x] is integer at this offset in the R vector of real numbers.
+  */
+CAMLprim value ocamlr_access_optint_vecsxp (value intsxp, value offset) {
+  int x = INTEGER(Sexp_val(intsxp))[Int_val(offset)];
+  if(x == NA_INTEGER) return Val_int(0);
+  else {
+    value some_x = caml_alloc(1, 0);
+    Store_field(some_x, 0, Val_int(x)) ;
+    return(some_x);
+  }
+}
 
 /**  Returns an element of a vector of real numbers.
   *
@@ -305,6 +320,22 @@ CAMLprim value ocamlr_access_real_vecsxp (value realsxp, value offset) {
   return(caml_copy_double(REAL(Sexp_val(realsxp))[Int_val(offset)]));
 }
 
+
+/**  Returns an element of a vector of real numbers, accounting for NAs
+  *
+  *  @param realsxp An R vector of real numbers.
+  *  @param offset An integer, offset in the R vector of real numbers.
+  *  @return a float option, [None] if [NA] or [Some x] where [x] is real number at this offset in the R vector of real numbers.
+  */
+CAMLprim value ocamlr_access_optreal_vecsxp (value realsxp, value offset) {
+  double x = REAL(Sexp_val(realsxp))[Int_val(offset)];
+  if(ISNA(x)) return Val_int(0);
+  else {
+    value some_x = caml_alloc(1, 0);
+    Store_field(some_x, 0, caml_copy_double(x)) ;
+    return(some_x);
+  }
+}
 
 /**  Returns an element of a vector of strings.
   *
@@ -319,7 +350,6 @@ CAMLprim value ocamlr_access_str_vecsxp (value strsxp, value offset) {
 
   return(caml_copy_string(CHAR(STRING_ELT(Sexp_val(strsxp), (Int_val(offset))))));
 }
-
 
 /**  Returns an element of a vector of SEXPs.
   *
