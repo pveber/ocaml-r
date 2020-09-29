@@ -34,12 +34,25 @@ module Integer : Atomic_vector with type elt = int and type format = R.integers
 module Character : Atomic_vector with type elt = string and type format = R.strings
 module Factor : Atomic_vector with type elt = string and type format = R.strings
 
+module List_ : sig
+  type t
+  val length : t -> int
+
+  module Unsafe : sig
+    val of_r : _ R.t -> t
+    val subset2 : t -> string -> _ R.t
+    val subset2_i : t -> int -> _ R.t
+  end
+end
+
 module Dataframe : sig
   type t
   include module type of S3 with type t := t
 
   val of_env : Environment.t -> string -> t option
   val dim : t -> int * int
+
+  val as_list : t -> List_.t
 
   type column
   val numeric : string -> Numeric.t -> column

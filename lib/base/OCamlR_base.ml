@@ -106,8 +106,28 @@ module Environment = struct
     else None
 end
 
+module List_ = struct
+  include S3
+
+  let length x =
+    OCamlR_base_stubs2.length x
+    |> R.int_of_t
+
+  module Unsafe = struct
+    let of_r r = R.cast (r : _ R.t :> R.sexp)
+
+    let subset2 x y =
+      OCamlR_base_stubs2.subset2_s x (R.string y)
+
+    let subset2_i x i =
+      OCamlR_base_stubs2.subset2_i x (R.int i)
+  end
+end
+
 module Dataframe = struct
   include S3
+
+  let as_list x = x
 
   let dim x =
     match Stubs.dim'data'frame ~x () |> R.ints_of_t with
@@ -160,15 +180,7 @@ module Dataframe = struct
       R.arg (fun x -> x) y
     ]
 
-  module Unsafe = struct
-    let of_r r = R.cast (r : _ R.t :> R.sexp)
-
-    let subset2 x y =
-      OCamlR_base_stubs2.subset2_s x (R.string y)
-
-    let subset2_i x i =
-      OCamlR_base_stubs2.subset2_i x (R.int i)
-  end
+  module Unsafe = List_.Unsafe
 end
 
 module Matrix = struct
