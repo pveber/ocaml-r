@@ -159,6 +159,16 @@ module Dataframe = struct
       R.arg (fun x -> x) x ;
       R.arg (fun x -> x) y
     ]
+
+  module Unsafe = struct
+    let of_r r = R.cast (r : _ R.t :> R.sexp)
+
+    let subset2 x y =
+      OCamlR_base_stubs2.subset2_s x (R.string y)
+
+    let subset2_i x i =
+      OCamlR_base_stubs2.subset2_i x (R.int i)
+  end
 end
 
 module Matrix = struct

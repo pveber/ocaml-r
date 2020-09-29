@@ -51,6 +51,12 @@ module Dataframe : sig
   val create : column list -> t
   val rbind : t -> t -> t
   val cbind : t -> t -> t
+
+  module Unsafe : sig
+    val of_r : _ R.t -> t
+    val subset2 : t -> string -> _ R.t
+    val subset2_i : t -> int -> _ R.t
+  end
 end
 
 module Matrix : sig
