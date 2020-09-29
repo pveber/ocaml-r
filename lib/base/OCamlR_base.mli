@@ -36,6 +36,7 @@ module Factor : Atomic_vector with type elt = string and type format = R.strings
 
 module List_ : sig
   type t
+  include module type of S3 with type t := t
   val length : t -> int
 
   module Unsafe : sig
@@ -47,7 +48,7 @@ end
 
 module Dataframe : sig
   type t
-  include module type of S3 with type t := t
+  include module type of List_ with type t := t
 
   val of_env : Environment.t -> string -> t option
   val dim : t -> int * int
@@ -64,12 +65,6 @@ module Dataframe : sig
   val create : column list -> t
   val rbind : t -> t -> t
   val cbind : t -> t -> t
-
-  module Unsafe : sig
-    val of_r : _ R.t -> t
-    val subset2 : t -> string -> _ R.t
-    val subset2_i : t -> int -> _ R.t
-  end
 end
 
 module Matrix : sig

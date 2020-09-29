@@ -125,7 +125,7 @@ module List_ = struct
 end
 
 module Dataframe = struct
-  include S3
+  include List_
 
   let as_list x = x
 
@@ -179,8 +179,6 @@ module Dataframe = struct
       R.arg (fun x -> x) x ;
       R.arg (fun x -> x) y
     ]
-
-  module Unsafe = List_.Unsafe
 end
 
 module Matrix = struct
