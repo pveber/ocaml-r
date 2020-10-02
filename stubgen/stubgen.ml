@@ -111,7 +111,7 @@ let generate_stub_ml_for_package p =
   ) ;
   Array.iter funs ~f:(fun name ->
         let value = R.symbol name in
-        let str = R.Pretty.t_of_sexp (value : _ R.t :> R.sexp) in
+        let str = R.Pretty.t_of_sexp value in
         generate_stub_ml name str
         |> Caml.print_endline
     )

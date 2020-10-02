@@ -7,7 +7,7 @@ val plot :
   ?xlim:R.reals R.t ->
   ?ylim:R.reals R.t ->
   ?y:_ R.t ->
-  _ R.t -> R.nilsxp
+  _ R.t -> _ R.t
 
 val plot2 :
   ?main:R.string_ R.t ->
@@ -15,7 +15,7 @@ val plot2 :
   ?ylab:R.string_ R.t ->
   ?xlim:R.reals R.t ->
   ?ylim:R.reals R.t ->
-  _ R.t -> _ R.t -> R.nilsxp
+  _ R.t -> _ R.t -> _ R.t
 
 val par :
   ?mfrow:_ R.t ->

@@ -64,42 +64,41 @@ module Standard = Standard
 
 type sexp
 
-type +'a t = sexp
+type 'a sxp = private sexp
 
-external cast : sexp -> 'a t = "%identity"
-
-
-(* Type aliases. *)
-
-type nilsxp         = [`Nil]                                      t
-type symsxp         = [`Sym]                                      t
-type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a]         t
-type 'a internallist = [`Nil | `List of [< `Pair | `Call ] as 'a ] t
+type nilsxp         = [`Nil] sxp
+type symsxp         = [`Sym] sxp
+type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a] sxp
+type 'a internallist = [`Nil | `List of [< `Pair | `Call] as 'a] sxp
 (**  Type of low-level internal list. In R, such
   *  internal lists may be empty, a pairlist or
   *  a call which is somewhat similar to closure
   *  ready for execution. *)
 
-type langsxp        = [`List of [`Call]]                          t
-type pairlistsxp    = [`List of [`Pair]]                          t
-and pairlist        = [`Nil | `List of [`Pair]]                   t
-type closxp         = [`Clo]                                      t
-type envsxp         = [`Env]                                      t
-type promsxp        = [`Prom]                                     t
-type specialsxp     = [`Special]                                  t
-type builtinsxp     = [`Builtin]                                  t
+type langsxp        = [`List of [`Call]] sxp
+type pairlistsxp    = [`List of [`Pair]] sxp
+type closxp         = [`Clo] sxp
+type envsxp         = [`Env] sxp
+type promsxp        = [`Prom] sxp
+type specialsxp     = [`Special] sxp
+type builtinsxp     = [`Builtin] sxp
+type charsxp     = [`Vec  of [`Char]] sxp
+type lglsxp      = [`Vec  of [`Lgl ]] sxp
+type intsxp      = [`Vec  of [`Int ]] sxp
+type realsxp     = [`Vec  of [`Real]] sxp
+type strsxp      = [`Vec  of [`Str ]] sxp
+type rawsxp      = [`Vec  of [`Raw ]] sxp
+type exprsxp     = [`Vec  of [`Raw ]] sxp
+type pairlist       = [`Nil | `List of [`Pair]] sxp
 type 'a vecsxp      = [`Vec  of
-    [< `Char | `Lgl | `Int  | `Real
-    | `Str  | `Raw | `Expr ] as 'a
-  ] t
-type charsxp  = [`Vec  of [`Char]]                             t
-type lglsxp   = [`Vec  of [`Lgl ]]                             t
-type intsxp   = [`Vec  of [`Int ]]                             t
-type realsxp  = [`Vec  of [`Real]]                             t
-type strsxp   = [`Vec  of [`Str ]]                             t
-type rawsxp   = [`Vec  of [`Raw ]]                             t
-type exprsxp  = [`Vec  of [`Raw ]]                             t
+                         [< `Char | `Lgl | `Int  | `Real
+                         | `Str  | `Raw | `Expr ] as 'a
+                      ] sxp
+external upcast : sexp -> 'a sxp = "%identity"
 
+type +'a t = sexp
+
+external cast : sexp -> 'a t = "%identity"
 
 
 class type ['a] ty = object
@@ -369,7 +368,7 @@ let symbol ?(generic = false) s : sexp =
 external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
 external length_of_vecsxp   : 'a vecsxp -> int  = "ocamlr_inspect_vecsxp_length"
 
-external inspect_primsxp_offset  : [< `Special | `Builtin ] t -> int = "ocamlr_inspect_primsxp_offset"
+external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
 external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
 external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
 external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"
@@ -388,9 +387,9 @@ external inspect_promsxp_env     : promsxp        -> sexp          = "ocamlr_ins
 
 external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
 external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
-external access_optintsxp  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
+external access_intsxp_opt  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
 external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
-external access_optrealsxp : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
+external access_realsxp_opt : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
 external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
 external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
 external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
@@ -488,7 +487,7 @@ external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
 (* We are looking for a clean solution
    for the typing of the R NULL. What should it be
    in OCaml? An 'a option mapping to None? *)
-external null_creator : unit -> nilsxp = "ocamlr_null"
+external null_creator : unit -> [> `Nil] sxp = "ocamlr_null"
 external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
 external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
 external base_env_creator : unit -> sexp = "ocamlr_base_env"
@@ -504,17 +503,17 @@ let rec list_of_pairlist (ll : 'a internallist) =
   match sexptype (ll : 'a internallist :> sexp) with
   | NilSxp -> [] | ListSxp | LangSxp | DotSxp ->
   (* There's a typing issue with the DotSxp sexptype... TODO *)
-  let ll : 'a listsxp = cast (ll : 'a internallist :> sexp) in
-  ( (cast (inspect_listsxp_tagval ll) : symsxp (* TODO: This may be excessive *)), (inspect_listsxp_carval ll))
-  :: (list_of_pairlist (cast (inspect_listsxp_cdrval ll) : pairlist))
+  let ll : 'a listsxp = upcast (ll : 'a internallist :> sexp) in
+  ( (upcast (inspect_listsxp_tagval ll) : symsxp (* TODO: This may be excessive *)), (inspect_listsxp_carval ll))
+  :: (list_of_pairlist (upcast (inspect_listsxp_cdrval ll) : pairlist))
   | _ -> failwith "Conversion failure in list_of_listsxp."
 
 let pairlist_of_list (l: (sexp * sexp) list) =
   let r_l = alloc_list (List.length l) in
   let cursor = ref r_l in List.iter
   begin function (tag, value) ->
-    let () = write_listsxp_element (cast (!cursor : pairlist :> sexp) : pairlistsxp) tag value in
-    cursor := (cast (inspect_listsxp_cdrval (cast (!cursor : pairlist :> sexp) : pairlistsxp)) : pairlist)
+    let () = write_listsxp_element (upcast (!cursor : pairlist :> sexp) : pairlistsxp) tag value in
+    cursor := (upcast (inspect_listsxp_cdrval (upcast (!cursor : pairlist :> sexp) : pairlistsxp)) : pairlist)
   end l; r_l
 
 external cons : sexp -> pairlist -> pairlistsxp = "ocamlr_cons"
@@ -522,12 +521,12 @@ external tag : pairlistsxp -> string -> unit = "ocamlr_tag"
 external set_langsxp : pairlistsxp -> unit = "ocamlr_set_langsxp"
 
 let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
-  let lcons hd tl = let x = cons hd tl in set_langsxp x; (cast (x : pairlistsxp :> sexp) : langsxp) in
+  let lcons hd tl = let x = cons hd tl in set_langsxp x; (upcast (x : pairlistsxp :> sexp) : langsxp) in
   lcons f begin List.fold_right begin fun (t, hd) tl ->
     let x = cons hd tl in match t with
-    | None -> (cast (x : pairlistsxp :> sexp) : pairlist)
-    | Some name -> tag x name; (cast (x : pairlistsxp :> sexp) : pairlist)
-  end args ((null_creator ()) : nilsxp :> pairlist) end
+    | None -> (upcast (x : pairlistsxp :> sexp) : pairlist)
+    | Some name -> tag x name; (upcast (x : pairlistsxp :> sexp) : pairlist)
+  end args ((null_creator ()) :> pairlist) end
 
 external string_of_charsxp : charsxp -> string = "ocamlr_internal_string_of_charsxp"
 
@@ -556,62 +555,63 @@ let bool_list_of_lglsxp x = list_of_vecsxp access_lglsxp x
 let lglsxp_of_bool_list x = vecsxp_of_list alloc_lglsxp assign_lglsxp x
 let bool_array_of_lglsxp x = array_of_vecsxp access_lglsxp x
 let lglsxp_of_bool_array x = vecsxp_of_array alloc_lglsxp assign_lglsxp x
-let bools_of_t tau = bool_array_of_lglsxp (cast (tau : lglsxp :> sexp) : lglsxp)
-let bool_of_t tau = access_lglsxp (cast (tau : lglsxp :> sexp) : lglsxp) 0
+let bools_of_t tau = bool_array_of_lglsxp (upcast tau)
+let bool_of_t tau = access_lglsxp (upcast tau) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the lgl vecsxp contains only one element. *)
-let bool b = (cast ((lglsxp_of_bool_array [| b |]) : lglsxp :> sexp) : lglsxp)
-let bools bl = (cast ((lglsxp_of_bool_array bl) : lglsxp :> sexp) : lglsxp)
+let bool b = (lglsxp_of_bool_array [| b |] :> sexp)
+let bools bl = (lglsxp_of_bool_array bl :> sexp)
 
 let int_list_of_intsxp x  = list_of_vecsxp access_intsxp x
 let intsxp_of_int_list x  = vecsxp_of_list alloc_intsxp assign_intsxp x
 let int_array_of_intsxp x  = array_of_vecsxp access_intsxp x
-let optint_array_of_intsxp x  = array_of_vecsxp access_optintsxp x
+let optint_array_of_intsxp x  = array_of_vecsxp access_intsxp_opt x
 let intsxp_of_int_array x  = vecsxp_of_array alloc_intsxp assign_intsxp x
 let intsxp_of_int_option_array x = vecsxp_of_array alloc_intsxp assign_intsxp_opt x
-let ints_of_t tau = int_array_of_intsxp (cast (tau : intsxp :> sexp) : intsxp)
-let optints_of_t tau = optint_array_of_intsxp (cast (tau : intsxp :> sexp) : intsxp)
-let int_of_t tau = access_intsxp (cast (tau : intsxp :> sexp) : intsxp) 0
+let ints_of_t tau = int_array_of_intsxp (upcast tau)
+let optints_of_t tau = optint_array_of_intsxp (upcast tau)
+let int_of_t tau = access_intsxp (upcast tau) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the int vecsxp contains only one element. *)
-let int i = (cast ((intsxp_of_int_array [| i |]) : intsxp :> sexp) : intsxp)
-let ints il = (cast ((intsxp_of_int_array il) : intsxp :> sexp) : intsxp)
-let optints xl = (cast ((intsxp_of_int_option_array xl) : intsxp :> sexp) : intsxp)
+let int i = (intsxp_of_int_array [| i |] :> sexp)
+let ints il = (intsxp_of_int_array il :> sexp)
+let optints xl = (intsxp_of_int_option_array xl :> sexp)
 
 let float_list_of_realsxp x = list_of_vecsxp access_realsxp x
 let realsxp_of_float_list x = vecsxp_of_list alloc_real_vector assign_realsxp x
 let float_array_of_realsxp x = array_of_vecsxp access_realsxp x
-let opt_float_array_of_realsxp x = array_of_vecsxp access_optrealsxp x
+let opt_float_array_of_realsxp x = array_of_vecsxp access_realsxp_opt x
 let realsxp_of_float_array x = vecsxp_of_array alloc_real_vector assign_realsxp x
-let floats_of_t tau = float_array_of_realsxp (cast (tau : realsxp :> sexp) : realsxp)
-let optfloats_of_t tau = opt_float_array_of_realsxp (cast (tau : realsxp :> sexp) : realsxp)
-let float_of_t tau = access_realsxp (cast (tau : realsxp :> sexp) : realsxp) 0
+let floats_of_t tau = float_array_of_realsxp (upcast tau)
+let optfloats_of_t tau = opt_float_array_of_realsxp (upcast tau)
+let float_of_t tau = access_realsxp (upcast tau) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the real vecsxp contains only one element. *)
-let float x = (cast ((realsxp_of_float_array [| x |]) : realsxp :> sexp) : realsxp)
-let floats xl = (cast ((realsxp_of_float_array xl) : realsxp :> sexp) : realsxp)
+let float x = (realsxp_of_float_array [| x |] :> sexp)
+let floats xl = (realsxp_of_float_array xl :> sexp)
 
 let realsxp_of_float_option_list x = vecsxp_of_list alloc_real_vector assign_realsxp_opt x
 let realsxp_of_float_option_array x = vecsxp_of_array alloc_real_vector assign_realsxp_opt x
-let optfloats xl = (cast ((realsxp_of_float_option_array xl) : realsxp :> sexp) : realsxp)
+let optfloats xl = (realsxp_of_float_option_array xl :> sexp)
 
 let string_list_of_strsxp x = list_of_vecsxp access_strsxp x
 let strsxp_of_string_list x = vecsxp_of_list alloc_str_vector assign_strsxp x
 let string_array_of_strsxp x = array_of_vecsxp access_strsxp x
 let strsxp_of_string_array x = vecsxp_of_array alloc_str_vector assign_strsxp x
-let string_list_of_t tau = string_list_of_strsxp (cast (tau : strsxp :> sexp) : strsxp)
-let strings_of_t tau = string_array_of_strsxp (cast (tau : strsxp :> sexp) : strsxp)
-let string_of_t tau = access_strsxp (cast (tau : strsxp :> sexp) : strsxp) 0
+let string_list_of_t tau = string_list_of_strsxp tau
+let strings_of_t tau = string_array_of_strsxp (upcast tau)
+let string_of_t tau = access_strsxp (upcast tau) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the str vecsxp contains only one element. *)
 external string : string -> strsxp = "ocamlr_strsxp_of_string"
-let strings sl = (cast ((strsxp_of_string_array sl) : strsxp :> sexp) : strsxp)
+let string x = (string x :> sexp)
+let strings sl = (strsxp_of_string_array sl :> sexp)
 
 let sexp_list_of_rawsxp x = list_of_vecsxp access_rawsxp x
-let sexps_of_t tau = sexp_list_of_rawsxp (cast (tau : rawsxp :> sexp) : rawsxp)
+let sexps_of_t tau = sexp_list_of_rawsxp tau
 
 let langsxp_list_of_exprsxp x = list_of_vecsxp access_exprsxp x
-let langsxps_of_t tau = langsxp_list_of_exprsxp (cast (tau : rawsxp :> sexp) : exprsxp)
+let langsxps_of_t tau = langsxp_list_of_exprsxp tau
 
 (* === INTERNAL ===== *)
 
@@ -633,18 +633,18 @@ module Specification = struct
     | (NilSxp,  _, NilSxp) when sexp_equality (s : symsxp :> sexp) value -> None
     | (CharSxp, SymSxp, NilSxp) -> (
         match (sexp_equality (s : symsxp :> sexp) value) &&
-              ("" = string_of_charsxp (cast pname : charsxp)) with
+              ("" = string_of_charsxp (upcast pname : charsxp)) with
         | true -> Some None
         | false -> (
-            match (sexp_equality value (inspect_symsxp_value (cast value : symsxp)))  &&
-                  (NilSxp = sexptype (inspect_symsxp_pname (cast value : symsxp)))    &&
-                  (NilSxp = sexptype (inspect_symsxp_internal (cast value : symsxp))) with
-            | true -> Some (Some ((string_of_charsxp (cast pname : charsxp)), None))
+            match (sexp_equality value (inspect_symsxp_value (upcast value : symsxp)))  &&
+                  (NilSxp = sexptype (inspect_symsxp_pname (upcast value : symsxp)))    &&
+                  (NilSxp = sexptype (inspect_symsxp_internal (upcast value : symsxp))) with
+            | true -> Some (Some ((string_of_charsxp (upcast pname : charsxp)), None))
             | false -> assert false
           )
       )
     | (CharSxp, _, (NilSxp | BuiltinSxp)) ->
-      let symbol_name = string_of_charsxp (cast pname : charsxp) in
+      let symbol_name = string_of_charsxp (upcast pname : charsxp) in
       Some (Some (symbol_name, (Some value)))
     | _ -> assert false
 
@@ -652,7 +652,7 @@ end
 
 let attributes sexp =
   let f (a, x) = (Specification.of_symbol a), x in
-  List.map f (list_of_pairlist sexp)
+  List.map f (list_of_pairlist (upcast sexp))
 
 let notnil x =
   if sexptype x = NilSxp then None
@@ -747,40 +747,40 @@ module CTypes = struct
     match sexptype s with
     | NilSxp     -> Val { content = NILSXP }
     | SymSxp     -> Val { content = SYMSXP {
-        pname      = rec_build (inspect_symsxp_pname    (cast s : symsxp));
-        sym_value  = rec_build (inspect_symsxp_value    (cast s : symsxp));
-        internal   = rec_build (inspect_symsxp_internal (cast s : symsxp))}}
+        pname      = rec_build (inspect_symsxp_pname    (upcast s : symsxp));
+        sym_value  = rec_build (inspect_symsxp_value    (upcast s : symsxp));
+        internal   = rec_build (inspect_symsxp_internal (upcast s : symsxp))}}
     | ListSxp    -> Val { content = LISTSXP {
-        carval     = rec_build (inspect_listsxp_carval  (cast s : pairlistsxp));
-        cdrval     = rec_build (inspect_listsxp_cdrval  (cast s : pairlistsxp));
-        tagval     = rec_build (inspect_listsxp_tagval  (cast s : pairlistsxp))}}
+        carval     = rec_build (inspect_listsxp_carval  (upcast s : pairlistsxp));
+        cdrval     = rec_build (inspect_listsxp_cdrval  (upcast s : pairlistsxp));
+        tagval     = rec_build (inspect_listsxp_tagval  (upcast s : pairlistsxp))}}
     | CloSxp     -> Val { content = CLOSXP {
-        formals    = rec_build (inspect_closxp_formals  (cast s : closxp));
-        body       = rec_build (inspect_closxp_body     (cast s : closxp));
-        clos_env   = rec_build (inspect_closxp_env      (cast s : closxp))}}
+        formals    = rec_build (inspect_closxp_formals  (upcast s : closxp));
+        body       = rec_build (inspect_closxp_body     (upcast s : closxp));
+        clos_env   = rec_build (inspect_closxp_env      (upcast s : closxp))}}
     | EnvSxp     -> Val { content = ENVSXP {
-        frame      = rec_build (inspect_envsxp_frame    (cast s : envsxp));
+        frame      = rec_build (inspect_envsxp_frame    (upcast s : envsxp));
      (* enclos     = rec_build (inspect_envsxp_enclos   s); *)
      (* hashtab    = rec_build (inspect_envsxp_hashtab  s) *) }}
     | PromSxp    -> Val { content = PROMSXP {
-        prom_value = rec_build (inspect_promsxp_value  (cast s : promsxp));
-        expr       = rec_build (inspect_promsxp_expr   (cast s : promsxp));
-        prom_env   = rec_build (inspect_promsxp_env    (cast s : promsxp))}}
+        prom_value = rec_build (inspect_promsxp_value  (upcast s : promsxp));
+        expr       = rec_build (inspect_promsxp_expr   (upcast s : promsxp));
+        prom_env   = rec_build (inspect_promsxp_env    (upcast s : promsxp))}}
     | LangSxp    -> Val { content = LANGSXP {
-        carval     = rec_build (inspect_listsxp_carval (cast s : langsxp));
-        cdrval     = rec_build (inspect_listsxp_cdrval (cast s : langsxp));
-        tagval     = rec_build (inspect_listsxp_tagval (cast s : langsxp))}}
+        carval     = rec_build (inspect_listsxp_carval (upcast s : langsxp));
+        cdrval     = rec_build (inspect_listsxp_cdrval (upcast s : langsxp));
+        tagval     = rec_build (inspect_listsxp_tagval (upcast s : langsxp))}}
     | SpecialSxp -> Val { content = SPECIALSXP }
-    | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset (cast s : builtinsxp))}
-    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (cast s : charsxp)) }
-    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lglsxp (cast s : lglsxp))}
-    | IntSxp     -> Val { content = INTSXP (int_list_of_intsxp (cast s : intsxp))}
-    | RealSxp    -> Val { content = REALSXP (float_list_of_realsxp (cast s : realsxp))}
+    | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset (upcast s : builtinsxp))}
+    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (upcast s : charsxp)) }
+    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lglsxp (upcast s : lglsxp))}
+    | IntSxp     -> Val { content = INTSXP (int_list_of_intsxp (upcast s : intsxp))}
+    | RealSxp    -> Val { content = REALSXP (float_list_of_realsxp (upcast s : realsxp))}
     | CplxSxp    -> Val { content = CPLXSXP }
-    | StrSxp     -> Val { content = STRSXP (string_list_of_strsxp (cast s: strsxp))}
+    | StrSxp     -> Val { content = STRSXP (string_list_of_strsxp (upcast s: strsxp))}
     | DotSxp     -> Val { content = DOTSXP }
     | AnySxp     -> Val { content = ANYSXP }
-    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_rawsxp (cast s : rawsxp)))}
+    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_rawsxp (upcast s : rawsxp)))}
     | ExprSxp    -> Val { content = EXPRSXP }
     | BcodeSxp   -> Val { content = BCODESXP }
     | ExtptrSxp  -> Val { content = EXTPTRSXP }
@@ -856,40 +856,40 @@ module PrettyTypes = struct
     | NilSxp     -> NULL
     | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
                     | Esoteric _ -> Unknown end
-    | ListSxp    -> begin try phi list_of_listsxp (cast s : 'a listsxp) with
+    | ListSxp    -> begin try phi list_of_listsxp (upcast s : 'a listsxp) with
                     | Esoteric _ -> Unknown end
     | CloSxp     -> CLOSURE {
-        formals  = rec_build (inspect_closxp_formals (cast s : closxp));
-        body     = rec_build (inspect_closxp_body    (cast s : closxp));
-        clos_env = rec_build (inspect_closxp_env     (cast s : closxp))}
+        formals  = rec_build (inspect_closxp_formals (upcast s : closxp));
+        body     = rec_build (inspect_closxp_body    (upcast s : closxp));
+        clos_env = rec_build (inspect_closxp_env     (upcast s : closxp))}
     | EnvSxp     -> ENV {
-        frame    = rec_build (inspect_envsxp_frame   (cast s : envsxp));
+        frame    = rec_build (inspect_envsxp_frame   (upcast s : envsxp));
      (* enclos  = rec_build (inspect_envsxp_enclos  s); *) (* We do not care for now. *)
      (* hashtab = rec_build (inspect_envsxp_hashtab s)  *) }
     | PromSxp    -> PROMISE {
-        value    = rec_build (inspect_promsxp_value  (cast s : promsxp));
-        expr     = rec_build (inspect_promsxp_expr   (cast s : promsxp));
-        prom_env = rec_build (inspect_promsxp_env    (cast s : promsxp))}
+        value    = rec_build (inspect_promsxp_value  (upcast s : promsxp));
+        expr     = rec_build (inspect_promsxp_expr   (upcast s : promsxp));
+        prom_env = rec_build (inspect_promsxp_env    (upcast s : promsxp))}
     | LangSxp    ->
-        let carval = inspect_listsxp_carval (cast s : langsxp)
-        and cdrval = inspect_listsxp_cdrval (cast s : langsxp)
-        and tagval = inspect_listsxp_tagval (cast s : langsxp) in
+        let carval = inspect_listsxp_carval (upcast s : langsxp)
+        and cdrval = inspect_listsxp_cdrval (upcast s : langsxp)
+        and tagval = inspect_listsxp_tagval (upcast s : langsxp) in
         begin match build rec_build cdrval with
         | LIST l -> begin match sexptype tagval with
                     | NilSxp -> CALL ((build rec_build carval), l)
                     | _ -> Unknown end
         | _ -> Unknown end
-    | SpecialSxp -> SPECIAL (inspect_primsxp_offset (cast s : specialsxp))
+    | SpecialSxp -> SPECIAL (inspect_primsxp_offset (upcast s : specialsxp))
     | BuiltinSxp -> BUILTIN
-    | CharSxp    -> STRING  (string_of_charsxp (cast s : charsxp))
-    | LglSxp     -> BOOLS   (bool_list_of_lglsxp (cast s : lglsxp))
-    | IntSxp     -> INTS    (int_list_of_intsxp (cast s : intsxp))
-    | RealSxp    -> FLOATS  (float_list_of_realsxp (cast s : realsxp))
+    | CharSxp    -> STRING  (string_of_charsxp (upcast s : charsxp))
+    | LglSxp     -> BOOLS   (bool_list_of_lglsxp (upcast s : lglsxp))
+    | IntSxp     -> INTS    (int_list_of_intsxp (upcast s : intsxp))
+    | RealSxp    -> FLOATS  (float_list_of_realsxp (upcast s : realsxp))
     | CplxSxp    -> Unknown
-    | StrSxp     -> STRINGS (string_list_of_strsxp (cast s : strsxp))
+    | StrSxp     -> STRINGS (string_list_of_strsxp (upcast s : strsxp))
     | DotSxp     -> Unknown
     | AnySxp     -> Unknown
-    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_rawsxp (cast s : rawsxp)))
+    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_rawsxp (upcast s : rawsxp)))
     | ExprSxp    -> Unknown
     | BcodeSxp   -> Unknown
     | ExtptrSxp  -> Unknown
@@ -930,18 +930,18 @@ external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
 
 (* class s3 r = object *)
 (*   val __underlying = (r : 'a t :> sexp) *)
-(*   method private attribute : 'a. string -> 'a t = function s -> cast (get_attrib __underlying s) *)
+(*   method private attribute : 'a. string -> 'a t = function s -> upcast (get_attrib __underlying s) *)
 (*   method attributes = List.map *)
 (*     begin function a, x -> (Specification.of_symbol a), x end *)
 (*     (list_of_pairlist (get_attributes __underlying)) *)
-(*   method classes = strings_of_t (cast (get_attrib __underlying "class") : strsxp) *)
+(*   method classes = strings_of_t (upcast (get_attrib __underlying "class") : strsxp) *)
 (* end *)
 
 (* let s3 (r : 'a t) = new s3 r *)
 
 
 let classes sexp =
-  string_list_of_t (cast (get_attrib sexp "class") : string list t)
+  string_list_of_t (upcast (get_attrib sexp "class") : strsxp)
 
 (* === S4 ===== *)
 
@@ -976,7 +976,7 @@ let parse_string ?max statement =
   let error_code, sexp = raw_parse_string statement
     begin match max with None -> -1 | Some n -> n end in
   match parse_status_of_int error_code with
-  | Parse_OK -> langsxps_of_t (cast sexp : rawsxp)
+  | Parse_OK -> langsxps_of_t (upcast sexp : rawsxp)
   | _ as status -> raise (Parsing_failure (status, statement))
 
 let parse statement = List.hd (parse_string ~max:1 statement)
@@ -1034,7 +1034,7 @@ let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
         "OCaml-R generic error"
            (* The Runtime_error is initialised with a nilsxp casted to a langsxp.
               This is ugly, but not unsafe. *)
-        (Runtime_error ((cast ((null_creator ()) : nilsxp :> sexp ) : langsxp ), ""))
+        (Runtime_error ((upcast ((null_creator ()) : nilsxp :> sexp ) : langsxp ), ""))
   | _ -> raise Initialisation_failed
 
 module type Interpreter = sig end
