@@ -92,13 +92,13 @@ type 'a vecsxp      = [`Vec  of
     [< `Char | `Lgl | `Int  | `Real
     | `Str  | `Raw | `Expr ] as 'a
   ] t
-type charvecsxp  = [`Vec  of [`Char]]                             t
-type lglvecsxp   = [`Vec  of [`Lgl ]]                             t
-type intvecsxp   = [`Vec  of [`Int ]]                             t
-type realvecsxp  = [`Vec  of [`Real]]                             t
-type strvecsxp   = [`Vec  of [`Str ]]                             t
-type rawvecsxp   = [`Vec  of [`Raw ]]                             t
-type exprvecsxp  = [`Vec  of [`Raw ]]                             t
+type charsxp  = [`Vec  of [`Char]]                             t
+type lglsxp   = [`Vec  of [`Lgl ]]                             t
+type intsxp   = [`Vec  of [`Int ]]                             t
+type realsxp  = [`Vec  of [`Real]]                             t
+type strsxp   = [`Vec  of [`Str ]]                             t
+type rawsxp   = [`Vec  of [`Raw ]]                             t
+type exprsxp  = [`Vec  of [`Raw ]]                             t
 
 
 
@@ -386,14 +386,14 @@ external inspect_promsxp_value   : promsxp        -> sexp          = "ocamlr_ins
 external inspect_promsxp_expr    : promsxp        -> sexp          = "ocamlr_inspect_promsxp_expr"
 external inspect_promsxp_env     : promsxp        -> sexp          = "ocamlr_inspect_promsxp_env"
 
-external access_lglvecsxp  : lglvecsxp  -> int -> bool     = "ocamlr_access_lgl_vecsxp"
-external access_intvecsxp  : intvecsxp  -> int -> int      = "ocamlr_access_int_vecsxp"
-external access_optintvecsxp  : intvecsxp  -> int -> int option = "ocamlr_access_optint_vecsxp"
-external access_realvecsxp : realvecsxp -> int -> float    = "ocamlr_access_real_vecsxp"
-external access_optrealvecsxp : realvecsxp -> int -> float option = "ocamlr_access_optreal_vecsxp"
-external access_strvecsxp  : strvecsxp  -> int -> string   = "ocamlr_access_str_vecsxp"
-external access_rawvecsxp  : rawvecsxp  -> int -> sexp     = "ocamlr_access_sexp_vecsxp"
-external access_exprvecsxp : exprvecsxp -> int -> langsxp  = "ocamlr_access_sexp_vecsxp"
+external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
+external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
+external access_optintsxp  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
+external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
+external access_optrealsxp : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
+external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
+external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
+external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
 
 (* === ALLOCATION ===== *)
 
@@ -401,10 +401,10 @@ external access_exprvecsxp : exprvecsxp -> int -> langsxp  = "ocamlr_access_sexp
    returning uninitialised pairlists and vectors. *)
 
 external alloc_list        : int -> 'a internallist = "ocamlr_alloc_list"
-external alloc_lgl_vector  : int -> lglvecsxp       = "ocamlr_alloc_lgl_vector"
-external alloc_int_vector  : int -> intvecsxp       = "ocamlr_alloc_int_vector"
-external alloc_real_vector : int -> realvecsxp      = "ocamlr_alloc_real_vector"
-external alloc_str_vector  : int -> strvecsxp       = "ocamlr_alloc_str_vector"
+external alloc_lglsxp      : int -> lglsxp       = "ocamlr_alloc_lglsxp"
+external alloc_intsxp      : int -> intsxp       = "ocamlr_alloc_intsxp"
+external alloc_real_vector : int -> realsxp      = "ocamlr_alloc_realsxp"
+external alloc_str_vector  : int -> strsxp       = "ocamlr_alloc_strsxp"
 
 (* === WRITE_INTERNAL ===== *)
 
@@ -424,7 +424,7 @@ let write_listsxp_element l tag elmnt =
   *  and sets the vector's offset element to the boolean's value.
   *)
 
-external assign_lglvecsxp  : lglvecsxp -> int -> bool -> unit = "ocamlr_assign_lglvecsxp"
+external assign_lglsxp  : lglsxp -> int -> bool -> unit = "ocamlr_assign_lglsxp"
 
 
 (**  Sets the element of a vector of integers.
@@ -436,7 +436,7 @@ external assign_lglvecsxp  : lglvecsxp -> int -> bool -> unit = "ocamlr_assign_l
   *  Question: should we rather map R's integers to int32s?
   *)
 
-external assign_intvecsxp  : intvecsxp -> int -> int -> unit = "ocamlr_assign_intvecsxp"
+external assign_intsxp  : intsxp -> int -> int -> unit = "ocamlr_assign_intsxp"
 
 
 (**  Sets the element of a vector of integers.
@@ -448,7 +448,7 @@ external assign_intvecsxp  : intvecsxp -> int -> int -> unit = "ocamlr_assign_in
   *  Question: should we rather map R's integers to int32s?
   *)
 
-external assign_intvecsxp_opt  : intvecsxp -> int -> int option -> unit = "ocamlr_assign_intvecsxp_opt"
+external assign_intsxp_opt  : intsxp -> int -> int option -> unit = "ocamlr_assign_intsxp_opt"
 
 
 (**  Sets the element of a vector of real numbers.
@@ -458,7 +458,7 @@ external assign_intvecsxp_opt  : intvecsxp -> int -> int option -> unit = "ocaml
   *  and sets the vector's offset element to the real number's value.
   *)
 
-external assign_realvecsxp : realvecsxp -> int -> float -> unit = "ocamlr_assign_realvecsxp"
+external assign_realsxp : realsxp -> int -> float -> unit = "ocamlr_assign_realsxp"
 
 
 (**  Sets the element of a vector of real numbers with possibly missing values
@@ -468,7 +468,7 @@ external assign_realvecsxp : realvecsxp -> int -> float -> unit = "ocamlr_assign
   *  and sets the vector's offset element to the real number's value or NA if non available.
   *)
 
-external assign_realvecsxp_opt : realvecsxp -> int -> float option -> unit = "ocamlr_assign_realvecsxp_opt"
+external assign_realsxp_opt : realsxp -> int -> float option -> unit = "ocamlr_assign_realsxp_opt"
 
 
 (**  Sets the element of a vector of string.
@@ -478,7 +478,7 @@ external assign_realvecsxp_opt : realvecsxp -> int -> float option -> unit = "oc
   *  and sets the vector's offset element to the string's value.
   *)
 
-external assign_strvecsxp  : strvecsxp -> int -> string -> unit = "ocamlr_assign_strvecsxp"
+external assign_strsxp  : strsxp -> int -> string -> unit = "ocamlr_assign_strsxp"
 
 (* === SEXPREC ===== *)
 
@@ -529,7 +529,7 @@ let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
     | Some name -> tag x name; (cast (x : pairlistsxp :> sexp) : pairlist)
   end args ((null_creator ()) : nilsxp :> pairlist) end
 
-external string_of_charsxp : charvecsxp -> string = "ocamlr_internal_string_of_charsxp"
+external string_of_charsxp : charsxp -> string = "ocamlr_internal_string_of_charsxp"
 
 let list_of_vecsxp (access : 'a vecsxp -> int -> 'b) (s : 'a vecsxp) =
   let lngth = length_of_vecsxp s in
@@ -552,66 +552,66 @@ let vecsxp_of_array (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'b 
   Array.iteri (assign s) t ;
   s
 
-let bool_list_of_lglvecsxp x = list_of_vecsxp access_lglvecsxp x
-let lglvecsxp_of_bool_list x = vecsxp_of_list alloc_lgl_vector assign_lglvecsxp x
-let bool_array_of_lglvecsxp x = array_of_vecsxp access_lglvecsxp x
-let lglvecsxp_of_bool_array x = vecsxp_of_array alloc_lgl_vector assign_lglvecsxp x
-let bools_of_t tau = bool_array_of_lglvecsxp (cast (tau : lglvecsxp :> sexp) : lglvecsxp)
-let bool_of_t tau = access_lglvecsxp (cast (tau : lglvecsxp :> sexp) : lglvecsxp) 0
+let bool_list_of_lglsxp x = list_of_vecsxp access_lglsxp x
+let lglsxp_of_bool_list x = vecsxp_of_list alloc_lglsxp assign_lglsxp x
+let bool_array_of_lglsxp x = array_of_vecsxp access_lglsxp x
+let lglsxp_of_bool_array x = vecsxp_of_array alloc_lglsxp assign_lglsxp x
+let bools_of_t tau = bool_array_of_lglsxp (cast (tau : lglsxp :> sexp) : lglsxp)
+let bool_of_t tau = access_lglsxp (cast (tau : lglsxp :> sexp) : lglsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the lgl vecsxp contains only one element. *)
-let bool b = (cast ((lglvecsxp_of_bool_array [| b |]) : lglvecsxp :> sexp) : lglvecsxp)
-let bools bl = (cast ((lglvecsxp_of_bool_array bl) : lglvecsxp :> sexp) : lglvecsxp)
+let bool b = (cast ((lglsxp_of_bool_array [| b |]) : lglsxp :> sexp) : lglsxp)
+let bools bl = (cast ((lglsxp_of_bool_array bl) : lglsxp :> sexp) : lglsxp)
 
-let int_list_of_intvecsxp x  = list_of_vecsxp access_intvecsxp x
-let intvecsxp_of_int_list x  = vecsxp_of_list alloc_int_vector assign_intvecsxp x
-let int_array_of_intvecsxp x  = array_of_vecsxp access_intvecsxp x
-let optint_array_of_intvecsxp x  = array_of_vecsxp access_optintvecsxp x
-let intvecsxp_of_int_array x  = vecsxp_of_array alloc_int_vector assign_intvecsxp x
-let intvecsxp_of_int_option_array x = vecsxp_of_array alloc_int_vector assign_intvecsxp_opt x
-let ints_of_t tau = int_array_of_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp)
-let optints_of_t tau = optint_array_of_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp)
-let int_of_t tau = access_intvecsxp (cast (tau : intvecsxp :> sexp) : intvecsxp) 0
+let int_list_of_intsxp x  = list_of_vecsxp access_intsxp x
+let intsxp_of_int_list x  = vecsxp_of_list alloc_intsxp assign_intsxp x
+let int_array_of_intsxp x  = array_of_vecsxp access_intsxp x
+let optint_array_of_intsxp x  = array_of_vecsxp access_optintsxp x
+let intsxp_of_int_array x  = vecsxp_of_array alloc_intsxp assign_intsxp x
+let intsxp_of_int_option_array x = vecsxp_of_array alloc_intsxp assign_intsxp_opt x
+let ints_of_t tau = int_array_of_intsxp (cast (tau : intsxp :> sexp) : intsxp)
+let optints_of_t tau = optint_array_of_intsxp (cast (tau : intsxp :> sexp) : intsxp)
+let int_of_t tau = access_intsxp (cast (tau : intsxp :> sexp) : intsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the int vecsxp contains only one element. *)
-let int i = (cast ((intvecsxp_of_int_array [| i |]) : intvecsxp :> sexp) : intvecsxp)
-let ints il = (cast ((intvecsxp_of_int_array il) : intvecsxp :> sexp) : intvecsxp)
-let optints xl = (cast ((intvecsxp_of_int_option_array xl) : intvecsxp :> sexp) : intvecsxp)
+let int i = (cast ((intsxp_of_int_array [| i |]) : intsxp :> sexp) : intsxp)
+let ints il = (cast ((intsxp_of_int_array il) : intsxp :> sexp) : intsxp)
+let optints xl = (cast ((intsxp_of_int_option_array xl) : intsxp :> sexp) : intsxp)
 
-let float_list_of_realvecsxp x = list_of_vecsxp access_realvecsxp x
-let realvecsxp_of_float_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp x
-let float_array_of_realvecsxp x = array_of_vecsxp access_realvecsxp x
-let opt_float_array_of_realvecsxp x = array_of_vecsxp access_optrealvecsxp x
-let realvecsxp_of_float_array x = vecsxp_of_array alloc_real_vector assign_realvecsxp x
-let floats_of_t tau = float_array_of_realvecsxp (cast (tau : realvecsxp :> sexp) : realvecsxp)
-let optfloats_of_t tau = opt_float_array_of_realvecsxp (cast (tau : realvecsxp :> sexp) : realvecsxp)
-let float_of_t tau = access_realvecsxp (cast (tau : realvecsxp :> sexp) : realvecsxp) 0
+let float_list_of_realsxp x = list_of_vecsxp access_realsxp x
+let realsxp_of_float_list x = vecsxp_of_list alloc_real_vector assign_realsxp x
+let float_array_of_realsxp x = array_of_vecsxp access_realsxp x
+let opt_float_array_of_realsxp x = array_of_vecsxp access_optrealsxp x
+let realsxp_of_float_array x = vecsxp_of_array alloc_real_vector assign_realsxp x
+let floats_of_t tau = float_array_of_realsxp (cast (tau : realsxp :> sexp) : realsxp)
+let optfloats_of_t tau = opt_float_array_of_realsxp (cast (tau : realsxp :> sexp) : realsxp)
+let float_of_t tau = access_realsxp (cast (tau : realsxp :> sexp) : realsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the real vecsxp contains only one element. *)
-let float x = (cast ((realvecsxp_of_float_array [| x |]) : realvecsxp :> sexp) : realvecsxp)
-let floats xl = (cast ((realvecsxp_of_float_array xl) : realvecsxp :> sexp) : realvecsxp)
+let float x = (cast ((realsxp_of_float_array [| x |]) : realsxp :> sexp) : realsxp)
+let floats xl = (cast ((realsxp_of_float_array xl) : realsxp :> sexp) : realsxp)
 
-let realvecsxp_of_float_option_list x = vecsxp_of_list alloc_real_vector assign_realvecsxp_opt x
-let realvecsxp_of_float_option_array x = vecsxp_of_array alloc_real_vector assign_realvecsxp_opt x
-let optfloats xl = (cast ((realvecsxp_of_float_option_array xl) : realvecsxp :> sexp) : realvecsxp)
+let realsxp_of_float_option_list x = vecsxp_of_list alloc_real_vector assign_realsxp_opt x
+let realsxp_of_float_option_array x = vecsxp_of_array alloc_real_vector assign_realsxp_opt x
+let optfloats xl = (cast ((realsxp_of_float_option_array xl) : realsxp :> sexp) : realsxp)
 
-let string_list_of_strvecsxp x = list_of_vecsxp access_strvecsxp x
-let strvecsxp_of_string_list x = vecsxp_of_list alloc_str_vector assign_strvecsxp x
-let string_array_of_strvecsxp x = array_of_vecsxp access_strvecsxp x
-let strvecsxp_of_string_array x = vecsxp_of_array alloc_str_vector assign_strvecsxp x
-let string_list_of_t tau = string_list_of_strvecsxp (cast (tau : strvecsxp :> sexp) : strvecsxp)
-let strings_of_t tau = string_array_of_strvecsxp (cast (tau : strvecsxp :> sexp) : strvecsxp)
-let string_of_t tau = access_strvecsxp (cast (tau : strvecsxp :> sexp) : strvecsxp) 0
+let string_list_of_strsxp x = list_of_vecsxp access_strsxp x
+let strsxp_of_string_list x = vecsxp_of_list alloc_str_vector assign_strsxp x
+let string_array_of_strsxp x = array_of_vecsxp access_strsxp x
+let strsxp_of_string_array x = vecsxp_of_array alloc_str_vector assign_strsxp x
+let string_list_of_t tau = string_list_of_strsxp (cast (tau : strsxp :> sexp) : strsxp)
+let strings_of_t tau = string_array_of_strsxp (cast (tau : strsxp :> sexp) : strsxp)
+let string_of_t tau = access_strsxp (cast (tau : strsxp :> sexp) : strsxp) 0
   (* We access only the first element, because static typing is supposed to
      ensure that the str vecsxp contains only one element. *)
-external string : string -> strvecsxp = "ocamlr_strsxp_of_string"
-let strings sl = (cast ((strvecsxp_of_string_array sl) : strvecsxp :> sexp) : strvecsxp)
+external string : string -> strsxp = "ocamlr_strsxp_of_string"
+let strings sl = (cast ((strsxp_of_string_array sl) : strsxp :> sexp) : strsxp)
 
-let sexp_list_of_rawvecsxp x = list_of_vecsxp access_rawvecsxp x
-let sexps_of_t tau = sexp_list_of_rawvecsxp (cast (tau : rawvecsxp :> sexp) : rawvecsxp)
+let sexp_list_of_rawsxp x = list_of_vecsxp access_rawsxp x
+let sexps_of_t tau = sexp_list_of_rawsxp (cast (tau : rawsxp :> sexp) : rawsxp)
 
-let langsxp_list_of_exprvecsxp x = list_of_vecsxp access_exprvecsxp x
-let langsxps_of_t tau = langsxp_list_of_exprvecsxp (cast (tau : rawvecsxp :> sexp) : exprvecsxp)
+let langsxp_list_of_exprsxp x = list_of_vecsxp access_exprsxp x
+let langsxps_of_t tau = langsxp_list_of_exprsxp (cast (tau : rawsxp :> sexp) : exprsxp)
 
 (* === INTERNAL ===== *)
 
@@ -633,18 +633,18 @@ module Specification = struct
     | (NilSxp,  _, NilSxp) when sexp_equality (s : symsxp :> sexp) value -> None
     | (CharSxp, SymSxp, NilSxp) -> (
         match (sexp_equality (s : symsxp :> sexp) value) &&
-              ("" = string_of_charsxp (cast pname : charvecsxp)) with
+              ("" = string_of_charsxp (cast pname : charsxp)) with
         | true -> Some None
         | false -> (
             match (sexp_equality value (inspect_symsxp_value (cast value : symsxp)))  &&
                   (NilSxp = sexptype (inspect_symsxp_pname (cast value : symsxp)))    &&
                   (NilSxp = sexptype (inspect_symsxp_internal (cast value : symsxp))) with
-            | true -> Some (Some ((string_of_charsxp (cast pname : charvecsxp)), None))
+            | true -> Some (Some ((string_of_charsxp (cast pname : charsxp)), None))
             | false -> assert false
           )
       )
     | (CharSxp, _, (NilSxp | BuiltinSxp)) ->
-      let symbol_name = string_of_charsxp (cast pname : charvecsxp) in
+      let symbol_name = string_of_charsxp (cast pname : charsxp) in
       Some (Some (symbol_name, (Some value)))
     | _ -> assert false
 
@@ -772,15 +772,15 @@ module CTypes = struct
         tagval     = rec_build (inspect_listsxp_tagval (cast s : langsxp))}}
     | SpecialSxp -> Val { content = SPECIALSXP }
     | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset (cast s : builtinsxp))}
-    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (cast s : charvecsxp)) }
-    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lglvecsxp (cast s : lglvecsxp))}
-    | IntSxp     -> Val { content = INTSXP (int_list_of_intvecsxp (cast s : intvecsxp))}
-    | RealSxp    -> Val { content = REALSXP (float_list_of_realvecsxp (cast s : realvecsxp))}
+    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (cast s : charsxp)) }
+    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lglsxp (cast s : lglsxp))}
+    | IntSxp     -> Val { content = INTSXP (int_list_of_intsxp (cast s : intsxp))}
+    | RealSxp    -> Val { content = REALSXP (float_list_of_realsxp (cast s : realsxp))}
     | CplxSxp    -> Val { content = CPLXSXP }
-    | StrSxp     -> Val { content = STRSXP (string_list_of_strvecsxp (cast s: strvecsxp))}
+    | StrSxp     -> Val { content = STRSXP (string_list_of_strsxp (cast s: strsxp))}
     | DotSxp     -> Val { content = DOTSXP }
     | AnySxp     -> Val { content = ANYSXP }
-    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_rawvecsxp (cast s : rawvecsxp)))}
+    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_rawsxp (cast s : rawsxp)))}
     | ExprSxp    -> Val { content = EXPRSXP }
     | BcodeSxp   -> Val { content = BCODESXP }
     | ExtptrSxp  -> Val { content = EXTPTRSXP }
@@ -881,15 +881,15 @@ module PrettyTypes = struct
         | _ -> Unknown end
     | SpecialSxp -> SPECIAL (inspect_primsxp_offset (cast s : specialsxp))
     | BuiltinSxp -> BUILTIN
-    | CharSxp    -> STRING  (string_of_charsxp (cast s : charvecsxp))
-    | LglSxp     -> BOOLS   (bool_list_of_lglvecsxp (cast s : lglvecsxp))
-    | IntSxp     -> INTS    (int_list_of_intvecsxp (cast s : intvecsxp))
-    | RealSxp    -> FLOATS  (float_list_of_realvecsxp (cast s : realvecsxp))
+    | CharSxp    -> STRING  (string_of_charsxp (cast s : charsxp))
+    | LglSxp     -> BOOLS   (bool_list_of_lglsxp (cast s : lglsxp))
+    | IntSxp     -> INTS    (int_list_of_intsxp (cast s : intsxp))
+    | RealSxp    -> FLOATS  (float_list_of_realsxp (cast s : realsxp))
     | CplxSxp    -> Unknown
-    | StrSxp     -> STRINGS (string_list_of_strvecsxp (cast s : strvecsxp))
+    | StrSxp     -> STRINGS (string_list_of_strsxp (cast s : strsxp))
     | DotSxp     -> Unknown
     | AnySxp     -> Unknown
-    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_rawvecsxp (cast s : rawvecsxp)))
+    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_rawsxp (cast s : rawsxp)))
     | ExprSxp    -> Unknown
     | BcodeSxp   -> Unknown
     | ExtptrSxp  -> Unknown
@@ -934,7 +934,7 @@ external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
 (*   method attributes = List.map *)
 (*     begin function a, x -> (Specification.of_symbol a), x end *)
 (*     (list_of_pairlist (get_attributes __underlying)) *)
-(*   method classes = strings_of_t (cast (get_attrib __underlying "class") : strvecsxp) *)
+(*   method classes = strings_of_t (cast (get_attrib __underlying "class") : strsxp) *)
 (* end *)
 
 (* let s3 (r : 'a t) = new s3 r *)
@@ -976,7 +976,7 @@ let parse_string ?max statement =
   let error_code, sexp = raw_parse_string statement
     begin match max with None -> -1 | Some n -> n end in
   match parse_status_of_int error_code with
-  | Parse_OK -> langsxps_of_t (cast sexp : rawvecsxp)
+  | Parse_OK -> langsxps_of_t (cast sexp : rawsxp)
   | _ as status -> raise (Parsing_failure (status, statement))
 
 let parse statement = List.hd (parse_string ~max:1 statement)

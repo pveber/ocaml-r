@@ -71,7 +71,7 @@ CAMLprim value ocamlr_write_lisplist_tagval (value lisplist, value tag) {
   *  and sets the vector's offset element to the boolean's value.
   */
 
-CAMLprim value ocamlr_assign_lglvecsxp (value lglsxp, value offset, value b) {
+CAMLprim value ocamlr_assign_lglsxp (value lglsxp, value offset, value b) {
   LOGICAL(Sexp_val(lglsxp))[Int_val(offset)] = Bool_val(b);
   return Val_unit;
 }
@@ -86,7 +86,7 @@ CAMLprim value ocamlr_assign_lglvecsxp (value lglsxp, value offset, value b) {
   *  Question: should we rather map R's integers to int32s?
   */
 
-CAMLprim value ocamlr_assign_intvecsxp (value intsxp, value offset, value i) {
+CAMLprim value ocamlr_assign_intsxp (value intsxp, value offset, value i) {
   INTEGER(Sexp_val(intsxp))[Int_val(offset)] = Int_val(i);
   return Val_unit;
 }
@@ -101,7 +101,7 @@ CAMLprim value ocamlr_assign_intvecsxp (value intsxp, value offset, value i) {
  * offset element to the real number's value, or NA if not available.
  */
 
-CAMLprim value ocamlr_assign_intvecsxp_opt (value intsxp, value offset, value io) {
+CAMLprim value ocamlr_assign_intsxp_opt (value intsxp, value offset, value io) {
   int ri = (io == Val_int(0)) ? NA_INTEGER : Int_val(Field(io,0)) ;
     
   INTEGER(Sexp_val(intsxp))[Int_val(offset)] = ri;
@@ -116,7 +116,7 @@ CAMLprim value ocamlr_assign_intvecsxp_opt (value intsxp, value offset, value io
   *  and sets the vector's offset element to the real number's value.
   */
 
-CAMLprim value ocamlr_assign_realvecsxp (value realsxp, value offset, value x) {
+CAMLprim value ocamlr_assign_realsxp (value realsxp, value offset, value x) {
   REAL(Sexp_val(realsxp))[Int_val(offset)] = Double_val(x);
   return Val_unit;
 }
@@ -130,7 +130,7 @@ CAMLprim value ocamlr_assign_realvecsxp (value realsxp, value offset, value x) {
   *  available.
   */
 
-CAMLprim value ocamlr_assign_realvecsxp_opt (value realsxp, value offset, value x) {
+CAMLprim value ocamlr_assign_realsxp_opt (value realsxp, value offset, value x) {
   double rx = (x == Val_int(0)) ? NA_REAL : Double_val(Field(x,0)) ;
     
   REAL(Sexp_val(realsxp))[Int_val(offset)] = rx;
@@ -145,7 +145,7 @@ CAMLprim value ocamlr_assign_realvecsxp_opt (value realsxp, value offset, value 
   *  and sets the vector's offset element to the string's value.
   */
 
-CAMLprim value ocamlr_assign_strvecsxp (value strsxp, value offset, value s) {
+CAMLprim value ocamlr_assign_strsxp (value strsxp, value offset, value s) {
   STRING_PTR(Sexp_val(strsxp))[Int_val(offset)] = mkChar(String_val(s));
   return Val_unit;
 }

@@ -274,7 +274,7 @@ CAMLprim value ocamlr_inspect_promsxp_env (value sexp) {
   *  @param offset An integer, offset in the R logical vector.
   *  @return The boolean at this offset in the R logical vector.
   */
-CAMLprim value ocamlr_access_lgl_vecsxp (value lglsxp, value offset) {
+CAMLprim value ocamlr_access_lglsxp (value lglsxp, value offset) {
   return(Val_bool(LOGICAL(Sexp_val(lglsxp))[Int_val(offset)]));
 }
 
@@ -285,7 +285,7 @@ CAMLprim value ocamlr_access_lgl_vecsxp (value lglsxp, value offset) {
   *  @param offset An integer, offset in the R vector of integers.
   *  @return The integer at this offset in the R vector of integers.
   */
-CAMLprim value ocamlr_access_int_vecsxp (value intsxp, value offset) {
+CAMLprim value ocamlr_access_intsxp (value intsxp, value offset) {
 
   /* The R macro is #define INTEGER(x) ((int *) DATAPTR(x)).
      Should use Val_int, or int32s? More generally, the typing
@@ -300,7 +300,7 @@ CAMLprim value ocamlr_access_int_vecsxp (value intsxp, value offset) {
   *  @param offset An integer, offset in the R vector of real numbers.
   *  @return an int option, [None] if [NA] or [Some x] where [x] is integer at this offset in the R vector of real numbers.
   */
-CAMLprim value ocamlr_access_optint_vecsxp (value intsxp, value offset) {
+CAMLprim value ocamlr_access_intsxp_opt (value intsxp, value offset) {
   int x = INTEGER(Sexp_val(intsxp))[Int_val(offset)];
   if(x == NA_INTEGER) return Val_int(0);
   else {
@@ -316,7 +316,7 @@ CAMLprim value ocamlr_access_optint_vecsxp (value intsxp, value offset) {
   *  @param offset An integer, offset in the R vector of real numbers.
   *  @return The real number at this offset in the R vector of real numbers.
   */
-CAMLprim value ocamlr_access_real_vecsxp (value realsxp, value offset) {
+CAMLprim value ocamlr_access_realsxp (value realsxp, value offset) {
   return(caml_copy_double(REAL(Sexp_val(realsxp))[Int_val(offset)]));
 }
 
@@ -327,7 +327,7 @@ CAMLprim value ocamlr_access_real_vecsxp (value realsxp, value offset) {
   *  @param offset An integer, offset in the R vector of real numbers.
   *  @return a float option, [None] if [NA] or [Some x] where [x] is real number at this offset in the R vector of real numbers.
   */
-CAMLprim value ocamlr_access_optreal_vecsxp (value realsxp, value offset) {
+CAMLprim value ocamlr_access_realsxp_opt(value realsxp, value offset) {
   double x = REAL(Sexp_val(realsxp))[Int_val(offset)];
   if(ISNA(x)) return Val_int(0);
   else {
@@ -343,7 +343,7 @@ CAMLprim value ocamlr_access_optreal_vecsxp (value realsxp, value offset) {
   *  @param offset An integer, offset in the R vector of strings.
   *  @return The string at this offset in the R vector of strings.
   */
-CAMLprim value ocamlr_access_str_vecsxp (value strsxp, value offset) {
+CAMLprim value ocamlr_access_strsxp (value strsxp, value offset) {
 
   /* Same comments as for r_access_int_vecsxp and for
      r_internal_string_of_charsxp. */
@@ -367,6 +367,6 @@ CAMLprim value ocamlr_access_str_vecsxp (value strsxp, value offset) {
   *  @param offset An integer, offset in the R vector of SEXPs.
   *  @return The SEXP at this offset in the R vector of SEXPs.
   */
-CAMLprim value ocamlr_access_sexp_vecsxp (value sexpsxp, value offset) {
+CAMLprim value ocamlr_access_vecsxp(value sexpsxp, value offset) {
   return(Val_sexp(VECTOR_ELT(Sexp_val(sexpsxp), Int_val(offset))));
 }
