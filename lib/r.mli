@@ -457,9 +457,6 @@ val init : ?name:string -> ?argv:string list -> ?env:(string * string) list -> ?
 val terminate : unit -> unit
 (**  Terminates the R session. *)
 
-module type Interpreter = sig end
-(**  Module type of an R interpreter. *)
-
 module type Environment = sig
   (**  [Environment] is the type of a module containing all necessary
        informations and data in order to set up the R interpreter
@@ -501,12 +498,12 @@ module type Environment = sig
 
 end
 
-module Standard : Environment
+module Standard_environment : Environment
 (**  The [Standard] module contains initialisation details for libR.so.
      These informations are determined when the binding is being compiled.
 *)
 
-module Interpreter (Env : Environment) : Interpreter
+module Interpreter_initialization(Env : Environment) : sig end
 (**  Functor used to initialise statically an R interpreter, given initialisation
      details provided by the provided [Env] module.
 *)

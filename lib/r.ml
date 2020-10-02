@@ -55,7 +55,7 @@ sig
 
 end
 
-module Standard = Standard
+module Standard_environment = Standard_environment
 
 (* === SEXPTYPE ===== *)
 
@@ -1018,9 +1018,9 @@ exception Initialisation_failed
 
 let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
          ?(argv     = try List.tl (Array.to_list Sys.argv) with _ -> [])
-         ?(env      = Standard.env)
+         ?(env      = Standard_environment.env)
          ?(packages = None)
-         ?(sigs     = Standard.signal_handlers) () =
+         ?(sigs     = Standard_environment.signal_handlers) () =
   let env_vars = begin match packages with
     | None -> env
     | Some [] -> ("R_DEFAULT_PACKAGES", "NULL")::env
@@ -1037,9 +1037,7 @@ let init ?(name     = try Sys.argv.(0) with _ -> "OCaml-R")
         (Runtime_error ((upcast ((null_creator ()) : nilsxp :> sexp ) : langsxp ), ""))
   | _ -> raise Initialisation_failed
 
-module type Interpreter = sig end
-
-module Interpreter (Env : Environment) : Interpreter = struct
+module Interpreter_initialization (Env : Environment) : sig end = struct
 
   let () = init ~name: Env.name
                 ~argv: Env.options
