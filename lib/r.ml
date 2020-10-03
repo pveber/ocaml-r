@@ -25,38 +25,6 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (*********************************************************************************)
 
-
-(* === ENVIRONMENT ===== *)
-
-module type Environment =
-sig
-
-  val name : string    (* This is the first argument of argv for R.
-                          Mandatory, otherwise libR.so segfaults. *)
-
-  (* See R reference manual, refman.pdf, page 452, section intitled
-     'Startup - Initialization at Start of an R Session' for details
-     about the most important command line options.
-     More options are documented on the following webpage:
-     http://cran.r-project.org/doc/manuals/R-intro.html#Invoking-R *)
-
-  val options : string list
-
-  (* signal_handlers, if set to false, asks R not to install its
-     signal handlers. I've been experiencing weird issues with R signal
-     handlers, since, for instance, a SIGSEGV originating from OCaml is
-     caught by libR.so, and R asks then asks whether or not you want to
-     save your workspace, et ceterae. By default, set to false. *)
-  val signal_handlers : bool
-
-  val env : (string * string) list
-
-  val packages : string list option
-
-end
-
-module Standard_environment = Standard_environment
-
 (* === SEXPTYPE ===== *)
 
 
@@ -108,6 +76,218 @@ type 'a vector = [< `Char | `Lgl | `Int  | `Real
                  |  `Str  | `Raw | `Expr | `Vec] as 'a
 
 external upcast : sexp -> 'a sxp = "%identity"
+
+
+module Low_level = struct
+  (* === PROMISE ===== *)
+
+  external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
+
+  (*let force : 'a promise -> 'a t = force_promsxp*)
+
+  (* For lazy evaluation, we have an issue here: R promises
+     are recursively forced by eval. This means that the
+     OCaml type system would be broken, because we would need
+     to have 'a Lazy.t R.t = 'a Lazy.t Lazy.t R.t. There's two
+     solutions:
+
+     -1- 'a R.t would denote a R value of type 'a, lazy or not.
+         This is suboptimal, because the OCaml type system could
+         and should express these lazy semantics.
+
+     -2- Make a dynamic check on the nature of the argument of
+         the force function. If it is a lazy lazy value, we
+         should force it manually, with OCaml semantics. If not,
+         we can run eval on it. *)
+
+
+
+  (* === SYMBOL ===== *)
+
+  (* There's a lot of stuff concerning symbols and environments in the
+     envir.c file of the R source code. *)
+
+  external install : string -> symsxp = "ocamlr_install"
+
+  external findvar : symsxp -> promsxp = "ocamlr_findvar"
+
+  external findfun : symsxp -> promsxp = "ocamlr_findfun"
+
+
+  (* === READ_INTERNAL ===== *)
+
+  (* Low-level data manipulation functions. *)
+
+  (* What follows is low-level accessor functions, in order to inspect
+     in details the contents of SEXPs and VECSEXPs. *)
+
+  external inspect_attributes : sexp -> sexp = "ocamlr_inspect_attributes"
+  external length_of_vector   : 'a vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
+
+  external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
+  external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
+  external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
+  external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"
+  external inspect_listsxp_carval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_carval"
+  external inspect_listsxp_cdrval  : 'a nonempty_list sxp -> [> internallist] sxp = "ocamlr_inspect_listsxp_cdrval"
+  external inspect_listsxp_tagval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_tagval"
+  external inspect_envsxp_frame    : envsxp         -> sexp          = "ocamlr_inspect_envsxp_frame"
+  external inspect_envsxp_enclos   : envsxp         -> sexp          = "ocamlr_inspect_envsxp_enclos"
+  external inspect_envsxp_hashtab  : envsxp         -> sexp          = "ocamlr_inspect_envsxp_hashtab"
+  external inspect_closxp_formals  : closxp         -> sexp          = "ocamlr_inspect_closxp_formals"
+  external inspect_closxp_body     : closxp         -> sexp          = "ocamlr_inspect_closxp_body"
+  external inspect_closxp_env      : closxp         -> sexp          = "ocamlr_inspect_closxp_env"
+  external inspect_promsxp_value   : promsxp        -> sexp          = "ocamlr_inspect_promsxp_value"
+  external inspect_promsxp_expr    : promsxp        -> sexp          = "ocamlr_inspect_promsxp_expr"
+  external inspect_promsxp_env     : promsxp        -> sexp          = "ocamlr_inspect_promsxp_env"
+
+  external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
+  external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
+  external access_intsxp_opt  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
+  external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
+  external access_realsxp_opt : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
+  external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
+  external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
+  external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
+
+  (* === ALLOCATION ===== *)
+
+  (* This file contains wrappers around allocation functions,
+     returning uninitialised pairlists and vectors. *)
+
+  external alloc_list        : int -> [> internallist] sxp = "ocamlr_alloc_list"
+  external alloc_lglsxp      : int -> lglsxp               = "ocamlr_alloc_lglsxp"
+  external alloc_intsxp      : int -> intsxp               = "ocamlr_alloc_intsxp"
+  external alloc_real_vector : int -> realsxp              = "ocamlr_alloc_realsxp"
+  external alloc_str_vector  : int -> strsxp               = "ocamlr_alloc_strsxp"
+
+  (* === WRITE_INTERNAL ===== *)
+
+
+  external write_listsxp_carval : 'a nonempty_list sxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
+  external write_listsxp_tagval : 'a nonempty_list sxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
+
+  let write_listsxp_element l tag elmnt =
+    let () = write_listsxp_tagval l tag in
+    let () = write_listsxp_carval l elmnt in
+    ()
+
+  (**  Sets the element of a logical vector.
+    *
+    *  assign_lgl_vecsxp takes a logical vector as first argument,
+    *  an offset as second argument, and a boolean as third argument,
+    *  and sets the vector's offset element to the boolean's value.
+  *)
+
+  external assign_lglsxp  : lglsxp -> int -> bool -> unit = "ocamlr_assign_lglsxp"
+
+
+  (**  Sets the element of a vector of integers.
+    *
+    *  assign_int_vecsxp takes a vector of integers as first argument,
+    *  an offset as second argument, and an integer as third argument,
+    *  and sets the vector's offset element to the integer's value.
+    *
+    *  Question: should we rather map R's integers to int32s?
+  *)
+
+  external assign_intsxp  : intsxp -> int -> int -> unit = "ocamlr_assign_intsxp"
+
+
+  (**  Sets the element of a vector of integers.
+    *
+    *  assign_int_vecsxp takes a vector of integers as first argument,
+    *  an offset as second argument, and an integer as third argument,
+    *  and sets the vector's offset element to the integer's value.
+    *
+    *  Question: should we rather map R's integers to int32s?
+  *)
+
+  external assign_intsxp_opt  : intsxp -> int -> int option -> unit = "ocamlr_assign_intsxp_opt"
+
+
+  (**  Sets the element of a vector of real numbers.
+    *
+    *  assign_real_vecsxp takes a vector of real numbers as first argument,
+    *  an offset as second argument, and a real number as third argument,
+    *  and sets the vector's offset element to the real number's value.
+  *)
+
+  external assign_realsxp : realsxp -> int -> float -> unit = "ocamlr_assign_realsxp"
+
+
+  (**  Sets the element of a vector of real numbers with possibly missing values
+    *
+    *  assign_real_vecsxp takes a vector of real numbers as first argument,
+    *  an offset as second argument, and a possibly missig real number as third argument,
+    *  and sets the vector's offset element to the real number's value or NA if non available.
+  *)
+
+  external assign_realsxp_opt : realsxp -> int -> float option -> unit = "ocamlr_assign_realsxp_opt"
+
+
+  (**  Sets the element of a vector of string.
+    *
+    *  assign_str_vecsxp takes a vector of strings as first argument,
+    *  an offset as second argument, and a string as third argument,
+    *  and sets the vector's offset element to the string's value.
+  *)
+
+  external assign_strsxp  : strsxp -> int -> string -> unit = "ocamlr_assign_strsxp"
+
+  (* === SEXPREC ===== *)
+
+  external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
+
+  (* R constants - global symbols in libR.so. *)
+  (* We are looking for a clean solution
+     for the typing of the R NULL. What should it be
+     in OCaml? An 'a option mapping to None? *)
+  external null_creator : unit -> [> `Nil] sxp = "ocamlr_null"
+  external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
+  external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
+  external base_env_creator : unit -> sexp = "ocamlr_base_env"
+
+  (* R_GlobalEnv is not a constant, but rather a constant pointer,
+     that gets updated by R itself. *)
+  external global_env : unit -> sexp = "ocamlr_global_env"
+
+  external cons : sexp -> [< `Nil | `List] sxp -> [> `List] sxp = "ocamlr_cons"
+  external tag : listsxp -> string -> unit = "ocamlr_tag"
+
+  external set_langsxp : listsxp -> unit = "ocamlr_set_langsxp"
+  (* Beware: [set_langsxp x] breaks typing, since after the call, [x] is
+     now of type [langsxp]. *)
+
+  (* === S3 ===== *)
+  (**  Get the S3 class of a given SEXP.
+    *
+    *  s3_class takes a SEXP as argument, and returns the S3 class
+    *  attribute of the given SEXP.
+  *)
+  external s3_class : sexp -> sexp = "ocamlr_s3_class"
+
+  external aux_get_attrib : sexp -> symsxp -> sexp = "ocamlr_get_attrib"
+  let get_attrib s name = aux_get_attrib s (install name)
+
+  external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
+
+  (* === S4 ===== *)
+
+  external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
+
+  external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
+
+  (* ==== REDUCTION ==== *)
+  external eval_langsxp : langsxp -> sexp = "ocamlr_eval_sxp"
+
+end
+
+open Low_level
+
+
+
+
 
 type +'a t = sexp
 
@@ -187,40 +367,6 @@ class type ['a] s3 = object
 end
 
 
-(* === DATA ===== *)
-
-
-(* TODO: We will have to use polymorphic variants and private
-   type abreviations to leverage the typing system to its full
-   extent to type R statically. *)
-
-(* Types of wrapped R SEXP values. sxp is a polymorphic type
-   wrapping up the monomorphic type sexp *)
-
-(* Argument types for the polymorphic 'a sxp type. *)
-(*type 'a sxp = sexp*)
-(*type nil*)                         (* For NILSXP *)
-(*type sym*)                         (* For SYMSXP *)
-(*type 'a lisplist*)                 (* For LISTSXP, and LANGSXP *)
-(*type simple*)                      (* For LISTSXP *)
-(*type pairlist = simple lisplist*)  (* For LISTSXP *)
-(*type clos*)                        (* For CLOSXP *)
-(*type env*)                         (* For ENVSXP *)
-(*type prom*)                        (* For PROMSXP *)
-(*type call*)                        (* For LANGSXP *)
-(*type lang = call lisplist*)        (* For LANGSXP *)
-(*type builtin*)                     (* For BUILTINSXP *)
-(* Phantom type vec, and phantom subtype vecsxp. *)
-(*type 'a vec*)                      (* For all the VECSXPs *)
-(*type 'a vecsxp = 'a vec sxp*)
-(*type vec_char = char vec*)         (* For CHARSXP *)
-(*type vec_lgl  = bool vec*)         (* For LGLSXP *)
-(*type vec_int  = int  vec*)         (* For INTSXP *)
-    (* Or shouldn't it be int32 vec ? *)
-(*type vec_real = float vec*)        (* For REALSXP *)
-(*type vec_str  = string vec*)       (* For STRSXP *)
-(*type vec_sexp = sexp vec*)
-(*type vec_expr = lang sxp vec*)     (* For EXPRSXP *)
 
 
 (* Algebraic type reflecting R's dynamic typing. *)
@@ -316,39 +462,6 @@ let is_function x = match sexptype x with
   | _ -> false
 
 
-(* === PROMISE ===== *)
-
-external force_promsxp : promsxp -> sexp = "ocamlr_eval_sxp"
-
-(*let force : 'a promise -> 'a t = force_promsxp*)
-
-(* For lazy evaluation, we have an issue here: R promises
-   are recursively forced by eval. This means that the
-   OCaml type system would be broken, because we would need
-   to have 'a Lazy.t R.t = 'a Lazy.t Lazy.t R.t. There's two
-   solutions:
-
-   -1- 'a R.t would denote a R value of type 'a, lazy or not.
-       This is suboptimal, because the OCaml type system could
-       and should express these lazy semantics.
-
-   -2- Make a dynamic check on the nature of the argument of
-       the force function. If it is a lazy lazy value, we
-       should force it manually, with OCaml semantics. If not,
-       we can run eval on it. *)
-
-
-
-(* === SYMBOL ===== *)
-
-(* There's a lot of stuff concerning symbols and environments in the
-   envir.c file of the R source code. *)
-
-external install : string -> symsxp = "ocamlr_install"
-
-external findvar : symsxp -> promsxp = "ocamlr_findvar"
-
-external findfun : symsxp -> promsxp = "ocamlr_findfun"
 
 let symbol ?(generic = false) s : sexp =
 
@@ -371,144 +484,6 @@ let symbol ?(generic = false) s : sexp =
   | false -> var
   | true -> force_promsxp (findfun (install s))
 
-
-(* === READ_INTERNAL ===== *)
-
-(* Low-level data manipulation functions. *)
-
-(* What follows is low-level accessor functions, in order to inspect
-   in details the contents of SEXPs and VECSEXPs. *)
-
-external inspect_attributes : sexp -> sexp = "ocamlr_inspect_attributes"
-external length_of_vector   : 'a vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
-
-external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
-external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
-external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
-external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"
-external inspect_listsxp_carval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_carval"
-external inspect_listsxp_cdrval  : 'a nonempty_list sxp -> [> internallist] sxp = "ocamlr_inspect_listsxp_cdrval"
-external inspect_listsxp_tagval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_tagval"
-external inspect_envsxp_frame    : envsxp         -> sexp          = "ocamlr_inspect_envsxp_frame"
-external inspect_envsxp_enclos   : envsxp         -> sexp          = "ocamlr_inspect_envsxp_enclos"
-external inspect_envsxp_hashtab  : envsxp         -> sexp          = "ocamlr_inspect_envsxp_hashtab"
-external inspect_closxp_formals  : closxp         -> sexp          = "ocamlr_inspect_closxp_formals"
-external inspect_closxp_body     : closxp         -> sexp          = "ocamlr_inspect_closxp_body"
-external inspect_closxp_env      : closxp         -> sexp          = "ocamlr_inspect_closxp_env"
-external inspect_promsxp_value   : promsxp        -> sexp          = "ocamlr_inspect_promsxp_value"
-external inspect_promsxp_expr    : promsxp        -> sexp          = "ocamlr_inspect_promsxp_expr"
-external inspect_promsxp_env     : promsxp        -> sexp          = "ocamlr_inspect_promsxp_env"
-
-external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
-external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
-external access_intsxp_opt  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
-external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
-external access_realsxp_opt : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
-external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
-external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
-external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
-
-(* === ALLOCATION ===== *)
-
-(* This file contains wrappers around allocation functions,
-   returning uninitialised pairlists and vectors. *)
-
-external alloc_list        : int -> [> internallist] sxp = "ocamlr_alloc_list"
-external alloc_lglsxp      : int -> lglsxp               = "ocamlr_alloc_lglsxp"
-external alloc_intsxp      : int -> intsxp               = "ocamlr_alloc_intsxp"
-external alloc_real_vector : int -> realsxp              = "ocamlr_alloc_realsxp"
-external alloc_str_vector  : int -> strsxp               = "ocamlr_alloc_strsxp"
-
-(* === WRITE_INTERNAL ===== *)
-
-
-external write_listsxp_carval : 'a nonempty_list sxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
-external write_listsxp_tagval : 'a nonempty_list sxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
-
-let write_listsxp_element l tag elmnt =
-  let () = write_listsxp_tagval l tag in
-  let () = write_listsxp_carval l elmnt in
-  ()
-
-(**  Sets the element of a logical vector.
-  *
-  *  assign_lgl_vecsxp takes a logical vector as first argument,
-  *  an offset as second argument, and a boolean as third argument,
-  *  and sets the vector's offset element to the boolean's value.
-  *)
-
-external assign_lglsxp  : lglsxp -> int -> bool -> unit = "ocamlr_assign_lglsxp"
-
-
-(**  Sets the element of a vector of integers.
-  *
-  *  assign_int_vecsxp takes a vector of integers as first argument,
-  *  an offset as second argument, and an integer as third argument,
-  *  and sets the vector's offset element to the integer's value.
-  *
-  *  Question: should we rather map R's integers to int32s?
-  *)
-
-external assign_intsxp  : intsxp -> int -> int -> unit = "ocamlr_assign_intsxp"
-
-
-(**  Sets the element of a vector of integers.
-  *
-  *  assign_int_vecsxp takes a vector of integers as first argument,
-  *  an offset as second argument, and an integer as third argument,
-  *  and sets the vector's offset element to the integer's value.
-  *
-  *  Question: should we rather map R's integers to int32s?
-  *)
-
-external assign_intsxp_opt  : intsxp -> int -> int option -> unit = "ocamlr_assign_intsxp_opt"
-
-
-(**  Sets the element of a vector of real numbers.
-  *
-  *  assign_real_vecsxp takes a vector of real numbers as first argument,
-  *  an offset as second argument, and a real number as third argument,
-  *  and sets the vector's offset element to the real number's value.
-  *)
-
-external assign_realsxp : realsxp -> int -> float -> unit = "ocamlr_assign_realsxp"
-
-
-(**  Sets the element of a vector of real numbers with possibly missing values
-  *
-  *  assign_real_vecsxp takes a vector of real numbers as first argument,
-  *  an offset as second argument, and a possibly missig real number as third argument,
-  *  and sets the vector's offset element to the real number's value or NA if non available.
-  *)
-
-external assign_realsxp_opt : realsxp -> int -> float option -> unit = "ocamlr_assign_realsxp_opt"
-
-
-(**  Sets the element of a vector of string.
-  *
-  *  assign_str_vecsxp takes a vector of strings as first argument,
-  *  an offset as second argument, and a string as third argument,
-  *  and sets the vector's offset element to the string's value.
-  *)
-
-external assign_strsxp  : strsxp -> int -> string -> unit = "ocamlr_assign_strsxp"
-
-(* === SEXPREC ===== *)
-
-external sexp_equality : sexp -> sexp -> bool = "ocamlr_sexp_equality"
-
-(* R constants - global symbols in libR.so. *)
-(* We are looking for a clean solution
-   for the typing of the R NULL. What should it be
-   in OCaml? An 'a option mapping to None? *)
-external null_creator : unit -> [> `Nil] sxp = "ocamlr_null"
-external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
-external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
-external base_env_creator : unit -> sexp = "ocamlr_base_env"
-
-(* R_GlobalEnv is not a constant, but rather a constant pointer,
-   that gets updated by R itself. *)
-external global_env : unit -> sexp = "ocamlr_global_env"
 
 
 (* === CONVERSION  ===== *)
@@ -537,13 +512,6 @@ let pairlist_of_list (l: (sexp * sexp) list) =
          nil. *)
     ) l ;
   r_l
-
-external cons : sexp -> [< `Nil | `List] sxp -> [> `List] sxp = "ocamlr_cons"
-external tag : listsxp -> string -> unit = "ocamlr_tag"
-
-external set_langsxp : listsxp -> unit = "ocamlr_set_langsxp"
-(* Beware: [set_langsxp x] breaks typing, since after the call, [x] is
-   now of type [langsxp]. *)
 
 let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
   let lcons hd tl =
@@ -952,18 +920,6 @@ module Pretty = struct
 end
 
 
-(* === S3 ===== *)
-(**  Get the S3 class of a given SEXP.
-  *
-  *  s3_class takes a SEXP as argument, and returns the S3 class
-  *  attribute of the given SEXP.
-  *)
-external s3_class : sexp -> sexp = "ocamlr_s3_class"
-
-external aux_get_attrib : sexp -> symsxp -> sexp = "ocamlr_get_attrib"
-let get_attrib s name = aux_get_attrib s (install name)
-
-external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
 
 (* class s3 r = object *)
 (*   val __underlying = (r : 'a t :> sexp) *)
@@ -980,12 +936,6 @@ external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
 let classes sexp =
   string_list_of_t (upcast (get_attrib sexp "class") : strsxp)
 
-(* === S4 ===== *)
-
-
-external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
-
-external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
 
 
 (* === R_PARSER ===== *)
@@ -1026,8 +976,6 @@ let parse statement = List.hd (parse_string ~max:1 statement)
    in a callback when the R interpreter is initialised. *)
 exception Runtime_error of langsxp * string
 
-external eval_langsxp : langsxp -> 'a t = "ocamlr_eval_sxp"
-
 let eval_string s = eval_langsxp (parse s)
 (* TODO: May segfault if stumbling on a symbol that
  * hasn't yet been loaded. *)
@@ -1047,6 +995,36 @@ let eval phi (args: (string option * sexp) option list) =
 
 (* === INITIALISATION ===== *)
 
+(* === ENVIRONMENT ===== *)
+
+module type Environment =
+sig
+
+  val name : string    (* This is the first argument of argv for R.
+                          Mandatory, otherwise libR.so segfaults. *)
+
+  (* See R reference manual, refman.pdf, page 452, section intitled
+     'Startup - Initialization at Start of an R Session' for details
+     about the most important command line options.
+     More options are documented on the following webpage:
+     http://cran.r-project.org/doc/manuals/R-intro.html#Invoking-R *)
+
+  val options : string list
+
+  (* signal_handlers, if set to false, asks R not to install its
+     signal handlers. I've been experiencing weird issues with R signal
+     handlers, since, for instance, a SIGSEGV originating from OCaml is
+     caught by libR.so, and R asks then asks whether or not you want to
+     save your workspace, et ceterae. By default, set to false. *)
+  val signal_handlers : bool
+
+  val env : (string * string) list
+
+  val packages : string list option
+
+end
+
+module Standard_environment = Standard_environment
 
 external initialise : string array -> int -> int = "ocamlr_initEmbeddedR" [@@noalloc]
 external terminate : unit -> unit = "ocamlr_endEmbeddedR" [@@noalloc]

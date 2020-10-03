@@ -107,6 +107,14 @@ external cast : sexp -> 'a t = "%identity"
 (** Upcast an SEXP to any typed representation. Of course this should
     never be used. *)
 
+
+val pairlist_of_list : (_ t * _ t) list -> [> internallist] sxp
+val lglsxp_of_bool_list : bool list -> lglsxp
+val intsxp_of_int_list : int list -> intsxp
+val realsxp_of_float_list : float list -> realsxp
+val strsxp_of_string_list : string list -> strsxp
+val realsxp_of_float_option_list : float option list -> realsxp
+
 (**  Algebraic datatype reflecting R's dynamic typing. *)
 type sexptype =
   | NilSxp
@@ -137,6 +145,8 @@ type sexptype =
 
 val sexptype : sexp -> sexptype
 (**  Returns the R dynamic typing of a wrapped R value. *)
+
+val string_of_sexptype : sexptype -> string
 
 
 (** {2 High-level SEXP typing.} *)
@@ -395,10 +405,6 @@ val parse : string -> langsxp
 
 exception Runtime_error of langsxp * string
 
-val eval_langsxp : langsxp -> 'a t
-(**  [eval_langsxp] takes a R value containing an R executable expression.
-     Also known as a [LANGSXP]. You get the resulting value back. *)
-
 val eval_string : string -> 'a t
 (**  [eval_string] takes a string containing R code, and feeds it to the
      R interpreter. You get the resulting value back. The typing of this
@@ -524,51 +530,48 @@ module Interpreter_initialization(Env : Environment) : sig end
 
 
 (**  {2 Low-level inspection} *)
+module Low_level : sig
+  external s3_class : sexp -> sexp = "ocamlr_s3_class"
+  external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
+  external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
+  external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
 
-external s3_class : sexp -> sexp = "ocamlr_s3_class"
-external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
-external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
-external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
+  external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
+  external length_of_vector   : 'a vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
-external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
-external length_of_vector   : 'a vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
+  external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
+  external inspect_symsxp_pname    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_pname"
+  external inspect_symsxp_value    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_value"
+  external inspect_symsxp_internal : symsxp         -> sexp              = "ocamlr_inspect_symsxp_internal"
+  external inspect_listsxp_carval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_carval"
+  external inspect_listsxp_cdrval  : 'a nonempty_list sxp -> [> internallist] sxp = "ocamlr_inspect_listsxp_cdrval"
+  external inspect_listsxp_tagval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_tagval"
+  external inspect_envsxp_frame    : envsxp         -> sexp              = "ocamlr_inspect_envsxp_frame"
+  external inspect_envsxp_enclos   : envsxp         -> sexp              = "ocamlr_inspect_envsxp_enclos"
+  external inspect_envsxp_hashtab  : envsxp         -> sexp              = "ocamlr_inspect_envsxp_hashtab"
+  external inspect_closxp_formals  : closxp         -> sexp              = "ocamlr_inspect_closxp_formals"
+  external inspect_closxp_body     : closxp         -> sexp              = "ocamlr_inspect_closxp_body"
+  external inspect_closxp_env      : closxp         -> sexp              = "ocamlr_inspect_closxp_env"
+  external inspect_promsxp_value   : promsxp        -> sexp              = "ocamlr_inspect_promsxp_value"
+  external inspect_promsxp_expr    : promsxp        -> sexp              = "ocamlr_inspect_promsxp_expr"
+  external inspect_promsxp_env     : promsxp        -> sexp               = "ocamlr_inspect_promsxp_env"
 
-external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
-external inspect_symsxp_pname    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_pname"
-external inspect_symsxp_value    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_value"
-external inspect_symsxp_internal : symsxp         -> sexp              = "ocamlr_inspect_symsxp_internal"
-external inspect_listsxp_carval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_carval"
-external inspect_listsxp_cdrval  : 'a nonempty_list sxp -> [> internallist] sxp = "ocamlr_inspect_listsxp_cdrval"
-external inspect_listsxp_tagval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_tagval"
-external inspect_envsxp_frame    : envsxp         -> sexp              = "ocamlr_inspect_envsxp_frame"
-external inspect_envsxp_enclos   : envsxp         -> sexp              = "ocamlr_inspect_envsxp_enclos"
-external inspect_envsxp_hashtab  : envsxp         -> sexp              = "ocamlr_inspect_envsxp_hashtab"
-external inspect_closxp_formals  : closxp         -> sexp              = "ocamlr_inspect_closxp_formals"
-external inspect_closxp_body     : closxp         -> sexp              = "ocamlr_inspect_closxp_body"
-external inspect_closxp_env      : closxp         -> sexp              = "ocamlr_inspect_closxp_env"
-external inspect_promsxp_value   : promsxp        -> sexp              = "ocamlr_inspect_promsxp_value"
-external inspect_promsxp_expr    : promsxp        -> sexp              = "ocamlr_inspect_promsxp_expr"
-external inspect_promsxp_env     : promsxp        -> sexp               = "ocamlr_inspect_promsxp_env"
+  external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
+  external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
+  external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
+  external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
+  external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
+  external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
 
-external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
-external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
-external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
-external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
-external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
-external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
+  external null_creator : unit -> nilsxp = "ocamlr_null"
+  external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
+  external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
+  external base_env_creator : unit -> sexp = "ocamlr_base_env"
 
-val pairlist_of_list : (_ t * _ t) list -> [> internallist] sxp
-val lglsxp_of_bool_list : bool list -> lglsxp
-val intsxp_of_int_list : int list -> intsxp
-val realsxp_of_float_list : float list -> realsxp
-val strsxp_of_string_list : string list -> strsxp
-val realsxp_of_float_option_list : float option list -> realsxp
+  external global_env : unit -> sexp = "ocamlr_global_env"
 
-external null_creator : unit -> nilsxp = "ocamlr_null"
-external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
-external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
-external base_env_creator : unit -> sexp = "ocamlr_base_env"
+  val eval_langsxp : langsxp -> sexp
+  (**  [eval_langsxp] takes a R value containing an R executable expression.
+       Also known as a [LANGSXP]. You get the resulting value back. *)
 
-external global_env : unit -> sexp = "ocamlr_global_env"
-
-val string_of_sexptype : sexptype -> string
+end
