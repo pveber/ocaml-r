@@ -64,27 +64,29 @@ module Standard_environment = Standard_environment
 
 type sexp
 
-type 'a sxp = private sexp
+type +'a sxp = private sexp
 
-type nilsxp         = [`Nil] sxp
-type symsxp         = [`Sym] sxp
-type pairlistsxp    = [`List of [`Pair]] sxp
-type langsxp        = [`List of [`Call]] sxp
-type dotsxp         = [`List of [`Dots]] sxp
-type closxp         = [`Clo] sxp
-type envsxp         = [`Env] sxp
-type promsxp        = [`Prom] sxp
-type specialsxp     = [`Special] sxp
-type builtinsxp     = [`Builtin] sxp
-type charsxp     = [`Vec  of [`Char]] sxp
-type lglsxp      = [`Vec  of [`Lgl ]] sxp
-type intsxp      = [`Vec  of [`Int ]] sxp
-type realsxp     = [`Vec  of [`Real]] sxp
-type strsxp      = [`Vec  of [`Str ]] sxp
-type rawsxp      = [`Vec  of [`Raw ]] sxp
-type exprsxp     = [`Vec  of [`Raw ]] sxp
 
-type 'a nonempty_list = [`List of [< `Pair | `Call | `Dots] as 'a] sxp
+type nilsxp      = [`Nil]     sxp
+type symsxp      = [`Sym]     sxp
+type langsxp     = [`Lang]    sxp
+type listsxp     = [`List]    sxp
+type dotsxp      = [`Dot]     sxp
+type closxp      = [`Clo]     sxp
+type envsxp      = [`Env]     sxp
+type promsxp     = [`Prom]    sxp
+type specialsxp  = [`Special] sxp
+type builtinsxp  = [`Builtin] sxp
+type vecsxp      = [`Vec]     sxp
+type charsxp     = [`Char]    sxp
+type lglsxp      = [`Lgl]     sxp
+type intsxp      = [`Int]     sxp
+type realsxp     = [`Real]    sxp
+type strsxp      = [`Str]     sxp
+type rawsxp      = [`Raw]     sxp
+type exprsxp     = [`Expr]    sxp
+
+type 'a nonempty_list = [< `List | `Lang | `Dots] as 'a
 (** R-ints: Language objects (LANGSXP) are calls (including formulae
    and so on). Internally they are pairlists with first element a
    reference to the function to be called with remaining elements the
@@ -92,23 +94,25 @@ type 'a nonempty_list = [`List of [< `Pair | `Call | `Dots] as 'a] sxp
    places in the code assume that the pairlist is of length one or
    more, often without checking. *)
 
-type 'a internallist = [`Nil | `List of [< `Pair | `Call | `Dots] as 'a] sxp
+type internallist = [ `Nil | `List | `Lang | `Dots]
 (**  Type of low-level internal list. In R, such
   *  internal lists may be empty, a pairlist or
   *  a call which is somewhat similar to closure
   *  ready for execution. *)
 
-type pairlist       = [`Nil | `List of [`Pair]] sxp
+type 'a at_most_internallist = [< internallist] as 'a
 
-type 'a vecsxp      = [`Vec  of
-                         [< `Char | `Lgl | `Int  | `Real
-                         | `Str  | `Raw | `Expr ] as 'a
-                      ] sxp
+type 'a pairlist = [< `Nil | `List] as 'a
+
+type 'a vector = [< `Char | `Lgl | `Int  | `Real
+                 |  `Str  | `Raw | `Expr | `Vec] as 'a
+
 external upcast : sexp -> 'a sxp = "%identity"
 
 type +'a t = sexp
 
 external cast : sexp -> 'a t = "%identity"
+external sxp_cast : _ sxp -> _ sxp = "%identity"
 
 
 class type ['a] ty = object
@@ -375,16 +379,16 @@ let symbol ?(generic = false) s : sexp =
 (* What follows is low-level accessor functions, in order to inspect
    in details the contents of SEXPs and VECSEXPs. *)
 
-external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
-external length_of_vecsxp   : 'a vecsxp -> int  = "ocamlr_inspect_vecsxp_length"
+external inspect_attributes : sexp -> sexp = "ocamlr_inspect_attributes"
+external length_of_vector   : 'a vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
 external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
 external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
 external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
 external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"
-external inspect_listsxp_carval  : 'a nonempty_list -> sexp          = "ocamlr_inspect_listsxp_carval"
-external inspect_listsxp_cdrval  : 'a nonempty_list -> sexp          = "ocamlr_inspect_listsxp_cdrval"
-external inspect_listsxp_tagval  : 'a nonempty_list -> sexp          = "ocamlr_inspect_listsxp_tagval"
+external inspect_listsxp_carval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_carval"
+external inspect_listsxp_cdrval  : 'a nonempty_list sxp -> [> internallist] sxp = "ocamlr_inspect_listsxp_cdrval"
+external inspect_listsxp_tagval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_tagval"
 external inspect_envsxp_frame    : envsxp         -> sexp          = "ocamlr_inspect_envsxp_frame"
 external inspect_envsxp_enclos   : envsxp         -> sexp          = "ocamlr_inspect_envsxp_enclos"
 external inspect_envsxp_hashtab  : envsxp         -> sexp          = "ocamlr_inspect_envsxp_hashtab"
@@ -409,17 +413,17 @@ external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
 (* This file contains wrappers around allocation functions,
    returning uninitialised pairlists and vectors. *)
 
-external alloc_list        : int -> 'a internallist = "ocamlr_alloc_list"
-external alloc_lglsxp      : int -> lglsxp          = "ocamlr_alloc_lglsxp"
-external alloc_intsxp      : int -> intsxp          = "ocamlr_alloc_intsxp"
-external alloc_real_vector : int -> realsxp         = "ocamlr_alloc_realsxp"
-external alloc_str_vector  : int -> strsxp          = "ocamlr_alloc_strsxp"
+external alloc_list        : int -> [> internallist] sxp = "ocamlr_alloc_list"
+external alloc_lglsxp      : int -> lglsxp               = "ocamlr_alloc_lglsxp"
+external alloc_intsxp      : int -> intsxp               = "ocamlr_alloc_intsxp"
+external alloc_real_vector : int -> realsxp              = "ocamlr_alloc_realsxp"
+external alloc_str_vector  : int -> strsxp               = "ocamlr_alloc_strsxp"
 
 (* === WRITE_INTERNAL ===== *)
 
 
-external write_listsxp_carval : 'a nonempty_list -> sexp -> unit = "ocamlr_write_lisplist_carval"
-external write_listsxp_tagval : 'a nonempty_list -> sexp -> unit = "ocamlr_write_lisplist_tagval"
+external write_listsxp_carval : 'a nonempty_list sxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
+external write_listsxp_tagval : 'a nonempty_list sxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
 
 let write_listsxp_element l tag elmnt =
   let () = write_listsxp_tagval l tag in
@@ -509,65 +513,81 @@ external global_env : unit -> sexp = "ocamlr_global_env"
 
 (* === CONVERSION  ===== *)
 
-let rec list_of_pairlist (ll : 'a internallist) =
-  match sexptype (ll : 'a internallist :> sexp) with
+let rec list_of_pairlist (ll : [< internallist] sxp) =
+  match sexptype (ll : 'a at_most_internallist sxp :> sexp) with
   | NilSxp -> []
   | ListSxp | LangSxp | DotSxp ->
-    let ll : 'a nonempty_list = upcast (ll : 'a internallist :> sexp) in
+    let ll : _ nonempty_list sxp = upcast (ll : 'a at_most_internallist sxp :> sexp) in
     (
       (upcast (inspect_listsxp_tagval ll) : symsxp (* TODO: This may be excessive *)),
       inspect_listsxp_carval ll
     )
-    :: list_of_pairlist (upcast (inspect_listsxp_cdrval ll) : pairlist)
+    :: list_of_pairlist (inspect_listsxp_cdrval ll)
   | _ -> failwith "Conversion failure in list_of_listsxp."
 
 let pairlist_of_list (l: (sexp * sexp) list) =
   let r_l = alloc_list (List.length l) in
-  let cursor = ref r_l in List.iter
-  begin function (tag, value) ->
-    let () = write_listsxp_element (upcast (!cursor : pairlist :> sexp) : pairlistsxp) tag value in
-    cursor := (upcast (inspect_listsxp_cdrval (upcast (!cursor : pairlist :> sexp) : pairlistsxp)) : pairlist)
-  end l; r_l
+  let cursor = ref r_l in
+  List.iter (function (tag, value) ->
+      write_listsxp_element (sxp_cast !cursor) tag value ;
+      cursor := inspect_listsxp_cdrval (sxp_cast !cursor)
+      (* [cursor] is not typeable because it is a non empty list until
+         we reach the end. But those casts are not unsafe since we
+         don't call [write_listsxp_element] when [cursor] becomes
+         nil. *)
+    ) l ;
+  r_l
 
-external cons : sexp -> pairlist -> pairlistsxp = "ocamlr_cons"
-external tag : pairlistsxp -> string -> unit = "ocamlr_tag"
-external set_langsxp : pairlistsxp -> unit = "ocamlr_set_langsxp"
+external cons : sexp -> [< `Nil | `List] sxp -> [> `List] sxp = "ocamlr_cons"
+external tag : listsxp -> string -> unit = "ocamlr_tag"
+
+external set_langsxp : listsxp -> unit = "ocamlr_set_langsxp"
+(* Beware: [set_langsxp x] breaks typing, since after the call, [x] is
+   now of type [langsxp]. *)
 
 let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
-  let lcons hd tl = let x = cons hd tl in set_langsxp x; (upcast (x : pairlistsxp :> sexp) : langsxp) in
-  lcons f begin List.fold_right begin fun (t, hd) tl ->
+  let lcons hd tl =
+    let x = cons hd tl in
+    set_langsxp x ; (* here, type of [x] has been changed to [langsxp]! *)
+    (upcast (x : listsxp :> sexp) : langsxp)
+  in
+  let g (t, hd) tl =
     let x = cons hd tl in match t with
-    | None -> (upcast (x : pairlistsxp :> sexp) : pairlist)
-    | Some name -> tag x name; (upcast (x : pairlistsxp :> sexp) : pairlist)
-  end args ((null_creator ()) :> pairlist) end
+    | None -> x
+    | Some name -> tag x name ; x
+  in
+  let args_as_listsxp =
+    List.fold_right g args (null_creator ())
+  in
+  lcons f args_as_listsxp
 
 external string_of_charsxp : charsxp -> string = "ocamlr_internal_string_of_charsxp"
 
-let list_of_vecsxp (access : 'a vecsxp -> int -> 'b) (s : 'a vecsxp) =
-  let lngth = length_of_vecsxp s in
+let list_of_vector (access : 'a vector sxp -> int -> 'b) (s : 'a vector sxp) =
+  let lngth = length_of_vector s in
   let rec aux n accu = match n with | 0 -> accu | _ ->
     let x = access s (n - 1) in aux (n - 1) (x :: accu)
   in aux lngth []
 
-let vecsxp_of_list (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'b -> unit) (l: 'b list) =
+let vector_of_list (alloc : int -> 'a vector sxp) (assign : 'a vector sxp -> int -> 'b -> unit) (l: 'b list) =
   let s = alloc (List.length l) in
   let rec aux offset = function | [] -> () | hd::tl ->
     let () = assign s offset hd in aux (1 + offset) tl
   in aux 0 l; s
 
-let array_of_vecsxp (access : 'a vecsxp -> int -> 'b) (s : 'a vecsxp) =
-  let lngth = length_of_vecsxp s in
+let array_of_vector (access : 'a vector sxp -> int -> 'b) (s : 'a vector sxp) =
+  let lngth = length_of_vector s in
   Array.init lngth (access s)
 
-let vecsxp_of_array (alloc : int -> 'a vecsxp) (assign : 'a vecsxp -> int -> 'b -> unit) (t : 'b array) =
+let vector_of_array (alloc : int -> 'a vector sxp) (assign : 'a vector sxp -> int -> 'b -> unit) (t : 'b array) =
   let s = alloc (Array.length t) in
   Array.iteri (assign s) t ;
   s
 
-let bool_list_of_lglsxp x = list_of_vecsxp access_lglsxp x
-let lglsxp_of_bool_list x = vecsxp_of_list alloc_lglsxp assign_lglsxp x
-let bool_array_of_lglsxp x = array_of_vecsxp access_lglsxp x
-let lglsxp_of_bool_array x = vecsxp_of_array alloc_lglsxp assign_lglsxp x
+let bool_list_of_lglsxp x = list_of_vector access_lglsxp x
+let lglsxp_of_bool_list x = vector_of_list alloc_lglsxp assign_lglsxp x
+let bool_array_of_lglsxp x = array_of_vector access_lglsxp x
+let lglsxp_of_bool_array x = vector_of_array alloc_lglsxp assign_lglsxp x
 let bools_of_t tau = bool_array_of_lglsxp (upcast tau)
 let bool_of_t tau = access_lglsxp (upcast tau) 0
   (* We access only the first element, because static typing is supposed to
@@ -575,12 +595,12 @@ let bool_of_t tau = access_lglsxp (upcast tau) 0
 let bool b = (lglsxp_of_bool_array [| b |] :> sexp)
 let bools bl = (lglsxp_of_bool_array bl :> sexp)
 
-let int_list_of_intsxp x  = list_of_vecsxp access_intsxp x
-let intsxp_of_int_list x  = vecsxp_of_list alloc_intsxp assign_intsxp x
-let int_array_of_intsxp x  = array_of_vecsxp access_intsxp x
-let optint_array_of_intsxp x  = array_of_vecsxp access_intsxp_opt x
-let intsxp_of_int_array x  = vecsxp_of_array alloc_intsxp assign_intsxp x
-let intsxp_of_int_option_array x = vecsxp_of_array alloc_intsxp assign_intsxp_opt x
+let int_list_of_intsxp x  = list_of_vector access_intsxp x
+let intsxp_of_int_list x  = vector_of_list alloc_intsxp assign_intsxp x
+let int_array_of_intsxp x  = array_of_vector access_intsxp x
+let optint_array_of_intsxp x  = array_of_vector access_intsxp_opt x
+let intsxp_of_int_array x  = vector_of_array alloc_intsxp assign_intsxp x
+let intsxp_of_int_option_array x = vector_of_array alloc_intsxp assign_intsxp_opt x
 let ints_of_t tau = int_array_of_intsxp (upcast tau)
 let optints_of_t tau = optint_array_of_intsxp (upcast tau)
 let int_of_t tau = access_intsxp (upcast tau) 0
@@ -590,11 +610,11 @@ let int i = (intsxp_of_int_array [| i |] :> sexp)
 let ints il = (intsxp_of_int_array il :> sexp)
 let optints xl = (intsxp_of_int_option_array xl :> sexp)
 
-let float_list_of_realsxp x = list_of_vecsxp access_realsxp x
-let realsxp_of_float_list x = vecsxp_of_list alloc_real_vector assign_realsxp x
-let float_array_of_realsxp x = array_of_vecsxp access_realsxp x
-let opt_float_array_of_realsxp x = array_of_vecsxp access_realsxp_opt x
-let realsxp_of_float_array x = vecsxp_of_array alloc_real_vector assign_realsxp x
+let float_list_of_realsxp x = list_of_vector access_realsxp x
+let realsxp_of_float_list x = vector_of_list alloc_real_vector assign_realsxp x
+let float_array_of_realsxp x = array_of_vector access_realsxp x
+let opt_float_array_of_realsxp x = array_of_vector access_realsxp_opt x
+let realsxp_of_float_array x = vector_of_array alloc_real_vector assign_realsxp x
 let floats_of_t tau = float_array_of_realsxp (upcast tau)
 let optfloats_of_t tau = opt_float_array_of_realsxp (upcast tau)
 let float_of_t tau = access_realsxp (upcast tau) 0
@@ -603,14 +623,14 @@ let float_of_t tau = access_realsxp (upcast tau) 0
 let float x = (realsxp_of_float_array [| x |] :> sexp)
 let floats xl = (realsxp_of_float_array xl :> sexp)
 
-let realsxp_of_float_option_list x = vecsxp_of_list alloc_real_vector assign_realsxp_opt x
-let realsxp_of_float_option_array x = vecsxp_of_array alloc_real_vector assign_realsxp_opt x
+let realsxp_of_float_option_list x = vector_of_list alloc_real_vector assign_realsxp_opt x
+let realsxp_of_float_option_array x = vector_of_array alloc_real_vector assign_realsxp_opt x
 let optfloats xl = (realsxp_of_float_option_array xl :> sexp)
 
-let string_list_of_strsxp x = list_of_vecsxp access_strsxp x
-let strsxp_of_string_list x = vecsxp_of_list alloc_str_vector assign_strsxp x
-let string_array_of_strsxp x = array_of_vecsxp access_strsxp x
-let strsxp_of_string_array x = vecsxp_of_array alloc_str_vector assign_strsxp x
+let string_list_of_strsxp x = list_of_vector access_strsxp x
+let strsxp_of_string_list x = vector_of_list alloc_str_vector assign_strsxp x
+let string_array_of_strsxp x = array_of_vector access_strsxp x
+let strsxp_of_string_array x = vector_of_array alloc_str_vector assign_strsxp x
 let string_list_of_t tau = string_list_of_strsxp tau
 let strings_of_t tau = string_array_of_strsxp (upcast tau)
 let string_of_t tau = access_strsxp (upcast tau) 0
@@ -620,10 +640,10 @@ external string : string -> strsxp = "ocamlr_strsxp_of_string"
 let string x = (string x :> sexp)
 let strings sl = (strsxp_of_string_array sl :> sexp)
 
-let sexp_list_of_rawsxp x = list_of_vecsxp access_rawsxp x
+let sexp_list_of_rawsxp x = list_of_vector access_rawsxp x
 let sexps_of_t tau = sexp_list_of_rawsxp tau
 
-let langsxp_list_of_exprsxp x = list_of_vecsxp access_exprsxp x
+let langsxp_list_of_exprsxp x = list_of_vector access_exprsxp x
 let langsxps_of_t tau = langsxp_list_of_exprsxp tau
 
 (* === INTERNAL ===== *)
@@ -763,10 +783,12 @@ module CTypes = struct
         pname      = rec_build (inspect_symsxp_pname    (upcast s : symsxp));
         sym_value  = rec_build (inspect_symsxp_value    (upcast s : symsxp));
         internal   = rec_build (inspect_symsxp_internal (upcast s : symsxp))}}
-    | ListSxp    -> Val { content = LISTSXP {
-        carval     = rec_build (inspect_listsxp_carval  (upcast s : pairlistsxp));
-        cdrval     = rec_build (inspect_listsxp_cdrval  (upcast s : pairlistsxp));
-        tagval     = rec_build (inspect_listsxp_tagval  (upcast s : pairlistsxp))}}
+    | ListSxp    ->
+      let s = (upcast s : listsxp) in
+      Val { content = LISTSXP {
+        carval     = rec_build (inspect_listsxp_carval  s);
+        cdrval     = rec_build ((inspect_listsxp_cdrval s) : internallist sxp :> sexp) ;
+        tagval     = rec_build (inspect_listsxp_tagval  s)}}
     | CloSxp     -> Val { content = CLOSXP {
         formals    = rec_build (inspect_closxp_formals  (upcast s : closxp));
         body       = rec_build (inspect_closxp_body     (upcast s : closxp));
@@ -779,10 +801,12 @@ module CTypes = struct
         prom_value = rec_build (inspect_promsxp_value  (upcast s : promsxp));
         expr       = rec_build (inspect_promsxp_expr   (upcast s : promsxp));
         prom_env   = rec_build (inspect_promsxp_env    (upcast s : promsxp))}}
-    | LangSxp    -> Val { content = LANGSXP {
-        carval     = rec_build (inspect_listsxp_carval (upcast s : langsxp));
-        cdrval     = rec_build (inspect_listsxp_cdrval (upcast s : langsxp));
-        tagval     = rec_build (inspect_listsxp_tagval (upcast s : langsxp))}}
+    | LangSxp    ->
+      let s = (upcast s : langsxp) in
+      Val { content = LANGSXP {
+        carval     = rec_build (inspect_listsxp_carval s);
+        cdrval     = rec_build (inspect_listsxp_cdrval s : internallist sxp :> sexp);
+        tagval     = rec_build (inspect_listsxp_tagval s)}}
     | SpecialSxp -> Val { content = SPECIALSXP }
     | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset (upcast s : builtinsxp))}
     | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (upcast s : charsxp)) }
@@ -845,7 +869,7 @@ module PrettyTypes = struct
     | Some (Some (symbol_name, None)) -> ARG symbol_name
     | Some (Some (symbol_name, Some v)) -> SYMBOL (Some (symbol_name, (builder v)))
 
-  let list_of_listsxp builder (s : 'a nonempty_list) =
+  let list_of_listsxp builder (s : 'a nonempty_list sxp) =
     let carval = inspect_listsxp_carval s
     and cdrval = inspect_listsxp_cdrval s
     and tagval = inspect_listsxp_tagval s in
@@ -858,9 +882,9 @@ module PrettyTypes = struct
     | _ -> raise Esoteric end *)
     (* Lax parsing of the LIST: *)
     LIST begin ((builder tagval), (builder carval))::
-      begin match builder cdrval with
+      begin match builder (cdrval : _ sxp :> sexp) with
       | LIST l -> l | NULL -> []
-      | _ -> raise (Esoteric (s : 'a nonempty_list :> sexp)) end
+      | _ -> raise (Esoteric (s : _ sxp :> sexp)) end
     end
 
   let rec build rec_build =
@@ -869,7 +893,7 @@ module PrettyTypes = struct
     | NilSxp     -> NULL
     | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
                     | Esoteric _ -> Unknown end
-    | ListSxp    -> begin try phi list_of_listsxp (upcast s : 'a nonempty_list) with
+    | ListSxp    -> begin try phi list_of_listsxp (upcast s : 'a nonempty_list sxp) with
                     | Esoteric _ -> Unknown end
     | CloSxp     -> CLOSURE {
         formals  = rec_build (inspect_closxp_formals (upcast s : closxp));
@@ -887,7 +911,7 @@ module PrettyTypes = struct
         let carval = inspect_listsxp_carval (upcast s : langsxp)
         and cdrval = inspect_listsxp_cdrval (upcast s : langsxp)
         and tagval = inspect_listsxp_tagval (upcast s : langsxp) in
-        begin match build rec_build cdrval with
+        begin match build rec_build (cdrval : _ sxp :> sexp) with
         | LIST l -> begin match sexptype tagval with
                     | NilSxp -> CALL ((build rec_build carval), l)
                     | _ -> Unknown end
@@ -939,7 +963,7 @@ external s3_class : sexp -> sexp = "ocamlr_s3_class"
 external aux_get_attrib : sexp -> symsxp -> sexp = "ocamlr_get_attrib"
 let get_attrib s name = aux_get_attrib s (install name)
 
-external get_attributes : sexp -> pairlist = "ocamlr_get_attributes"
+external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
 
 (* class s3 r = object *)
 (*   val __underlying = (r : 'a t :> sexp) *)
@@ -989,7 +1013,7 @@ let parse_string ?max statement =
   let error_code, sexp = raw_parse_string statement
     begin match max with None -> -1 | Some n -> n end in
   match parse_status_of_int error_code with
-  | Parse_OK -> langsxps_of_t (upcast sexp : rawsxp)
+  | Parse_OK -> langsxps_of_t (upcast sexp : exprsxp)
   | _ as status -> raise (Parsing_failure (status, statement))
 
 let parse statement = List.hd (parse_string ~max:1 statement)
