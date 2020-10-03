@@ -68,15 +68,9 @@ type 'a sxp = private sexp
 
 type nilsxp         = [`Nil] sxp
 type symsxp         = [`Sym] sxp
-type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a] sxp
-type 'a internallist = [`Nil | `List of [< `Pair | `Call] as 'a] sxp
-(**  Type of low-level internal list. In R, such
-  *  internal lists may be empty, a pairlist or
-  *  a call which is somewhat similar to closure
-  *  ready for execution. *)
-
-type langsxp        = [`List of [`Call]] sxp
 type pairlistsxp    = [`List of [`Pair]] sxp
+type langsxp        = [`List of [`Call]] sxp
+type dotsxp         = [`List of [`Dots]] sxp
 type closxp         = [`Clo] sxp
 type envsxp         = [`Env] sxp
 type promsxp        = [`Prom] sxp
@@ -89,7 +83,23 @@ type realsxp     = [`Vec  of [`Real]] sxp
 type strsxp      = [`Vec  of [`Str ]] sxp
 type rawsxp      = [`Vec  of [`Raw ]] sxp
 type exprsxp     = [`Vec  of [`Raw ]] sxp
+
+type 'a nonempty_list = [`List of [< `Pair | `Call | `Dots] as 'a] sxp
+(** R-ints: Language objects (LANGSXP) are calls (including formulae
+   and so on). Internally they are pairlists with first element a
+   reference to the function to be called with remaining elements the
+   actual arguments for the call. Although this is not enforced, many
+   places in the code assume that the pairlist is of length one or
+   more, often without checking. *)
+
+type 'a internallist = [`Nil | `List of [< `Pair | `Call | `Dots] as 'a] sxp
+(**  Type of low-level internal list. In R, such
+  *  internal lists may be empty, a pairlist or
+  *  a call which is somewhat similar to closure
+  *  ready for execution. *)
+
 type pairlist       = [`Nil | `List of [`Pair]] sxp
+
 type 'a vecsxp      = [`Vec  of
                          [< `Char | `Lgl | `Int  | `Real
                          | `Str  | `Raw | `Expr ] as 'a
@@ -372,9 +382,9 @@ external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr
 external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
 external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
 external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"
-external inspect_listsxp_carval  : 'a listsxp     -> sexp          = "ocamlr_inspect_listsxp_carval"
-external inspect_listsxp_cdrval  : 'a listsxp     -> sexp          = "ocamlr_inspect_listsxp_cdrval"
-external inspect_listsxp_tagval  : 'a listsxp     -> sexp          = "ocamlr_inspect_listsxp_tagval"
+external inspect_listsxp_carval  : 'a nonempty_list -> sexp          = "ocamlr_inspect_listsxp_carval"
+external inspect_listsxp_cdrval  : 'a nonempty_list -> sexp          = "ocamlr_inspect_listsxp_cdrval"
+external inspect_listsxp_tagval  : 'a nonempty_list -> sexp          = "ocamlr_inspect_listsxp_tagval"
 external inspect_envsxp_frame    : envsxp         -> sexp          = "ocamlr_inspect_envsxp_frame"
 external inspect_envsxp_enclos   : envsxp         -> sexp          = "ocamlr_inspect_envsxp_enclos"
 external inspect_envsxp_hashtab  : envsxp         -> sexp          = "ocamlr_inspect_envsxp_hashtab"
@@ -400,16 +410,16 @@ external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
    returning uninitialised pairlists and vectors. *)
 
 external alloc_list        : int -> 'a internallist = "ocamlr_alloc_list"
-external alloc_lglsxp      : int -> lglsxp       = "ocamlr_alloc_lglsxp"
-external alloc_intsxp      : int -> intsxp       = "ocamlr_alloc_intsxp"
-external alloc_real_vector : int -> realsxp      = "ocamlr_alloc_realsxp"
-external alloc_str_vector  : int -> strsxp       = "ocamlr_alloc_strsxp"
+external alloc_lglsxp      : int -> lglsxp          = "ocamlr_alloc_lglsxp"
+external alloc_intsxp      : int -> intsxp          = "ocamlr_alloc_intsxp"
+external alloc_real_vector : int -> realsxp         = "ocamlr_alloc_realsxp"
+external alloc_str_vector  : int -> strsxp          = "ocamlr_alloc_strsxp"
 
 (* === WRITE_INTERNAL ===== *)
 
 
-external write_listsxp_carval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_carval"
-external write_listsxp_tagval : 'a listsxp -> sexp -> unit = "ocamlr_write_lisplist_tagval"
+external write_listsxp_carval : 'a nonempty_list -> sexp -> unit = "ocamlr_write_lisplist_carval"
+external write_listsxp_tagval : 'a nonempty_list -> sexp -> unit = "ocamlr_write_lisplist_tagval"
 
 let write_listsxp_element l tag elmnt =
   let () = write_listsxp_tagval l tag in
@@ -501,11 +511,14 @@ external global_env : unit -> sexp = "ocamlr_global_env"
 
 let rec list_of_pairlist (ll : 'a internallist) =
   match sexptype (ll : 'a internallist :> sexp) with
-  | NilSxp -> [] | ListSxp | LangSxp | DotSxp ->
-  (* There's a typing issue with the DotSxp sexptype... TODO *)
-  let ll : 'a listsxp = upcast (ll : 'a internallist :> sexp) in
-  ( (upcast (inspect_listsxp_tagval ll) : symsxp (* TODO: This may be excessive *)), (inspect_listsxp_carval ll))
-  :: (list_of_pairlist (upcast (inspect_listsxp_cdrval ll) : pairlist))
+  | NilSxp -> []
+  | ListSxp | LangSxp | DotSxp ->
+    let ll : 'a nonempty_list = upcast (ll : 'a internallist :> sexp) in
+    (
+      (upcast (inspect_listsxp_tagval ll) : symsxp (* TODO: This may be excessive *)),
+      inspect_listsxp_carval ll
+    )
+    :: list_of_pairlist (upcast (inspect_listsxp_cdrval ll) : pairlist)
   | _ -> failwith "Conversion failure in list_of_listsxp."
 
 let pairlist_of_list (l: (sexp * sexp) list) =
@@ -832,7 +845,7 @@ module PrettyTypes = struct
     | Some (Some (symbol_name, None)) -> ARG symbol_name
     | Some (Some (symbol_name, Some v)) -> SYMBOL (Some (symbol_name, (builder v)))
 
-  let list_of_listsxp builder (s : 'a listsxp) =
+  let list_of_listsxp builder (s : 'a nonempty_list) =
     let carval = inspect_listsxp_carval s
     and cdrval = inspect_listsxp_cdrval s
     and tagval = inspect_listsxp_tagval s in
@@ -847,7 +860,7 @@ module PrettyTypes = struct
     LIST begin ((builder tagval), (builder carval))::
       begin match builder cdrval with
       | LIST l -> l | NULL -> []
-      | _ -> raise (Esoteric (s : 'a listsxp :> sexp)) end
+      | _ -> raise (Esoteric (s : 'a nonempty_list :> sexp)) end
     end
 
   let rec build rec_build =
@@ -856,7 +869,7 @@ module PrettyTypes = struct
     | NilSxp     -> NULL
     | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
                     | Esoteric _ -> Unknown end
-    | ListSxp    -> begin try phi list_of_listsxp (upcast s : 'a listsxp) with
+    | ListSxp    -> begin try phi list_of_listsxp (upcast s : 'a nonempty_list) with
                     | Esoteric _ -> Unknown end
     | CloSxp     -> CLOSURE {
         formals  = rec_build (inspect_closxp_formals (upcast s : closxp));

@@ -63,10 +63,9 @@ type 'a sxp = private sexp
 
 type nilsxp         = [`Nil] sxp
 type symsxp         = [`Sym] sxp
-type 'a listsxp     = [`List of [< `Pair | `Call ] as 'a] sxp
-and 'a internallist = [`Nil | `List of [< `Pair | `Call] as 'a] sxp
 type langsxp        = [`List of [`Call]] sxp
 type pairlistsxp    = [`List of [`Pair]] sxp
+type dotsxp         = [`List of [`Dots]] sxp
 type closxp         = [`Clo] sxp
 type envsxp         = [`Env] sxp
 type promsxp        = [`Prom] sxp
@@ -79,7 +78,23 @@ type realsxp     = [`Vec  of [`Real]] sxp
 type strsxp      = [`Vec  of [`Str ]] sxp
 type rawsxp      = [`Vec  of [`Raw ]] sxp
 type exprsxp     = [`Vec  of [`Raw ]] sxp
+
+type 'a nonempty_list = [`List of [< `Pair | `Call | `Dots] as 'a] sxp
+(** R-ints: Language objects (LANGSXP) are calls (including formulae
+   and so on). Internally they are pairlists with first element a
+   reference to the function to be called with remaining elements the
+   actual arguments for the call. Although this is not enforced, many
+   places in the code assume that the pairlist is of length one or
+   more, often without checking. *)
+
+type 'a internallist = [`Nil | `List of [< `Pair | `Call | `Dots] as 'a] sxp
+(**  Type of low-level internal list. In R, such
+  *  internal lists may be empty, a pairlist or
+  *  a call which is somewhat similar to closure
+  *  ready for execution. *)
+
 type pairlist       = [`Nil | `List of [`Pair]] sxp
+
 type 'a vecsxp      = [`Vec  of
                          [< `Char | `Lgl | `Int  | `Real
                          | `Str  | `Raw | `Expr ] as 'a
@@ -523,9 +538,9 @@ external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr
 external inspect_symsxp_pname    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_pname"
 external inspect_symsxp_value    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_value"
 external inspect_symsxp_internal : symsxp         -> sexp              = "ocamlr_inspect_symsxp_internal"
-external inspect_listsxp_carval  : 'a listsxp     -> sexp              = "ocamlr_inspect_listsxp_carval"
-external inspect_listsxp_cdrval  : 'a listsxp     -> sexp              = "ocamlr_inspect_listsxp_cdrval"
-external inspect_listsxp_tagval  : 'a listsxp     -> sexp              = "ocamlr_inspect_listsxp_tagval"
+external inspect_listsxp_carval  : 'a nonempty_list -> sexp              = "ocamlr_inspect_listsxp_carval"
+external inspect_listsxp_cdrval  : 'a nonempty_list -> sexp              = "ocamlr_inspect_listsxp_cdrval"
+external inspect_listsxp_tagval  : 'a nonempty_list -> sexp              = "ocamlr_inspect_listsxp_tagval"
 external inspect_envsxp_frame    : envsxp         -> sexp              = "ocamlr_inspect_envsxp_frame"
 external inspect_envsxp_enclos   : envsxp         -> sexp              = "ocamlr_inspect_envsxp_enclos"
 external inspect_envsxp_hashtab  : envsxp         -> sexp              = "ocamlr_inspect_envsxp_hashtab"
