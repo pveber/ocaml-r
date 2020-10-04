@@ -952,7 +952,7 @@ module Envsxp = struct
 end
 
 module Langsxp = struct
-  include Sxp.Impl(struct type t = [`Env] end)(Sexp)
+  include Sxp.Impl(struct type t = [`Lang] end)(Sexp)
 end
 
 module type Vector = sig

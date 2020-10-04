@@ -9,13 +9,13 @@ module Environment : sig
   (** wrapper for [new.env] *)
 end
 
-module Numeric : module type of Realsxp
-module Logical = Lglsxp
-module Integer = Intsxp
-module Character = Strsxp
+module Numeric : Atomic_vector with type repr := float
+module Logical : Atomic_vector with type repr := bool
+module Integer : Atomic_vector with type repr := int
+module Character : Atomic_vector with type repr := string
 
 module Factor : sig
-  include SXP
+  include module type of Integer
 end
 
 module List_ : sig

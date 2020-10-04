@@ -116,21 +116,21 @@ module type SXP = sig
 end
 
 module Nilsxp : sig
-  include SXP
+  include SXP with type t = nilsxp
   val create : unit -> t
 end
 
 module Dotsxp : sig
-  include SXP
+  include SXP with type t = dotsxp
   val create : unit -> t
 end
 
 module Envsxp : sig
-  include SXP
+  include SXP with type t = envsxp
 end
 
 module Langsxp : sig
-  include SXP
+  include SXP with type t = langsxp
 end
 
 (** {2 Vector types}
@@ -157,19 +157,24 @@ module type Atomic_vector = sig
 end
 
 (** R array of integer values *)
-module Intsxp : Atomic_vector with type repr := int
+module Intsxp : Atomic_vector with type t = intsxp
+                               and type repr := int
 
 (** R array of boolean values *)
-module Lglsxp : Atomic_vector with type repr := bool
+module Lglsxp : Atomic_vector with type t = lglsxp
+                               and type repr := bool
 
 (** R array of float values *)
-module Realsxp : Atomic_vector with type repr := float
+module Realsxp : Atomic_vector with type t = realsxp
+                                and type repr := float
 
 (** R array of string values *)
-module Strsxp : Atomic_vector with type repr := string
+module Strsxp : Atomic_vector with type t = strsxp
+                               and type repr := string
 
 (** R list *)
-module Vecsxp : Vector with type repr := Sexp.t
+module Vecsxp : Vector with type t = vecsxp
+                        and type repr := Sexp.t
 
 
 (** {2 Value inspection} *)
