@@ -99,6 +99,19 @@ type 'a pairlist = [< `Nil | `List] as 'a
 type 'a vector = [< `Char | `Lgl | `Int  | `Real
                  |  `Str  | `Raw | `Expr | `Vec] as 'a
 
+module type SXP = sig
+  type t
+
+  val equal : t -> t -> bool
+  val is_function : t -> bool
+  val attr : t -> string -> sexp
+  val _class_ : t -> string list
+  external unsafe_of_sexp : sexp -> t = "%identity"
+  external to_sexp : t -> sexp = "%identity"
+end
+
+module Sexp : SXP with type t = sexp
+
 type +'a t = private sexp
 (** Phantom-typed representation of R values. ['a] provides an
     information on the actual type of the underlying R value. *)
@@ -531,7 +544,7 @@ module Interpreter_initialization(Env : Environment) : sig end
 
 (**  {2 Low-level inspection} *)
 module Low_level : sig
-  external s3_class : sexp -> sexp = "ocamlr_s3_class"
+  external s3_class : sexp -> strsxp = "ocamlr_s3_class"
   external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
   external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
   external do_new_object : sexp -> sexp = "ocamlr_do_new_object"

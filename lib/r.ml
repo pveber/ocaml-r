@@ -34,7 +34,6 @@ type sexp
 
 type +'a sxp = private sexp
 
-
 type nilsxp      = [`Nil]     sxp
 type symsxp      = [`Sym]     sxp
 type langsxp     = [`Lang]    sxp
@@ -265,7 +264,7 @@ module Low_level = struct
     *  s3_class takes a SEXP as argument, and returns the S3 class
     *  attribute of the given SEXP.
   *)
-  external s3_class : sexp -> sexp = "ocamlr_s3_class"
+  external s3_class : sexp -> strsxp = "ocamlr_s3_class"
 
   external aux_get_attrib : sexp -> symsxp -> sexp = "ocamlr_get_attrib"
   let get_attrib s name = aux_get_attrib s (install name)
@@ -284,8 +283,6 @@ module Low_level = struct
 end
 
 open Low_level
-
-
 
 
 
@@ -992,6 +989,40 @@ let opt f name x = match x with
 
 let eval phi (args: (string option * sexp) option list) =
   eval_langsxp (langsxp phi (prepare_args args))
+
+
+module type SXP = sig
+  type t
+
+  val equal : t -> t -> bool
+  val is_function : t -> bool
+  val attr : t -> string -> sexp
+  val _class_ : t -> string list
+  external unsafe_of_sexp : sexp -> t = "%identity"
+  external to_sexp : t -> sexp = "%identity"
+end
+
+module Sexp = struct
+  type t = sexp
+  let is_function x =
+    match sexptype x with
+    | CloSxp | SpecialSxp | BuiltinSxp | FunSxp -> true
+    | _ -> false
+
+  let equal x y = sexp_equality x y
+
+  let _class_ x =
+    s3_class x
+    |> list_of_vector access_strsxp
+
+  let attr x s = get_attrib x s
+
+  external unsafe_of_sexp : sexp -> sexp = "%identity"
+  external to_sexp : sexp -> sexp = "%identity"
+end
+
+
+
 
 (* === INITIALISATION ===== *)
 
