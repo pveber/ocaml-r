@@ -1,4 +1,4 @@
-open OCamlR
+open OCamlR.R
 open OCamlR_base
 open OCamlR_wraputils
 
@@ -8,28 +8,28 @@ let o x f = match x with
   | None -> None
   | Some x -> Some (f x)
 
-let float_tup (x, y) = R.Enc.floats [| x ; y |]
+let float_tup (x, y) = Enc.floats [| x ; y |]
 
 module Symbol = struct
-  let ks'test = R.symbol "ks.test"
-  let p'adjust = R.symbol "p.adjust"
+  let ks'test = symbol "ks.test"
+  let p'adjust = symbol "p.adjust"
 end
 
 module Formula = struct
-  include R.Sexp
+  include Langsxp
   let of_string x =
-    S.formula ~x:(R.Enc.string x) ()
+    S.formula ~x:(Enc.string x) ()
     |> unsafe_of_sexp
 end
 
 
 let rnorm ?mean ?sd n =
   S.rnorm
-    ?mean:(mean |?> R.Enc.float)
-    ?sd:(sd |?> R.Enc.float)
-    ~n:(n |> R.Enc.int)
+    ?mean:(mean |?> Enc.float)
+    ?sd:(sd |?> Enc.float)
+    ~n:(n |> Enc.int)
     ()
-  |> R.Dec.floats
+  |> Dec.floats
 
 
 let string_of_test_kind = function
@@ -45,27 +45,27 @@ class type test = object
 end
 
 class test_impl o = object
-  method p'value = List_.subset2_exn o "p.value" R.Dec.float
-  method method_ = List_.subset2_exn o "method" R.Dec.string
-  method data'name = List_.subset2_exn o "data.name" R.Dec.string
-  method alternative = List_.subset2_exn o "alternative" R.Dec.string
+  method p'value = List_.subset2_exn o "p.value" Dec.float
+  method method_ = List_.subset2_exn o "method" Dec.string
+  method data'name = List_.subset2_exn o "data.name" Dec.string
+  method alternative = List_.subset2_exn o "alternative" Dec.string
 end
 
 class fisher'test o = object
   inherit test_impl o
   method conf'int =
-    List_.subset2 o "conf.int" R.Dec.floats
+    List_.subset2 o "conf.int" Dec.floats
     |> Option.map (function
         | [| x ; y |] -> (x, y)
         | _ -> assert false
       )
-  method estimate = List_.subset2_exn o "estimate" R.Dec.float
-  method null'value = List_.subset2_exn o "null.value" R.Dec.float
+  method estimate = List_.subset2_exn o "estimate" Dec.float
+  method null'value = List_.subset2_exn o "null.value" Dec.float
 end
 
 let fisher'test ?alternative v v' =
   S.fisher'test
-    ?alternative:(alternative |?> string_of_test_kind |?> R.Enc.string)
+    ?alternative:(alternative |?> string_of_test_kind |?> Enc.string)
     ~x:(Logical.to_sexp v)
     ~y:(Logical.to_sexp v')
     ()
@@ -74,15 +74,15 @@ let fisher'test ?alternative v v' =
 
 class test_impl_with_statistic o = object
   inherit test_impl o
-  method statistic = List_.subset2_exn o "statistic" R.Dec.float
+  method statistic = List_.subset2_exn o "statistic" Dec.float
 end
 
 let chisq'test_contingency_table ?correct ?simulate'p'value ?b mat =
   S.chisq'test
     ~x:(Matrix.to_sexp mat)
-    ?correct:(o correct R.Enc.bool)
-    ?simulate'p'value:(o simulate'p'value R.Enc.bool)
-    ?_B:(o b R.Enc.int)
+    ?correct:(o correct Enc.bool)
+    ?simulate'p'value:(o simulate'p'value Enc.bool)
+    ?_B:(o b Enc.int)
     ()
   |> List_.unsafe_of_sexp
   |> new test_impl_with_statistic
@@ -92,8 +92,8 @@ class ks'test o = object
 end
 
 let ks'test ?alternative v v' =
-  let open R.Eval in
-  call Symbol.ks'test R.Enc.[
+  let open Eval in
+  call Symbol.ks'test Enc.[
     arg floats v ;
     arg floats v' ;
     opt_arg (fun x -> string (string_of_test_kind x)) "alternative" alternative ;
@@ -111,12 +111,12 @@ let string_of_p'adjust_method = function
   | `BY -> "BY"
 
 let p'adjust ?method_ data =
-  let open R.Eval in
-  call Symbol.p'adjust R.Enc.[
+  let open Eval in
+  call Symbol.p'adjust Enc.[
       arg floats data ;
       opt_arg (fun x -> string (string_of_p'adjust_method x)) "method" method_
     ]
-  |> R.Dec.floats
+  |> Dec.floats
 
 module Ecdf = struct
   type t = List_.t
@@ -125,8 +125,8 @@ module Ecdf = struct
     |> List_.unsafe_of_sexp
 
   let plot ?(main = "") ?xlab ?ylab ?xlim ?ylim o =
-    let open R.Eval in
-    call OCamlR_stats_stubs2.plot'ecdf_symbol R.Enc.[
+    let open Eval in
+    call OCamlR_stats_stubs2.plot'ecdf_symbol Enc.[
       arg ~name:"x" List_.to_sexp o ;
       opt_arg string "xlab" xlab ;
       opt_arg string "ylab" ylab ;

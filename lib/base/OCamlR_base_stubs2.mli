@@ -1,32 +1,32 @@
 open OCamlR.R
 
-val length : sexp -> sexp
+val length : Sexp.t -> Sexp.t
 
-val subset : sexp -> sexp -> sexp
+val subset : Sexp.t -> Sexp.t -> Sexp.t
 val subset_ii :
-  sexp ->
-  sexp ->
-  sexp ->
-  sexp
-val subset2_s : sexp -> sexp -> sexp
-val subset2_i : sexp -> sexp -> sexp
-val dim : sexp -> sexp
+  Sexp.t ->
+  Sexp.t ->
+  Sexp.t ->
+  Sexp.t
+val subset2_s : Sexp.t -> Sexp.t -> Sexp.t
+val subset2_i : Sexp.t -> Sexp.t -> Sexp.t
+val dim : Sexp.t -> Sexp.t
 
 module Matrix : sig
-  val subset : sexp -> sexp -> sexp
-  val subset_ii : sexp -> sexp -> sexp -> sexp
-  val subset2 : sexp -> sexp -> sexp
+  val subset : Sexp.t -> Sexp.t -> Sexp.t
+  val subset_ii : Sexp.t -> Sexp.t -> Sexp.t -> Sexp.t
+  val subset2 : Sexp.t -> Sexp.t -> Sexp.t
 end
 
-val rle : sexp -> sexp
+val rle : Sexp.t -> Sexp.t
 
 val sample :
-  sexp ->
-  sexp ->
-  ?replace:sexp ->
-  ?prob:sexp ->
+  Sexp.t ->
+  Sexp.t ->
+  ?replace:Sexp.t ->
+  ?prob:Sexp.t ->
   unit ->
-  sexp
+  Sexp.t
 
-val min : sexp -> sexp
-val max : sexp -> sexp
+val min : Sexp.t -> Sexp.t
+val max : Sexp.t -> Sexp.t

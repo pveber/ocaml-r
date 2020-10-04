@@ -99,30 +99,38 @@ type 'a pairlist = [< `Nil | `List] as 'a
 type vector = [ `Char | `Lgl | `Int  | `Real
               | `Str  | `Raw | `Expr | `Vec]
 
-module type SXP = sig
+module Sexp : sig
   type t
 
   val equal : t -> t -> bool
   val is_function : t -> bool
   val attr : t -> string -> sexp
   val _class_ : t -> string list
-  external unsafe_of_sexp : sexp -> t = "%identity"
-  external to_sexp : t -> sexp = "%identity"
-end
-
-module Sexp : sig
-  include SXP with type t = sexp
   val nil_map : t -> f:(t -> 'a) -> 'a option
 end
 
+module type SXP = sig
+  include module type of Sexp
+  external unsafe_of_sexp : Sexp.t -> t = "%identity"
+  external to_sexp : t -> Sexp.t = "%identity"
+end
+
 module Nilsxp : sig
-  include SXP with type t = nilsxp
+  include SXP
   val create : unit -> t
 end
 
 module Dotsxp : sig
-  include SXP with type t = dotsxp
+  include SXP
   val create : unit -> t
+end
+
+module Envsxp : sig
+  include SXP
+end
+
+module Langsxp : sig
+  include SXP
 end
 
 (** {2 Vector types}
@@ -133,9 +141,8 @@ end
    a simple value, the array has only one element.  *)
 
 module type Vector = sig
-  type t
+  include SXP
   type repr
-  include SXP with type t := t
   val length : t -> int
   val of_array : repr array -> t
   val of_list : repr list -> t
@@ -150,24 +157,19 @@ module type Atomic_vector = sig
 end
 
 (** R array of integer values *)
-module Intsxp : Atomic_vector with type t = intsxp
-                               and type repr := int
+module Intsxp : Atomic_vector with type repr := int
 
 (** R array of boolean values *)
-module Lglsxp : Atomic_vector with type t = lglsxp
-                               and type repr := bool
+module Lglsxp : Atomic_vector with type repr := bool
 
 (** R array of float values *)
-module Realsxp : Atomic_vector with type t = realsxp
-                                and type repr := float
+module Realsxp : Atomic_vector with type repr := float
 
 (** R array of string values *)
-module Strsxp : Atomic_vector with type t = strsxp
-                               and type repr := string
+module Strsxp : Atomic_vector with type repr := string
 
 (** R list *)
-module Vecsxp : Vector with type t = vecsxp
-                        and type repr := Sexp.t
+module Vecsxp : Vector with type repr := Sexp.t
 
 
 (** {2 Value inspection} *)
@@ -241,7 +243,7 @@ module Pretty : sig
   and pairlist = (t * t) list
 
   (**  Analyses recursively the structure of a given SEXP. *)
-  val t_of_sexp : sexp -> t
+  val t_of_sexp : Sexp.t -> t
 
 end
 
@@ -335,7 +337,7 @@ end
 
 (** {2 Symbol retrieval.} *)
 
-val symbol : ?generic:bool -> string -> sexp
+val symbol : ?generic:bool -> string -> Sexp.t
 (**  Retrieves an R symbol from the symbol table, given its name. *)
 
 (** {2 Conversion functions.} *)
@@ -484,7 +486,7 @@ exception Runtime_error of langsxp * string
 
 module type Conversion = sig
   type 'a t
-  val sexp         : sexp t
+  val sexp         : Sexp.t t
   val int          : int t
   val ints         : int array t
   val maybe_int    : int option t
@@ -499,8 +501,8 @@ module type Conversion = sig
   val maybe_string : string option t
 end
 
-module Enc : Conversion with type 'a t = 'a -> sexp
-module Dec : Conversion with type 'a t = sexp -> 'a
+module Enc : Conversion with type 'a t = 'a -> Sexp.t
+module Dec : Conversion with type 'a t = Sexp.t -> 'a
 
 module Eval : sig
   val string : string -> 'a t
@@ -520,7 +522,7 @@ module Eval : sig
   val arg     : 'a Enc.t -> ?name:string -> 'a  -> arg
   val opt_arg : 'a Enc.t -> string -> 'a option -> arg
 
-  val call : sexp -> arg list -> sexp
+  val call : Sexp.t -> arg list -> Sexp.t
   (**  [eval f args] evaluates an the R function [f] with respect to a list of
        arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
        argument whose optional name is [name] and whose value is [sexp]. The

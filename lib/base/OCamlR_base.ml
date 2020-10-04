@@ -16,10 +16,14 @@ let raw_subset2 = gen_raw_subset2 Enc.string
 let raw_subset2_i = gen_raw_subset2 Enc.int
 
 module Environment = struct
-  include Sexp
-  let create () = Stubs.new'env ()
+  include Envsxp
+
+  let create () =
+    Stubs.new'env ()
+    |> unsafe_of_sexp
+
   let unsafe_get env ~class_ x =
-    let y = raw_subset2 env x in
+    let y = raw_subset2 (to_sexp env) x in
     let cls = Sexp._class_ y in
     if List.mem class_ cls then Some y
     else None
@@ -31,7 +35,7 @@ module Integer = Intsxp
 module Character = Strsxp
 
 module Factor = struct
-  include Sexp
+  include Integer
 end
 
 module List_ = struct
@@ -40,7 +44,7 @@ module List_ = struct
   let as_vecsxp x = x
 
   let gen_subset2 subset2 x field dec =
-    subset2 (x : t :> sexp) field
+    subset2 (to_sexp x) field
     |> Sexp.nil_map ~f:dec
 
   let subset2 x field dec = gen_subset2 raw_subset2 x field dec
@@ -121,7 +125,7 @@ module Matrix = struct
   include Numeric
 
   let dim (x : t) =
-    match Stubs2.dim (x :> sexp) |> Dec.ints with
+    match Stubs2.dim (to_sexp x) |> Dec.ints with
     | [| i ; j |] -> (i, j)
     | _ -> assert false
 

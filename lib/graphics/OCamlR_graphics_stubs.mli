@@ -1,22 +1,22 @@
 open OCamlR
 
 val plot :
-  ?main:R.sexp ->
-  ?xlab:R.sexp ->
-  ?ylab:R.sexp ->
-  ?xlim:R.sexp ->
-  ?ylim:R.sexp ->
-  ?y:R.sexp ->
-  R.sexp -> R.sexp
+  ?main:R.Sexp.t ->
+  ?xlab:R.Sexp.t ->
+  ?ylab:R.Sexp.t ->
+  ?xlim:R.Sexp.t ->
+  ?ylim:R.Sexp.t ->
+  ?y:R.Sexp.t ->
+  R.Sexp.t -> R.Sexp.t
 
 val plot2 :
-  ?main:R.sexp ->
-  ?xlab:R.sexp ->
-  ?ylab:R.sexp ->
-  ?xlim:R.sexp ->
-  ?ylim:R.sexp ->
-  R.sexp -> R.sexp -> R.sexp
+  ?main:R.Sexp.t ->
+  ?xlab:R.Sexp.t ->
+  ?ylab:R.Sexp.t ->
+  ?xlim:R.Sexp.t ->
+  ?ylim:R.Sexp.t ->
+  R.Sexp.t -> R.Sexp.t -> R.Sexp.t
 
 val par :
-  ?mfrow:R.sexp ->
-  unit -> R.sexp
+  ?mfrow:R.Sexp.t ->
+  unit -> R.Sexp.t

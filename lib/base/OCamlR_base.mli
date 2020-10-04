@@ -9,7 +9,7 @@ module Environment : sig
   (** wrapper for [new.env] *)
 end
 
-module Numeric = Realsxp
+module Numeric : module type of Realsxp
 module Logical = Lglsxp
 module Integer = Intsxp
 module Character = Strsxp
@@ -20,7 +20,7 @@ end
 
 module List_ : sig
   include SXP
-  val as_vecsxp : t -> vecsxp
+  val as_vecsxp : t -> Vecsxp.t
   val subset2 : t -> string -> 'a Dec.t -> 'a option
   val subset2_i : t -> int -> 'a Dec.t -> 'a option
   val subset2_exn : t -> string -> 'a Dec.t -> 'a
@@ -55,13 +55,13 @@ val sample :
   float array ->
   float array
 
-val readRDS : string -> sexp
+val readRDS : string -> Sexp.t
 
 val saveRDS :
   ?ascii:bool ->
   ?compress:bool ->
   file:string ->
-  sexp -> unit
+  Sexp.t -> unit
 
 module Matrix : sig
   include module type of Numeric

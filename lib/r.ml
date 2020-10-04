@@ -39,6 +39,7 @@ module type SXP = sig
   val is_function : t -> bool
   val attr : t -> string -> sexp
   val _class_ : t -> string list
+  val nil_map : t -> f:(t -> 'a) -> 'a option
   external unsafe_of_sexp : sexp -> t = "%identity"
   external to_sexp : t -> sexp = "%identity"
 end
@@ -1065,6 +1066,14 @@ end
 module Dotsxp = struct
   include Sxp.Impl(struct type t = [`Dot] end)(Sexp)
   let create = dots_symbol_creator
+end
+
+module Envsxp = struct
+  include Sxp.Impl(struct type t = [`Env] end)(Sexp)
+end
+
+module Langsxp = struct
+  include Sxp.Impl(struct type t = [`Env] end)(Sexp)
 end
 
 module type Vector = sig
