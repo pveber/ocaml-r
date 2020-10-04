@@ -88,11 +88,11 @@ let %s %s () = R.Eval.call %s_symbol [ %s ]|}
       ocaml_name
       (String.concat ~sep:" ; " (List.map args ~f:r_arg_of_arg))
   | STRINGS _ ->
-    sprintf {|let %s : string array R.t = R.Eval.string "%s"|} (ocamlify name) name
+    sprintf {|let %s : R.Sexp.t = R.Eval.string "%s"|} (ocamlify name) name
   | BOOLS _ ->
-    sprintf {|let %s : bool array R.t = R.Eval.string "%s"|} (ocamlify name) name
+    sprintf {|let %s : R.Sexp.t = R.Eval.string "%s"|} (ocamlify name) name
   | FLOATS _ ->
-    sprintf {|let %s : float array R.t = R.Eval.string "%s"|} (ocamlify name) name
+    sprintf {|let %s : R.Sexp.t = R.Eval.string "%s"|} (ocamlify name) name
   | VECSXP _ -> "" (* TODO *)
   | BUILTIN
   | SPECIAL _ -> "" (* FIXME: how to handle this case? *)
@@ -102,7 +102,7 @@ let generate_stub_ml_for_package p =
   let () = ignore @@ R.Eval.string {|require(utils, quietly=TRUE)|} in
   let () = ignore @@ R.Eval.string (sprintf {|require(%s, quietly=TRUE)|} p) in
   let r_list = R.Eval.string (sprintf {|ls("package:%s")|} p) in
-  let funs = filter_names (R.strings_of_t r_list) in
+  let funs = filter_names (R.Dec.strings r_list) in
   Caml.print_endline "open OCamlR" ;
   Caml.print_endline (
     sprintf

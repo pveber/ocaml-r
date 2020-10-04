@@ -329,84 +329,8 @@ end
 
 open Low_level
 
+external cast : _ sxp -> _ sxp = "%identity"
 
-
-type +'a t = sexp
-
-external cast : sexp -> 'a t = "%identity"
-external sxp_cast : _ sxp -> _ sxp = "%identity"
-
-
-class type ['a] ty = object
-  method repr : 'a
-end
-(** *)
-
-type _ scalar_format =
-  | Integer : int scalar_format
-  | Real : float scalar_format
-  | Logical : bool scalar_format
-  | String : string scalar_format
-
-(*
-  The following slightly contrived definition are needed to workaround
-  the compiler, see
-  https://groups.google.com/forum/#!topic/fa.caml/-7yCBMx7xxw
-*)
-class type ['a, 'int] atomic_vector0 = object
-  inherit ['a array] ty
-  method length : 'int
-end
-
-class type ['a, 'int] scalar0 = object
-  inherit ['a, 'int] atomic_vector0
-  method scalar : unit
-end
-
-class type ['a] scalar = object
-  inherit ['a, (int, int) scalar0] scalar0
-end
-
-class type ['a] atomic_vector = object
-  inherit ['a, int scalar] atomic_vector0
-end
-
-class type reals = object
-  inherit [float] atomic_vector
-end
-
-class type real = object
-  inherit [float] scalar
-end
-
-class type integers = object
-  inherit [int] atomic_vector
-end
-
-class type integer = object
-  inherit [int] scalar
-end
-
-class type strings = object
-  inherit [string] atomic_vector
-end
-
-class type string_ = object
-  inherit [string] scalar
-end
-
-class type logicals = object
-  inherit [bool] atomic_vector
-end
-
-class type logical = object
-  inherit [bool] scalar
-end
-
-class type ['a] s3 = object
-  inherit ['a] ty
-  method classes : string list
-end
 
 (* Algebraic type reflecting R's dynamic typing. *)
 type sexptype =
@@ -574,8 +498,8 @@ let pairlist_of_list (l: (sexp * sexp) list) =
   let r_l = alloc_list (List.length l) in
   let cursor = ref r_l in
   List.iter (function (tag, value) ->
-      write_listsxp_element (sxp_cast !cursor) tag value ;
-      cursor := inspect_listsxp_cdrval (sxp_cast !cursor)
+      write_listsxp_element (cast !cursor) tag value ;
+      cursor := inspect_listsxp_cdrval (cast !cursor)
       (* [cursor] is not typeable because it is a non empty list until
          we reach the end. But those casts are not unsafe since we
          don't call [write_listsxp_element] when [cursor] becomes
@@ -624,59 +548,18 @@ let vector_of_array (alloc : int -> 'a at_most_vector sxp) (assign : 'a at_most_
 
 let bool_list_of_lglsxp x = list_of_vector access_lglsxp x
 let lglsxp_of_bool_list x = vector_of_list alloc_lglsxp assign_lglsxp x
-let bool_array_of_lglsxp x = array_of_vector access_lglsxp x
-let lglsxp_of_bool_array x = vector_of_array alloc_lglsxp assign_lglsxp x
-let bools_of_t tau = bool_array_of_lglsxp (upcast tau)
-let bool_of_t tau = access_lglsxp (upcast tau) 0
-  (* We access only the first element, because static typing is supposed to
-     ensure that the lgl vecsxp contains only one element. *)
-let bool b = (lglsxp_of_bool_array [| b |] :> sexp)
-let bools bl = (lglsxp_of_bool_array bl :> sexp)
 
 let int_list_of_intsxp x  = list_of_vector access_intsxp x
 let intsxp_of_int_list x  = vector_of_list alloc_intsxp assign_intsxp x
-let int_array_of_intsxp x  = array_of_vector access_intsxp x
-let optint_array_of_intsxp x  = array_of_vector access_intsxp_opt x
-let intsxp_of_int_array x  = vector_of_array alloc_intsxp assign_intsxp x
-let intsxp_of_int_option_array x = vector_of_array alloc_intsxp assign_intsxp_opt x
-let ints_of_t tau = int_array_of_intsxp (upcast tau)
-let optints_of_t tau = optint_array_of_intsxp (upcast tau)
-let int_of_t tau = access_intsxp (upcast tau) 0
-  (* We access only the first element, because static typing is supposed to
-     ensure that the int vecsxp contains only one element. *)
-let int i = (intsxp_of_int_array [| i |] :> sexp)
-let ints il = (intsxp_of_int_array il :> sexp)
-let optints xl = (intsxp_of_int_option_array xl :> sexp)
 
 let float_list_of_realsxp x = list_of_vector access_realsxp x
 let realsxp_of_float_list x = vector_of_list alloc_real_vector assign_realsxp x
-let float_array_of_realsxp x = array_of_vector access_realsxp x
-let opt_float_array_of_realsxp x = array_of_vector access_realsxp_opt x
-let realsxp_of_float_array x = vector_of_array alloc_real_vector assign_realsxp x
-let floats_of_t tau = float_array_of_realsxp (upcast tau)
-let optfloats_of_t tau = opt_float_array_of_realsxp (upcast tau)
-let float_of_t tau = access_realsxp (upcast tau) 0
-  (* We access only the first element, because static typing is supposed to
-     ensure that the real vecsxp contains only one element. *)
-let float x = (realsxp_of_float_array [| x |] :> sexp)
-let floats xl = (realsxp_of_float_array xl :> sexp)
 
 let realsxp_of_float_option_list x = vector_of_list alloc_real_vector assign_realsxp_opt x
-let realsxp_of_float_option_array x = vector_of_array alloc_real_vector assign_realsxp_opt x
-let optfloats xl = (realsxp_of_float_option_array xl :> sexp)
 
 let string_list_of_strsxp x = list_of_vector access_strsxp x
 let strsxp_of_string_list x = vector_of_list alloc_str_vector assign_strsxp x
-let string_array_of_strsxp x = array_of_vector access_strsxp x
-let strsxp_of_string_array x = vector_of_array alloc_str_vector assign_strsxp x
 let string_list_of_t tau = string_list_of_strsxp tau
-let strings_of_t tau = string_array_of_strsxp (upcast tau)
-let string_of_t tau = access_strsxp (upcast tau) 0
-  (* We access only the first element, because static typing is supposed to
-     ensure that the str vecsxp contains only one element. *)
-external string : string -> strsxp = "ocamlr_strsxp_of_string"
-let string x = (string x :> sexp)
-let strings sl = (strsxp_of_string_array sl :> sexp)
 
 let sexp_list_of_rawsxp x = list_of_vector access_rawsxp x
 let sexps_of_t tau = sexp_list_of_rawsxp tau
@@ -687,7 +570,7 @@ let langsxps_of_t tau = langsxp_list_of_exprsxp tau
 (* === INTERNAL ===== *)
 
 
-let is_nil x = sexptype (x : _ t :> sexp) = NilSxp
+let is_nil x = sexptype (x :> sexp) = NilSxp
 
 module Specification = struct
 
@@ -721,10 +604,6 @@ end
 let attributes sexp =
   let f (a, x) = (Specification.of_symbol a), x in
   List.map f (list_of_pairlist (upcast sexp))
-
-let notnil x =
-  if sexptype x = NilSxp then None
-  else Some x
 
 module type Types = sig
 

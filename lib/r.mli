@@ -247,191 +247,22 @@ module Pretty : sig
 
 end
 
-
-type +'a t = private sexp
-(** Phantom-typed representation of R values. ['a] provides an
-    information on the actual type of the underlying R value. *)
-
-external cast : sexp -> 'a t = "%identity"
+external cast : 'a sxp -> 'b sxp = "%identity"
 (** Upcast an SEXP to any typed representation. Of course this should
     never be used. *)
 
 
-val pairlist_of_list : (_ t * _ t) list -> [> internallist] sxp
+val pairlist_of_list : (sexp * sexp) list -> [> internallist] sxp
 val lglsxp_of_bool_list : bool list -> lglsxp
 val intsxp_of_int_list : int list -> intsxp
 val realsxp_of_float_list : float list -> realsxp
 val strsxp_of_string_list : string list -> strsxp
 val realsxp_of_float_option_list : float option list -> realsxp
 
-
-
-(** {2 High-level SEXP typing.} *)
-
-class type ['a] ty = object
-  method repr : 'a
-end
-(** *)
-
-type _ scalar_format =
-  | Integer : int scalar_format
-  | Real : float scalar_format
-  | Logical : bool scalar_format
-  | String : string scalar_format
-
-class type ['a, 'int] atomic_vector0 = object
-  inherit ['a array] ty
-  method length : 'int
-end
-
-class type ['a, 'int] scalar0 = object
-  inherit ['a, 'int] atomic_vector0
-  method scalar : unit
-end
-
-class type ['a] scalar = object
-  inherit ['a, (int, int) scalar0] scalar0
-end
-
-class type ['a] atomic_vector = object
-  inherit ['a, int scalar] atomic_vector0
-end
-
-class type reals = object
-  inherit [float] atomic_vector
-end
-
-class type real = object
-  inherit [float] scalar
-end
-
-class type integers = object
-  inherit [int] atomic_vector
-end
-
-class type integer = object
-  inherit [int] scalar
-end
-
-class type strings = object
-  inherit [string] atomic_vector
-end
-
-class type string_ = object
-  inherit [string] scalar
-end
-
-class type logicals = object
-  inherit [bool] atomic_vector
-end
-
-class type logical = object
-  inherit [bool] scalar
-end
-
-class type ['a] s3 = object
-  inherit ['a] ty
-  method classes : string list
-end
-
-
 (** {2 Symbol retrieval.} *)
 
 val symbol : ?generic:bool -> string -> Sexp.t
 (**  Retrieves an R symbol from the symbol table, given its name. *)
-
-(** {2 Conversion functions.} *)
-
-val bools_of_t : logicals t -> bool array
-(** Converts an R array of logical values into an array of OCaml
-    booleans.  *)
-
-val bool_of_t : logical t -> bool
-(**  Converts an R array of logical values with one element into an
-     Objective Caml boolean.
-*)
-
-val bool : bool -> logical t
-(**  Converts an Objective Caml boolean value to an R boolean value,
-     that is a mono-element array of booleans.
-*)
-
-val bools : bool array -> logicals t
-(** Converts an OCaml array of booleans into an R array of logical
-    values.  *)
-
-val ints_of_t : integers t -> int array
-(** Converts an R array of integers into an array of OCaml
-    integers.  *)
-
-val optints_of_t : integers t -> int option array
-(** Converts an R array of integers possibly containing [NA] values to
-   optional ints. *)
-
-val int_of_t : integer t -> int
-(**  Converts an R array of integers with one element into an Objective
-     Caml integer.
-*)
-
-val int : int -> integer t
-(**  Converts an Objective Caml integer to an R integer value, that
-     is a mono-element array of integers.
-*)
-
-val ints : int array -> integers t
-(** Converts an OCaml array of integers into an R array of
-    integers.  *)
-
-val optints : int option array -> integers t
-(**  Converts a OCaml array of int options into an R array of
-     integer numbers with possibly missing values. The value [None] is
-     converted to [NA] on the R side.
-*)
-
-val floats_of_t : reals t -> float array
-(** Converts an R array of real numbers into an array of OCaml
-    floats.  *)
-
-val optfloats_of_t : reals t -> float option array
-(** Converts an R array of floats possibly containing [NA] values to
-   optional floats. *)
-
-val float_of_t : real t -> float
-(** Converts an R array of floats with one element into an OCaml
-    float.  *)
-
-val float : float -> real t
-(**  Converts an OCaml float to an R real value, that is a
-     mono-element array of real numbers.
-*)
-
-val floats : float array -> reals t
-(**  Converts an OCaml array of floats into an R array of
-     real numbers.
-*)
-
-val optfloats : float option array -> reals t
-(**  Converts a OCaml array of float options into an R array of
-     real numbers with possibly missing values. The value [None] is
-     converted to [NA] on the R side.
-*)
-
-val strings_of_t : strings t -> string array
-(** Converts an R array of strings into a list of OCaml strings. *)
-
-val string_of_t : string_ t -> string
-(** Converts an R array of strings with one element into an OCaml
-    string.  *)
-
-val string : string -> string_ t
-(**  Converts an OCaml string to an R string, that is a
-     mono-element array of strings.
-*)
-
-val strings : string array -> strings t
-(**  Converts an OCaml array of strings into an R array of
-     strings.
-*)
 
 val sexps_of_t : rawsxp -> sexp list
 (**  Converts an R array of SEXPs into an OCaml array of
@@ -445,9 +276,6 @@ module Specification : sig
   (** Semantic description of [SYMSXP] structures. *)
   type symbol = (string * (sexp option)) option option
 end
-
-val is_nil : _ t -> bool
-val notnil : 'a t -> 'a t option
 
 val attributes : sexp -> (Specification.symbol * sexp) list
 
@@ -505,7 +333,7 @@ module Enc : Conversion with type 'a t = 'a -> Sexp.t
 module Dec : Conversion with type 'a t = Sexp.t -> 'a
 
 module Eval : sig
-  val string : string -> 'a t
+  val string : string -> Sexp.t
   (**  [string] takes a string containing R code, and feeds it to the
        R interpreter. You get the resulting value back. The typing of this
        function is deliberately unsafe in order to allow the user to type
