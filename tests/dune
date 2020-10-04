@@ -1,0 +1,3 @@
+(tests
+  (names conversions)
+  (libraries alcotest ocaml-r.base))
