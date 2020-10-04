@@ -325,6 +325,53 @@ module Low_level = struct
   (* ==== REDUCTION ==== *)
   external eval_langsxp : langsxp -> sexp = "ocamlr_eval_sxp"
 
+  external string_of_charsxp : charsxp -> string = "ocamlr_internal_string_of_charsxp"
+
+  let list_of_vector (access : 'a at_most_vector sxp -> int -> 'b) (s : 'a at_most_vector sxp) =
+    let lngth = length_of_vector s in
+    let rec aux n accu = match n with | 0 -> accu | _ ->
+      let x = access s (n - 1) in aux (n - 1) (x :: accu)
+    in aux lngth []
+
+  let vector_of_list (alloc : int -> 'a at_most_vector sxp) (assign : 'a at_most_vector sxp -> int -> 'b -> unit) (l: 'b list) =
+    let s = alloc (List.length l) in
+    let rec aux offset = function | [] -> () | hd::tl ->
+      let () = assign s offset hd in aux (1 + offset) tl
+    in aux 0 l; s
+
+  let array_of_vector (access : 'a at_most_vector sxp -> int -> 'b) (s : 'a at_most_vector sxp) =
+    let lngth = length_of_vector s in
+    Array.init lngth (access s)
+
+  let vector_of_array (alloc : int -> 'a at_most_vector sxp) (assign : 'a at_most_vector sxp -> int -> 'b -> unit) (t : 'b array) =
+    let s = alloc (Array.length t) in
+    Array.iteri (assign s) t ;
+    s
+
+  let bool_list_of_lglsxp x = list_of_vector access_lglsxp x
+  let lglsxp_of_bool_list x = vector_of_list alloc_lglsxp assign_lglsxp x
+
+  let int_list_of_intsxp x  = list_of_vector access_intsxp x
+  let intsxp_of_int_list x  = vector_of_list alloc_intsxp assign_intsxp x
+
+  let float_list_of_realsxp x = list_of_vector access_realsxp x
+  let realsxp_of_float_list x = vector_of_list alloc_real_vector assign_realsxp x
+
+  let realsxp_of_float_option_list x = vector_of_list alloc_real_vector assign_realsxp_opt x
+
+  let string_list_of_strsxp x = list_of_vector access_strsxp x
+  let strsxp_of_string_list x = vector_of_list alloc_str_vector assign_strsxp x
+  let string_list_of_t tau = string_list_of_strsxp tau
+
+  let sexp_list_of_rawsxp x = list_of_vector access_rawsxp x
+  let sexps_of_t tau = sexp_list_of_rawsxp tau
+
+  let langsxp_list_of_exprsxp x = list_of_vector access_exprsxp x
+  let langsxps_of_t tau = langsxp_list_of_exprsxp tau
+
+  let classes sexp =
+    string_list_of_t (upcast (get_attrib sexp "class") : strsxp)
+
 end
 
 open Low_level
@@ -523,49 +570,6 @@ let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
   in
   lcons f args_as_listsxp
 
-external string_of_charsxp : charsxp -> string = "ocamlr_internal_string_of_charsxp"
-
-let list_of_vector (access : 'a at_most_vector sxp -> int -> 'b) (s : 'a at_most_vector sxp) =
-  let lngth = length_of_vector s in
-  let rec aux n accu = match n with | 0 -> accu | _ ->
-    let x = access s (n - 1) in aux (n - 1) (x :: accu)
-  in aux lngth []
-
-let vector_of_list (alloc : int -> 'a at_most_vector sxp) (assign : 'a at_most_vector sxp -> int -> 'b -> unit) (l: 'b list) =
-  let s = alloc (List.length l) in
-  let rec aux offset = function | [] -> () | hd::tl ->
-    let () = assign s offset hd in aux (1 + offset) tl
-  in aux 0 l; s
-
-let array_of_vector (access : 'a at_most_vector sxp -> int -> 'b) (s : 'a at_most_vector sxp) =
-  let lngth = length_of_vector s in
-  Array.init lngth (access s)
-
-let vector_of_array (alloc : int -> 'a at_most_vector sxp) (assign : 'a at_most_vector sxp -> int -> 'b -> unit) (t : 'b array) =
-  let s = alloc (Array.length t) in
-  Array.iteri (assign s) t ;
-  s
-
-let bool_list_of_lglsxp x = list_of_vector access_lglsxp x
-let lglsxp_of_bool_list x = vector_of_list alloc_lglsxp assign_lglsxp x
-
-let int_list_of_intsxp x  = list_of_vector access_intsxp x
-let intsxp_of_int_list x  = vector_of_list alloc_intsxp assign_intsxp x
-
-let float_list_of_realsxp x = list_of_vector access_realsxp x
-let realsxp_of_float_list x = vector_of_list alloc_real_vector assign_realsxp x
-
-let realsxp_of_float_option_list x = vector_of_list alloc_real_vector assign_realsxp_opt x
-
-let string_list_of_strsxp x = list_of_vector access_strsxp x
-let strsxp_of_string_list x = vector_of_list alloc_str_vector assign_strsxp x
-let string_list_of_t tau = string_list_of_strsxp tau
-
-let sexp_list_of_rawsxp x = list_of_vector access_rawsxp x
-let sexps_of_t tau = sexp_list_of_rawsxp tau
-
-let langsxp_list_of_exprsxp x = list_of_vector access_exprsxp x
-let langsxps_of_t tau = langsxp_list_of_exprsxp tau
 
 (* === INTERNAL ===== *)
 
@@ -879,8 +883,6 @@ end
 (* let s3 (r : 'a t) = new s3 r *)
 
 
-let classes sexp =
-  string_list_of_t (upcast (get_attrib sexp "class") : strsxp)
 
 
 

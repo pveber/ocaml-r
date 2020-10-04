@@ -133,7 +133,7 @@ module Langsxp : sig
   include SXP with type t = langsxp
 end
 
-(** {2 Vector types}
+(** {3 Vector types}
 
     R is an array-oriented language. Therefore, simple values such as
    a boolean, a string, a number, are in fact encapsulated, in R, in
@@ -252,41 +252,10 @@ module Pretty : sig
 
 end
 
-external cast : 'a sxp -> 'b sxp = "%identity"
-(** Upcast an SEXP to any typed representation. Of course this should
-    never be used. *)
-
-
-val pairlist_of_list : (sexp * sexp) list -> [> internallist] sxp
-val lglsxp_of_bool_list : bool list -> lglsxp
-val intsxp_of_int_list : int list -> intsxp
-val realsxp_of_float_list : float list -> realsxp
-val strsxp_of_string_list : string list -> strsxp
-val realsxp_of_float_option_list : float option list -> realsxp
-
-(** {2 Symbol retrieval.} *)
-
-val symbol : ?generic:bool -> string -> Sexp.t
-(**  Retrieves an R symbol from the symbol table, given its name. *)
-
-val sexps_of_t : rawsxp -> sexp list
-(**  Converts an R array of SEXPs into an OCaml array of
-     SEXPs.
-*)
-
-
-(**  {2 Inspection and specification of internals.} *)
-
 module Specification : sig
   (** Semantic description of [SYMSXP] structures. *)
   type symbol = (string * (sexp option)) option option
 end
-
-val attributes : sexp -> (Specification.symbol * sexp) list
-
-val classes : sexp -> string list
-
-
 
 (** {2 Parsing R code.} *)
 
@@ -336,6 +305,9 @@ end
 
 module Enc : Conversion with type 'a t = 'a -> Sexp.t
 module Dec : Conversion with type 'a t = Sexp.t -> 'a
+
+val symbol : ?generic:bool -> string -> Sexp.t
+(**  Retrieves an R symbol from the symbol table, given its name. *)
 
 module Eval : sig
   val string : string -> Sexp.t
@@ -505,4 +477,19 @@ module Low_level : sig
   (**  [eval_langsxp] takes a R value containing an R executable expression.
        Also known as a [LANGSXP]. You get the resulting value back. *)
 
+  val lglsxp_of_bool_list : bool list -> lglsxp
+  val intsxp_of_int_list : int list -> intsxp
+  val realsxp_of_float_list : float list -> realsxp
+  val strsxp_of_string_list : string list -> strsxp
+  val realsxp_of_float_option_list : float option list -> realsxp
+
+  val sexps_of_t : rawsxp -> sexp list
+  (**  Converts an R array of SEXPs into an OCaml array of
+       SEXPs.
+  *)
+
+  val classes : sexp -> string list
 end
+
+val attributes : sexp -> (Specification.symbol * sexp) list
+val pairlist_of_list : (sexp * sexp) list -> [> internallist] sxp
