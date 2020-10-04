@@ -32,7 +32,42 @@
 
 type sexp
 
-type +'a sxp = private sexp
+module type SXP = sig
+  type t
+
+  val equal : t -> t -> bool
+  val is_function : t -> bool
+  val attr : t -> string -> sexp
+  val _class_ : t -> string list
+  external unsafe_of_sexp : sexp -> t = "%identity"
+  external to_sexp : t -> sexp = "%identity"
+end
+
+
+module Sxp : sig
+  type +'a t = private sexp
+
+  module type Constraint = sig
+    type t = private [> ]
+  end
+
+  module Impl(K : Constraint)(I : SXP with type t := sexp) : SXP with type t = K.t t
+end
+=
+struct
+  type +'a t = sexp
+
+  module type Constraint = sig
+    type t = private [> ]
+  end
+
+  module Impl(K : Constraint)(I : SXP with type t := sexp) = struct
+    type nonrec t = K.t t
+    include I
+  end
+end
+
+type 'a sxp = 'a Sxp.t
 
 type nilsxp      = [`Nil]     sxp
 type symsxp      = [`Sym]     sxp
@@ -243,7 +278,7 @@ module Low_level = struct
      for the typing of the R NULL. What should it be
      in OCaml? An 'a option mapping to None? *)
   external null_creator : unit -> [> `Nil] sxp = "ocamlr_null"
-  external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
+  external dots_symbol_creator : unit -> [> `Dot] sxp = "ocamlr_dots_symbol"
   external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
   external base_env_creator : unit -> sexp = "ocamlr_base_env"
 
@@ -990,18 +1025,6 @@ let opt f name x = match x with
 let eval phi (args: (string option * sexp) option list) =
   eval_langsxp (langsxp phi (prepare_args args))
 
-
-module type SXP = sig
-  type t
-
-  val equal : t -> t -> bool
-  val is_function : t -> bool
-  val attr : t -> string -> sexp
-  val _class_ : t -> string list
-  external unsafe_of_sexp : sexp -> t = "%identity"
-  external to_sexp : t -> sexp = "%identity"
-end
-
 module Sexp = struct
   type t = sexp
   let is_function x =
@@ -1021,8 +1044,15 @@ module Sexp = struct
   external to_sexp : sexp -> sexp = "%identity"
 end
 
+module Nilsxp = struct
+  include Sxp.Impl(struct type t = [`Nil] end)(Sexp)
+  let create = null_creator
+end
 
-
+module Dotsxp = struct
+  include Sxp.Impl(struct type t = [`Dot] end)(Sexp)
+  let create = dots_symbol_creator
+end
 
 (* === INITIALISATION ===== *)
 

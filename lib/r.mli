@@ -112,6 +112,16 @@ end
 
 module Sexp : SXP with type t = sexp
 
+module Nilsxp : sig
+  include SXP with type t = nilsxp
+  val create : unit -> t
+end
+
+module Dotsxp : sig
+  include SXP with type t = dotsxp
+  val create : unit -> t
+end
+
 type +'a t = private sexp
 (** Phantom-typed representation of R values. ['a] provides an
     information on the actual type of the underlying R value. *)
@@ -576,8 +586,8 @@ module Low_level : sig
   external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
   external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
 
-  external null_creator : unit -> nilsxp = "ocamlr_null"
-  external dots_symbol_creator : unit -> sexp = "ocamlr_dots_symbol"
+  external null_creator : unit -> [`Nil] sxp = "ocamlr_null"
+  external dots_symbol_creator : unit -> [`Dot] sxp = "ocamlr_dots_symbol"
   external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
   external base_env_creator : unit -> sexp = "ocamlr_base_env"
 
