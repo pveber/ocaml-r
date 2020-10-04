@@ -687,9 +687,6 @@ let langsxps_of_t tau = langsxp_list_of_exprsxp tau
 
 
 let is_nil x = sexptype (x : _ t :> sexp) = NilSxp
-let nil_map x ~f =
-  if is_nil x then None
-  else Some (f x)
 
 module Specification = struct
 
@@ -1037,31 +1034,6 @@ let parse_string ?max statement =
 
 let parse statement = List.hd (parse_string ~max:1 statement)
 
-
-(* === REDUCTION ===== *)
-
-
-(* The following exception needs to be registered
-   in a callback when the R interpreter is initialised. *)
-exception Runtime_error of langsxp * string
-
-let eval_string s = eval_langsxp (parse s)
-(* TODO: May segfault if stumbling on a symbol that
- * hasn't yet been loaded. *)
-
-let rec prepare_args = function
-  | (Some x)::l -> x::(prepare_args l)
-  | None::l     -> prepare_args l
-  | []          -> []
-
-let arg f ?name x = Some (name, (Obj.magic (f x)))
-let opt f name x = match x with
-  | None -> None
-  | Some x -> Some ((Some name), (Obj.magic (f x)))
-
-let eval phi (args: (string option * sexp) option list) =
-  eval_langsxp (langsxp phi (prepare_args args))
-
 module Sexp = struct
   type t = sexp
   let is_function x =
@@ -1079,6 +1051,10 @@ module Sexp = struct
 
   external unsafe_of_sexp : sexp -> sexp = "%identity"
   external to_sexp : sexp -> sexp = "%identity"
+
+  let nil_map x ~f =
+    if is_nil x then None
+    else Some (f x)
 end
 
 module Nilsxp = struct
@@ -1199,6 +1175,86 @@ module Vecsxp = struct
   end
   include Vector_impl(Elt)
 end
+
+module type Conversion = sig
+  type 'a t
+  val sexp         : sexp t
+  val int          : int t
+  val ints         : int array t
+  val maybe_int    : int option t
+  val bool         : bool t
+  val bools        : bool array t
+  val maybe_bool   : bool option t
+  val float        : float t
+  val floats       : float array t
+  val maybe_float  : float option t
+  val string       : string t
+  val strings      : string array t
+  val maybe_string : string option t
+end
+
+module Enc = struct
+  type 'a t = 'a -> sexp
+  let sexp x = x
+  let int i = (Intsxp.of_array [| i |] :> sexp)
+  let ints x = (Intsxp.of_array x :> sexp)
+  let maybe_int i = (Intsxp.of_array_opt [| i |] :> sexp)
+  let bool i = (Lglsxp.of_array [| i |] :> sexp)
+  let bools x = (Lglsxp.of_array x :> sexp)
+  let maybe_bool i = (Lglsxp.of_array_opt [| i |] :> sexp)
+  let float i = (Realsxp.of_array [| i |] :> sexp)
+  let floats x = (Realsxp.of_array x :> sexp)
+  let maybe_float i = (Realsxp.of_array_opt [| i |] :> sexp)
+  let string i = (Strsxp.of_array [| i |] :> sexp)
+  let strings x = (Strsxp.of_array x :> sexp)
+  let maybe_string i = (Strsxp.of_array_opt [| i |] :> sexp)
+end
+
+module Dec = struct
+  type 'a t = sexp -> 'a
+  let sexp x = x
+  let int i = Intsxp.(to_array (unsafe_of_sexp i)).(0)
+  let ints x = Intsxp.(to_array (unsafe_of_sexp x))
+  let maybe_int i = Intsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let bool i = Lglsxp.(to_array (unsafe_of_sexp i)).(0)
+  let bools x = Lglsxp.(to_array (unsafe_of_sexp x))
+  let maybe_bool i = Lglsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let float i = Realsxp.(to_array (unsafe_of_sexp i)).(0)
+  let floats x = Realsxp.(to_array (unsafe_of_sexp x))
+  let maybe_float i = Realsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let string i = Strsxp.(to_array (unsafe_of_sexp i)).(0)
+  let strings x = Strsxp.(to_array (unsafe_of_sexp x))
+  let maybe_string i = Strsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+end
+
+
+(* === REDUCTION ===== *)
+
+
+(* The following exception needs to be registered
+   in a callback when the R interpreter is initialised. *)
+exception Runtime_error of langsxp * string
+
+module Eval = struct
+  let string s = eval_langsxp (parse s)
+  (* TODO: May segfault if stumbling on a symbol that
+   * hasn't yet been loaded. *)
+
+  let rec prepare_args = function
+    | (Some x)::l -> x::(prepare_args l)
+    | None::l     -> prepare_args l
+    | []          -> []
+
+  type arg = (string option * sexp) option
+  let arg f ?name x = Some (name, f x)
+  let opt_arg f name x = match x with
+    | None -> None
+    | Some x -> Some ((Some name), f x)
+
+  let call phi (args: (string option * sexp) option list) =
+    eval_langsxp (langsxp phi (prepare_args args))
+end
+
 
 (* === INITIALISATION ===== *)
 

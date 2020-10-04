@@ -1,6 +1,6 @@
 open OCamlR
 
-let () = ignore (R.eval_string "require(stats, quietly=TRUE)")
+let () = ignore (R.Eval.string "require(stats, quietly=TRUE)")
 
 let id x = x
 
@@ -28,46 +28,50 @@ module Symbol = struct
 end
 
 let rnorm ?mean ?sd n =
-  R.eval Symbol.rnorm [
-    R.arg id n ;
-    R.opt id "mean" mean ;
-    R.opt id "sd" sd
+  let open R.Eval in
+  call Symbol.rnorm [
+    arg id n ;
+    opt_arg id "mean" mean ;
+    opt_arg id "sd" sd
   ]
 
 let fisher'test ?alternative v v' =
-  R.eval Symbol.fisher'test [
-    R.arg id v ;
-    R.arg id v' ;
-    R.opt id "alternative" alternative ;
+  let open R.Eval in
+  call Symbol.fisher'test [
+    arg id v ;
+    arg id v' ;
+    opt_arg id "alternative" alternative ;
   ]
 
 let cor x ?y ?use ?cor_method () =
-  R.eval Symbol.cor [
-    R.arg (fun x -> x) x                   ;
-    R.opt (fun x -> x) "y" y               ;
-    R.opt (fun x -> x) "use" use           ;
-    R.opt (fun x -> x) "method" cor_method ]
+  let open R.Eval in
+  call Symbol.cor [
+    arg (fun x -> x) x                   ;
+    opt_arg (fun x -> x) "y" y               ;
+    opt_arg (fun x -> x) "use" use           ;
+    opt_arg (fun x -> x) "method" cor_method ]
 
 let lm formula ?data ?subset ?weights ?na_action ?lm_method ?model ?x ?y ?qr ?singular_ok ?contrasts ?offset () =
-  R.eval Symbol.lm [
-    R.arg (fun x -> x)                formula     ;
-    R.opt (fun x -> x) "data"         data        ;
-    R.opt (fun x -> x) "subset"       subset      ;
-    R.opt (fun x -> x) "weights"      weights     ;
-    R.opt (fun x -> x) "na.action"    na_action   ;
-    R.opt (fun x -> x) "method"       lm_method   ;
-    R.opt (fun x -> x) "model"        model       ;
-    R.opt (fun x -> x) "x"            x           ;
-    R.opt (fun x -> x) "y"            y           ;
-    R.opt (fun x -> x) "qr"           qr          ;
-    R.opt (fun x -> x) "singular.ok"  singular_ok ;
-    R.opt (fun x -> x) "contrasts"    contrasts   ;
-    R.opt (fun x -> x) "offset"       offset      ]
+  let open R.Eval in
+  call Symbol.lm [
+    arg (fun x -> x)                formula     ;
+    opt_arg (fun x -> x) "data"         data        ;
+    opt_arg (fun x -> x) "subset"       subset      ;
+    opt_arg (fun x -> x) "weights"      weights     ;
+    opt_arg (fun x -> x) "na.action"    na_action   ;
+    opt_arg (fun x -> x) "method"       lm_method   ;
+    opt_arg (fun x -> x) "model"        model       ;
+    opt_arg (fun x -> x) "x"            x           ;
+    opt_arg (fun x -> x) "y"            y           ;
+    opt_arg (fun x -> x) "qr"           qr          ;
+    opt_arg (fun x -> x) "singular.ok"  singular_ok ;
+    opt_arg (fun x -> x) "contrasts"    contrasts   ;
+    opt_arg (fun x -> x) "offset"       offset      ]
 
 (* let fisher'test_2x2 ?alternative ~ff ~ft ~tf ~tt () = *)
 (*   let data = List.map float [ ff ; ft ; tf ; tt ] in *)
-(*   R.eval Stub.fisher'test [ *)
-(*     R.arg (fun x -> matrix ~nrow:2 ~ncol:2 x) data ; *)
-(*     R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ; *)
+(*   let open R.Eval in
+     call Stub.fisher'test [ *)
+(*     arg (fun x -> matrix ~nrow:2 ~ncol:2 x) data ; *)
+(*     opt_arg (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ; *)
 (*   ] *)
-

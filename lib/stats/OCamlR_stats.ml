@@ -8,7 +8,7 @@ let o x f = match x with
   | None -> None
   | Some x -> Some (f x)
 
-let float_tup (x, y) = R.floats [| x ; y |]
+let float_tup (x, y) = R.Enc.floats [| x ; y |]
 
 module Symbol = struct
   let ks'test = R.symbol "ks.test"
@@ -16,20 +16,20 @@ module Symbol = struct
 end
 
 module Formula = struct
-  include S3
+  include R.Sexp
   let of_string x =
-    S.formula ~x:(R.string x) ()
-    |> unsafe_of_r
+    S.formula ~x:(R.Enc.string x) ()
+    |> unsafe_of_sexp
 end
 
 
 let rnorm ?mean ?sd n =
   S.rnorm
-    ?mean:(mean |?> R.float)
-    ?sd:(sd |?> R.float)
-    ~n:(n |> R.int)
+    ?mean:(mean |?> R.Enc.float)
+    ?sd:(sd |?> R.Enc.float)
+    ~n:(n |> R.Enc.int)
     ()
-  |> R.floats_of_t
+  |> R.Dec.floats
 
 
 let string_of_test_kind = function
@@ -37,90 +37,102 @@ let string_of_test_kind = function
   | `greater -> "greater"
   | `less -> "less"
 
-class test_result o = object
-  method p'value = R.float_of_t (subset2_s o "p.value")
-  method method_ = R.string_of_t (subset2_s o "method")
-  method data'name = R.string_of_t (subset2_s o "data.name")
+class type test = object
+  method p'value : float
+  method method_ : string
+  method data'name : string
+  method alternative : string
+end
+
+class test_impl o = object
+  method p'value = List_.subset2_exn o "p.value" R.Dec.float
+  method method_ = List_.subset2_exn o "method" R.Dec.string
+  method data'name = List_.subset2_exn o "data.name" R.Dec.string
+  method alternative = List_.subset2_exn o "alternative" R.Dec.string
 end
 
 class fisher'test o = object
-  inherit test_result o
+  inherit test_impl o
   method conf'int =
-    R.notnil (subset2_s o "conf.int")
-    |?> (fun x ->
-        match R.floats_of_t x with
+    List_.subset2 o "conf.int" R.Dec.floats
+    |> Option.map (function
         | [| x ; y |] -> (x, y)
         | _ -> assert false
       )
-  method estimate = R.float_of_t (subset2_s o "estimate")
-  method null'value = R.float_of_t (subset2_s o "null.value")
-  method alternative = R.string_of_t (subset2_s o "alternative")
+  method estimate = List_.subset2_exn o "estimate" R.Dec.float
+  method null'value = List_.subset2_exn o "null.value" R.Dec.float
 end
 
 let fisher'test ?alternative v v' =
   S.fisher'test
-    ?alternative:(alternative |?> string_of_test_kind |?> R.string)
-    ~x:(Logical.r v)
-    ~y:(Logical.r v')
+    ?alternative:(alternative |?> string_of_test_kind |?> R.Enc.string)
+    ~x:(Logical.to_sexp v)
+    ~y:(Logical.to_sexp v')
     ()
+  |> List_.unsafe_of_sexp
   |> new fisher'test
 
-class chipsq'test o = object
-  inherit test_result o
-  method statistic = R.float_of_t (subset2_s o "statistic")
+class test_impl_with_statistic o = object
+  inherit test_impl o
+  method statistic = List_.subset2_exn o "statistic" R.Dec.float
 end
 
 let chisq'test_contingency_table ?correct ?simulate'p'value ?b mat =
   S.chisq'test
-    ~x:(Matrix.r mat)
-    ?correct:(o correct R.bool)
-    ?simulate'p'value:(o simulate'p'value R.bool)
-    ?_B:(o b R.int)
+    ~x:(Matrix.to_sexp mat)
+    ?correct:(o correct R.Enc.bool)
+    ?simulate'p'value:(o simulate'p'value R.Enc.bool)
+    ?_B:(o b R.Enc.int)
     ()
-  |> new chipsq'test
+  |> List_.unsafe_of_sexp
+  |> new test_impl_with_statistic
 
 class ks'test o = object
-  inherit test_result o
-  method statistic = R.float_of_t (subset2_s o "statistic")
-  method alternative = R.string_of_t (subset2_s o "alternative")
+  inherit test_impl_with_statistic o
 end
 
 let ks'test ?alternative v v' =
-  R.eval Symbol.ks'test [
-    R.arg R.floats v ;
-    R.arg R.floats v' ;
-    R.opt (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ;
+  let open R.Eval in
+  call Symbol.ks'test R.Enc.[
+    arg floats v ;
+    arg floats v' ;
+    opt_arg (fun x -> string (string_of_test_kind x)) "alternative" alternative ;
   ]
+  |> List_.unsafe_of_sexp
   |> new ks'test
 
 let string_of_p'adjust_method = function
-| `fdr -> "fdr"
-| `holm -> "holm"
-| `hochberg -> "hochberg"
-| `hommel -> "hommel"
-| `bonferroni -> "bonferroni"
-| `BH -> "BH"
-| `BY -> "BY"
+  | `fdr -> "fdr"
+  | `holm -> "holm"
+  | `hochberg -> "hochberg"
+  | `hommel -> "hommel"
+  | `bonferroni -> "bonferroni"
+  | `BH -> "BH"
+  | `BY -> "BY"
 
 let p'adjust ?method_ data =
-  R.floats_of_t (
-    R.eval Symbol.p'adjust [
-      R.arg R.floats data ;
-      R.opt (fun x -> R.string (string_of_p'adjust_method x)) "method" method_
+  let open R.Eval in
+  call Symbol.p'adjust R.Enc.[
+      arg floats data ;
+      opt_arg (fun x -> string (string_of_p'adjust_method x)) "method" method_
     ]
-  )
+  |> R.Dec.floats
 
 module Ecdf = struct
-  type t = < > R.t
-  let make x = OCamlR_stats_stubs2.ecdf ~x:(Numeric.r x) ()
+  type t = List_.t
+  let make x =
+    OCamlR_stats_stubs2.ecdf ~x:(Numeric.to_sexp x) ()
+    |> List_.unsafe_of_sexp
+
   let plot ?(main = "") ?xlab ?ylab ?xlim ?ylim o =
-    R.eval OCamlR_stats_stubs2.plot'ecdf_symbol [
-      R.arg ~name:"x" ident o ;
-      R.opt R.string "xlab" xlab ;
-      R.opt R.string "ylab" ylab ;
-      R.arg R.string ~name:"main" main ;
-      R.opt float_tup "xlim" xlim ;
-      R.opt float_tup "ylim" ylim ;
+    let open R.Eval in
+    call OCamlR_stats_stubs2.plot'ecdf_symbol R.Enc.[
+      arg ~name:"x" List_.to_sexp o ;
+      opt_arg string "xlab" xlab ;
+      opt_arg string "ylab" ylab ;
+      arg string ~name:"main" main ;
+      opt_arg float_tup "xlim" xlim ;
+      opt_arg float_tup "ylim" ylim ;
     ]
     |> ignore
 end

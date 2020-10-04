@@ -110,7 +110,10 @@ module type SXP = sig
   external to_sexp : t -> sexp = "%identity"
 end
 
-module Sexp : SXP with type t = sexp
+module Sexp : sig
+  include SXP with type t = sexp
+  val nil_map : t -> f:(t -> 'a) -> 'a option
+end
 
 module Nilsxp : sig
   include SXP with type t = nilsxp
@@ -442,7 +445,6 @@ module Specification : sig
 end
 
 val is_nil : _ t -> bool
-val nil_map : _ t -> f:(_ t -> 'a) -> 'a option
 val notnil : 'a t -> 'a t option
 
 val attributes : sexp -> (Specification.symbol * sexp) list
@@ -480,32 +482,51 @@ val parse : string -> langsxp
 
 exception Runtime_error of langsxp * string
 
-val eval_string : string -> 'a t
-(**  [eval_string] takes a string containing R code, and feeds it to the
-     R interpreter. You get the resulting value back. The typing of this
-     function is deliberately unsafe in order to allow the user to type
-     it precisely.
-  *
-     Bug: currently, if you try to execute a statement that refers to
-     symbols that haven't been loaded, you get a segfault. For instance,
-     evaluating a string containing the [rbinom] symbol without the
-     [R.stats] package being loaded raises a segfault. *)
+module type Conversion = sig
+  type 'a t
+  val sexp         : sexp t
+  val int          : int t
+  val ints         : int array t
+  val maybe_int    : int option t
+  val bool         : bool t
+  val bools        : bool array t
+  val maybe_bool   : bool option t
+  val float        : float t
+  val floats       : float array t
+  val maybe_float  : float option t
+  val string       : string t
+  val strings      : string array t
+  val maybe_string : string option t
+end
 
-val arg : ('a -> 'b t) -> ?name:string -> 'a -> (string option * sexp) option
-(**  Convenience function to wrap up arguments, when mapping R functions
-     to Objective Caml functions. *)
+module Enc : Conversion with type 'a t = 'a -> sexp
+module Dec : Conversion with type 'a t = sexp -> 'a
 
-val opt : ('a -> 'b t) -> string -> 'a option -> (string option * sexp) option
-(**  Convenience function to wrap up optional arguments, when mapping R functions
-     to Objective Caml functions. *)
+module Eval : sig
+  val string : string -> 'a t
+  (**  [string] takes a string containing R code, and feeds it to the
+       R interpreter. You get the resulting value back. The typing of this
+       function is deliberately unsafe in order to allow the user to type
+       it precisely.
+    *
+       Bug: currently, if you try to execute a statement that refers to
+       symbols that haven't been loaded, you get a segfault. For instance,
+       evaluating a string containing the [rbinom] symbol without the
+       [R.stats] package being loaded raises a segfault. *)
 
-val eval : sexp -> (string option * sexp) option list -> 'a t
-(**  [eval f args] evaluates an the R function [f] with respect to a list of
-     arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
-     argument whose optional name is [name] and whose value is [sexp]. The
-     typing of this function is deliberately unsafe in order to allow the
-     user to type it precisely. *)
+  (** Convenience functions to wrap up arguments, when mapping R
+     functions to Objective Caml functions. *)
+  type arg
+  val arg     : 'a Enc.t -> ?name:string -> 'a  -> arg
+  val opt_arg : 'a Enc.t -> string -> 'a option -> arg
 
+  val call : sexp -> arg list -> sexp
+  (**  [eval f args] evaluates an the R function [f] with respect to a list of
+       arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
+       argument whose optional name is [name] and whose value is [sexp]. The
+       typing of this function is deliberately unsafe in order to allow the
+       user to type it precisely. *)
+end
 
 (** {2 Initialisation}
 

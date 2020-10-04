@@ -4,9 +4,7 @@
 open OCamlR_base
 
 module Formula : sig
-  type t
-  include module type of S3 with type t := t
-
+  include OCamlR.R.SXP
   val of_string : string -> t
 end
 
@@ -32,17 +30,21 @@ val rnorm : ?mean:float -> ?sd:float -> int -> float array
 
 (** {2 Tests} *)
 
+class type test = object
+  method p'value : float
+  method method_ : string
+  method data'name : string
+  method alternative : string
+end
+
 val fisher'test :
   ?alternative:[`two_sided | `greater | `less] ->
   Logical.t ->
   Logical.t ->
-  < p'value : float ;
+  < test ;
     conf'int : (float * float) option  ;
     estimate : float ;
-    null'value : float ;
-    alternative : string ;
-    method_ : string ;
-    data'name : string >
+    null'value : float >
 
 (* val fisher'test_2x2 :
  *   ?alternative:[`two_sided | `greater | `less] ->
@@ -60,19 +62,12 @@ val chisq'test_contingency_table :
   ?simulate'p'value:bool ->
   ?b:int ->
   Matrix.t ->
-  < statistic : float ;
-    p'value : float ;
-    method_ : string ;
-    data'name : string >
+  < test ; statistic : float >
 
 val ks'test :
   ?alternative:[`two_sided | `greater | `less] ->
   float array -> float array ->
-  < statistic : float ;
-    p'value : float ;
-    alternative : string ;
-    method_ : string ;
-    data'name : string >
+  < test ; statistic : float >
 
 val p'adjust :
   ?method_ : [`holm | `hochberg | `hommel | `bonferroni | `BH | `BY | `fdr] ->

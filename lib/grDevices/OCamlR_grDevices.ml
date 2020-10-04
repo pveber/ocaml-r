@@ -1,6 +1,6 @@
 open OCamlR
 
-let () = ignore (R.eval_string "require(grDevices, quietly=TRUE)")
+let () = ignore (R.Eval.string "require(grDevices, quietly=TRUE)")
 
 module Stub = struct
 
@@ -21,51 +21,56 @@ end
 type length_unit = [`pixel | `inch | `cm | `mm]
 
 let string_of_length_unit = function
-| `pixel -> "px"
-| `inch -> "in"
-| `cm -> "cm"
-| `mm -> "mm"
+  | `pixel -> "px"
+  | `inch -> "in"
+  | `cm -> "cm"
+  | `mm -> "mm"
 
-let r_length_unit x = R.string (string_of_length_unit x)
+let r_length_unit x = R.Enc.string (string_of_length_unit x)
 
 let png ?width ?height ?unit ?pointsize path =
   ignore (
-    R.eval Stub.png [
-      R.arg R.string                  path ;
-      R.opt R.float       "width"     width ;
-      R.opt R.float       "height"    height ;
-      R.opt r_length_unit "unit"      unit ;
-      R.opt R.int         "pointsize" pointsize
+    let open R.Eval in
+    call Stub.png [
+      arg R.Enc.string                  path ;
+      opt_arg R.Enc.float       "width"     width ;
+      opt_arg R.Enc.float       "height"    height ;
+      opt_arg r_length_unit "unit"      unit ;
+      opt_arg R.Enc.int         "pointsize" pointsize
     ])
 
 let pdf ?width ?height ?pointsize path =
   ignore (
-    R.eval Stub.pdf [
-      R.arg R.string                  path ;
-      R.opt R.float       "width"     width ;
-      R.opt R.float       "height"    height ;
-      R.opt R.int         "pointsize" pointsize
+    let open R.Eval in
+    call Stub.pdf [
+      arg R.Enc.string                  path ;
+      opt_arg R.Enc.float       "width"     width ;
+      opt_arg R.Enc.float       "height"    height ;
+      opt_arg R.Enc.int         "pointsize" pointsize
     ])
 
 let postscript ?width ?height ?pointsize path =
   ignore (
-    R.eval Stub.postscript [
-      R.arg R.string                  path ;
-      R.opt R.float       "width"     width ;
-      R.opt R.float       "height"    height ;
-      R.opt R.int         "pointsize" pointsize
+    let open R.Eval in
+    call Stub.postscript [
+      arg R.Enc.string                  path ;
+      opt_arg R.Enc.float       "width"     width ;
+      opt_arg R.Enc.float       "height"    height ;
+      opt_arg R.Enc.int         "pointsize" pointsize
     ])
 
 let svg ?width ?height ?pointsize path =
   ignore (
-    R.eval Stub.svg [
-      R.arg R.string                  path ;
-      R.opt R.float       "width"     width ;
-      R.opt R.float       "height"    height ;
-      R.opt R.int         "pointsize" pointsize
+    let open R.Eval in
+    call Stub.svg [
+      arg R.Enc.string                  path ;
+      opt_arg R.Enc.float       "width"     width ;
+      opt_arg R.Enc.float       "height"    height ;
+      opt_arg R.Enc.int         "pointsize" pointsize
     ])
 
 let dev_off () =
   ignore (
-    R.eval Stub.dev_off []
+    let open R.Eval in
+    call Stub.dev_off []
   )

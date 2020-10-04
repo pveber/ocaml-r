@@ -1,22 +1,22 @@
 open OCamlR
 
 val plot :
-  ?main:R.string_ R.t ->
-  ?xlab:R.string_ R.t ->
-  ?ylab:R.string_ R.t ->
-  ?xlim:R.reals R.t ->
-  ?ylim:R.reals R.t ->
-  ?y:_ R.t ->
-  _ R.t -> _ R.t
+  ?main:R.sexp ->
+  ?xlab:R.sexp ->
+  ?ylab:R.sexp ->
+  ?xlim:R.sexp ->
+  ?ylim:R.sexp ->
+  ?y:R.sexp ->
+  R.sexp -> R.sexp
 
 val plot2 :
-  ?main:R.string_ R.t ->
-  ?xlab:R.string_ R.t ->
-  ?ylab:R.string_ R.t ->
-  ?xlim:R.reals R.t ->
-  ?ylim:R.reals R.t ->
-  _ R.t -> _ R.t -> _ R.t
+  ?main:R.sexp ->
+  ?xlab:R.sexp ->
+  ?ylab:R.sexp ->
+  ?xlim:R.sexp ->
+  ?ylim:R.sexp ->
+  R.sexp -> R.sexp -> R.sexp
 
 val par :
-  ?mfrow:_ R.t ->
-  unit -> _ R.t
+  ?mfrow:R.sexp ->
+  unit -> R.sexp

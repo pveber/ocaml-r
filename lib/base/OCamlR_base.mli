@@ -1,54 +1,34 @@
 (**  Runtime R base library. *)
 
-open OCamlR
-
-module S3 : sig
-  type t
-
-  val r : t -> t R.t
-  val _class_ : t -> string array
-  val unsafe_of_r : _ R.t -> t
-end
+open OCamlR.R
 
 module Environment : sig
-  type t
-  include module type of S3 with type t := t
+  include SXP
 
   val create : unit -> t
   (** wrapper for [new.env] *)
 end
 
-module type Atomic_vector = sig
-  type t
-  type format
-  type elt
-  val r : t -> format R.t
-  val length : t -> int
-  val to_array : t -> elt array
-  val of_array : elt array -> t
+module Numeric = Realsxp
+module Logical = Lglsxp
+module Integer = Intsxp
+module Character = Strsxp
+
+module Factor : sig
+  include SXP
 end
 
-module Numeric : Atomic_vector with type elt = float and type format = R.reals
-module Logical : Atomic_vector with type elt = bool and type format = R.logicals
-module Integer : Atomic_vector with type elt = int and type format = R.integers
-module Character : Atomic_vector with type elt = string and type format = R.strings
-module Factor : Atomic_vector with type elt = string and type format = R.strings
-
 module List_ : sig
-  type t
-  include module type of S3 with type t := t
-  val length : t -> int
-
-  module Unsafe : sig
-    val of_r : _ R.t -> t
-    val subset2 : t -> string -> _ R.t
-    val subset2_i : t -> int -> _ R.t
-  end
+  include SXP
+  val as_vecsxp : t -> vecsxp
+  val subset2 : t -> string -> 'a Dec.t -> 'a option
+  val subset2_i : t -> int -> 'a Dec.t -> 'a option
+  val subset2_exn : t -> string -> 'a Dec.t -> 'a
+  val subset2_i_exn : t -> int -> 'a Dec.t -> 'a
 end
 
 module Dataframe : sig
-  type t
-  include module type of List_ with type t := t
+  include module type of List_
 
   val of_env : Environment.t -> string -> t option
   val dim : t -> int * int
@@ -67,12 +47,6 @@ module Dataframe : sig
   val cbind : t -> t -> t
 end
 
-module Matrix : sig
-  type t
-  include module type of S3 with type t := t
-  val dim : t -> int * int
-  val of_arrays : float array array -> t
-end
 
 val sample :
   ?replace:bool ->
@@ -81,19 +55,16 @@ val sample :
   float array ->
   float array
 
-val readRDS : string -> _ R.t
+val readRDS : string -> sexp
+
 val saveRDS :
   ?ascii:bool ->
   ?compress:bool ->
   file:string ->
-  _ R.t -> unit
+  sexp -> unit
 
-(** {2 Low-level access}
-
-    Use with great care!
-*)
-
-val subset : _ R.t -> int -> 'b R.t
-val subset_ii : _ R.t -> int -> int -> 'b R.t
-val subset2_s : _ R.t -> string -> 'b R.t
-val subset2_i : _ R.t -> int -> 'b R.t
+module Matrix : sig
+  include module type of Numeric
+  val dim : t -> int * int
+  val of_arrays : float array array -> t
+end

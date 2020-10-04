@@ -1,34 +1,32 @@
-open OCamlR
+open OCamlR.R
 
-val length : _ R.t -> R.integer R.t
+val length : sexp -> sexp
 
-val subset : _ R.t -> R.integer R.t -> 'a R.t
+val subset : sexp -> sexp -> sexp
 val subset_ii :
-  _ R.t ->
-  R.integer R.t ->
-  R.integer R.t ->
-  'b R.t
-val subset2_s : _ R.t -> R.string_ R.t -> 'a R.t
-val subset2_i : _ R.t -> R.integer R.t -> 'a R.t
-val dim : _ R.t -> R.integers R.t
+  sexp ->
+  sexp ->
+  sexp ->
+  sexp
+val subset2_s : sexp -> sexp -> sexp
+val subset2_i : sexp -> sexp -> sexp
+val dim : sexp -> sexp
 
 module Matrix : sig
-  val subset : _ R.t -> R.integer R.t -> _ R.t
-  val subset_ii : _ R.t -> R.integer R.t -> R.integer R.t -> 'a R.scalar R.t
-  val subset2 : _ R.t -> R.integer R.t -> 'a R.atomic_vector R.t
+  val subset : sexp -> sexp -> sexp
+  val subset_ii : sexp -> sexp -> sexp -> sexp
+  val subset2 : sexp -> sexp -> sexp
 end
 
-val rle :
-  (_ #R.atomic_vector as 'a) R.t ->
-  < lengths : R.integers R.t ; values : 'a R.t > R.t
+val rle : sexp -> sexp
 
 val sample :
-  (< length : R.integer R.t ; subset : 'b. R.integer R.t -> 'b R.t ; .. > as 'c) R.t ->
-  R.integer R.t ->
-  ?replace:R.logical R.t ->
-  ?prob:R.reals R.t ->
+  sexp ->
+  sexp ->
+  ?replace:sexp ->
+  ?prob:sexp ->
   unit ->
-  'c R.t
+  sexp
 
-val min : 'a #R.atomic_vector R.t -> 'a R.scalar R.t
-val max : 'a #R.atomic_vector R.t -> 'a R.scalar R.t
+val min : sexp -> sexp
+val max : sexp -> sexp
