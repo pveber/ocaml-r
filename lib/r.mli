@@ -96,8 +96,8 @@ type internallist = [ `Nil | `List | `Lang | `Dots]
 
 type 'a pairlist = [< `Nil | `List] as 'a
 
-type 'a vector = [< `Char | `Lgl | `Int  | `Real
-                 |  `Str  | `Raw | `Expr | `Vec] as 'a
+type vector = [ `Char | `Lgl | `Int  | `Real
+              | `Str  | `Raw | `Expr | `Vec]
 
 module type SXP = sig
   type t
@@ -121,6 +121,50 @@ module Dotsxp : sig
   include SXP with type t = dotsxp
   val create : unit -> t
 end
+
+(** {2 Vector types}
+
+    R is an array-oriented language. Therefore, simple values such as
+   a boolean, a string, a number, are in fact encapsulated, in R, in
+   an array of booleans, an array of strings, an array of numbers. For
+   a simple value, the array has only one element.  *)
+
+module type Vector = sig
+  type t
+  type repr
+  include SXP with type t := t
+  val length : t -> int
+  val of_array : repr array -> t
+  val of_list : repr list -> t
+  val to_array : t -> repr array
+  val to_list : t -> repr list
+end
+
+module type Atomic_vector = sig
+  include Vector
+  val of_array_opt : repr option array -> t
+  val to_array_opt : t -> repr option array
+end
+
+(** R array of integer values *)
+module Intsxp : Atomic_vector with type t = intsxp
+                               and type repr := int
+
+(** R array of boolean values *)
+module Lglsxp : Atomic_vector with type t = lglsxp
+                               and type repr := bool
+
+(** R array of float values *)
+module Realsxp : Atomic_vector with type t = realsxp
+                                and type repr := float
+
+(** R array of string values *)
+module Strsxp : Atomic_vector with type t = strsxp
+                               and type repr := string
+
+(** R list *)
+module Vecsxp : Vector with type t = vecsxp
+                        and type repr := Sexp.t
 
 type +'a t = private sexp
 (** Phantom-typed representation of R values. ['a] provides an
@@ -560,7 +604,7 @@ module Low_level : sig
   external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
 
   external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
-  external length_of_vector   : 'a vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
+  external length_of_vector   : [< vector] sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
   external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
   external inspect_symsxp_pname    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_pname"

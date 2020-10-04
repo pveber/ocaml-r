@@ -106,8 +106,9 @@ type 'a at_most_internallist = [< internallist] as 'a
 
 type 'a pairlist = [< `Nil | `List] as 'a
 
-type 'a vector = [< `Char | `Lgl | `Int  | `Real
-                 |  `Str  | `Raw | `Expr | `Vec] as 'a
+type vector = [ `Char | `Lgl | `Int  | `Real
+              | `Str  | `Raw | `Expr | `Vec]
+type 'a at_most_vector = [< vector] as 'a
 
 external upcast : sexp -> 'a sxp = "%identity"
 
@@ -156,7 +157,7 @@ module Low_level = struct
      in details the contents of SEXPs and VECSEXPs. *)
 
   external inspect_attributes : sexp -> sexp = "ocamlr_inspect_attributes"
-  external length_of_vector   : 'a vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
+  external length_of_vector   : 'a at_most_vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
   external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
   external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
@@ -176,11 +177,14 @@ module Low_level = struct
   external inspect_promsxp_env     : promsxp        -> sexp          = "ocamlr_inspect_promsxp_env"
 
   external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
+  external access_lglsxp_opt : lglsxp  -> int -> bool option = "ocamlr_access_lglsxp_opt"
   external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
   external access_intsxp_opt  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
   external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
   external access_realsxp_opt : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
   external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
+  external access_strsxp_opt  : strsxp  -> int -> string option = "ocamlr_access_strsxp_opt"
+  external access_vecsxp  : vecsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
   external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
   external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"
 
@@ -194,6 +198,7 @@ module Low_level = struct
   external alloc_intsxp      : int -> intsxp               = "ocamlr_alloc_intsxp"
   external alloc_real_vector : int -> realsxp              = "ocamlr_alloc_realsxp"
   external alloc_str_vector  : int -> strsxp               = "ocamlr_alloc_strsxp"
+  external alloc_vecsxp      : int -> vecsxp               = "ocamlr_alloc_vecsxp"
 
   (* === WRITE_INTERNAL ===== *)
 
@@ -213,7 +218,8 @@ module Low_level = struct
     *  and sets the vector's offset element to the boolean's value.
   *)
 
-  external assign_lglsxp  : lglsxp -> int -> bool -> unit = "ocamlr_assign_lglsxp"
+  external assign_lglsxp     : lglsxp -> int -> bool -> unit = "ocamlr_assign_lglsxp"
+  external assign_lglsxp_opt : lglsxp -> int -> bool option -> unit = "ocamlr_assign_lglsxp_opt"
 
 
   (**  Sets the element of a vector of integers.
@@ -268,6 +274,9 @@ module Low_level = struct
   *)
 
   external assign_strsxp  : strsxp -> int -> string -> unit = "ocamlr_assign_strsxp"
+  external assign_strsxp_opt : strsxp -> int -> string option -> unit = "ocamlr_assign_strsxp_opt"
+
+  external assign_vecsxp  : vecsxp -> int -> sexp -> unit = "ocamlr_assign_vecsxp"
 
   (* === SEXPREC ===== *)
 
@@ -563,23 +572,23 @@ let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
 
 external string_of_charsxp : charsxp -> string = "ocamlr_internal_string_of_charsxp"
 
-let list_of_vector (access : 'a vector sxp -> int -> 'b) (s : 'a vector sxp) =
+let list_of_vector (access : 'a at_most_vector sxp -> int -> 'b) (s : 'a at_most_vector sxp) =
   let lngth = length_of_vector s in
   let rec aux n accu = match n with | 0 -> accu | _ ->
     let x = access s (n - 1) in aux (n - 1) (x :: accu)
   in aux lngth []
 
-let vector_of_list (alloc : int -> 'a vector sxp) (assign : 'a vector sxp -> int -> 'b -> unit) (l: 'b list) =
+let vector_of_list (alloc : int -> 'a at_most_vector sxp) (assign : 'a at_most_vector sxp -> int -> 'b -> unit) (l: 'b list) =
   let s = alloc (List.length l) in
   let rec aux offset = function | [] -> () | hd::tl ->
     let () = assign s offset hd in aux (1 + offset) tl
   in aux 0 l; s
 
-let array_of_vector (access : 'a vector sxp -> int -> 'b) (s : 'a vector sxp) =
+let array_of_vector (access : 'a at_most_vector sxp -> int -> 'b) (s : 'a at_most_vector sxp) =
   let lngth = length_of_vector s in
   Array.init lngth (access s)
 
-let vector_of_array (alloc : int -> 'a vector sxp) (assign : 'a vector sxp -> int -> 'b -> unit) (t : 'b array) =
+let vector_of_array (alloc : int -> 'a at_most_vector sxp) (assign : 'a at_most_vector sxp -> int -> 'b -> unit) (t : 'b array) =
   let s = alloc (Array.length t) in
   Array.iteri (assign s) t ;
   s
@@ -1052,6 +1061,115 @@ end
 module Dotsxp = struct
   include Sxp.Impl(struct type t = [`Dot] end)(Sexp)
   let create = dots_symbol_creator
+end
+
+module type Vector = sig
+  type t
+  type repr
+  include SXP with type t := t
+  val length : t -> int
+  val of_array : repr array -> t
+  val of_list : repr list -> t
+  val to_array : t -> repr array
+  val to_list : t -> repr list
+end
+
+module type Atomic_vector = sig
+  include Vector
+  val of_array_opt : repr option array -> t
+  val to_array_opt : t -> repr option array
+end
+
+module type Vector_ops = sig
+  type t = private [< vector]
+  type repr
+  val access : t sxp -> int -> repr
+  val alloc : int -> t sxp
+  val assign : t sxp -> int -> repr -> unit
+end
+
+module type Atomic_vector_ops = sig
+  include Vector_ops
+  val access_opt : t sxp -> int -> repr option
+  val assign_opt : t sxp -> int -> repr option -> unit
+end
+
+module Vector_impl(K : Vector_ops) = struct
+  include Sxp.Impl(struct type t = K.t end)(Sexp)
+  let length (x : t) = length_of_vector x
+  let to_list = list_of_vector K.access
+  let of_list = vector_of_list K.alloc K.assign
+  let to_array = array_of_vector K.access
+  let of_array = vector_of_array K.alloc K.assign
+end
+
+module Atomic_vector_impl(K : Atomic_vector_ops) = struct
+  include Vector_impl(K)
+  let to_array_opt = array_of_vector K.access_opt
+  let of_array_opt = vector_of_array K.alloc K.assign_opt
+end
+
+module Intsxp = struct
+  module Elt = struct
+    type t = [`Int]
+    type repr = int
+    let access = access_intsxp
+    let access_opt = access_intsxp_opt
+    let alloc = alloc_intsxp
+    let assign = assign_intsxp
+    let assign_opt = assign_intsxp_opt
+  end
+  include Atomic_vector_impl(Elt)
+end
+
+module Realsxp = struct
+  module Elt = struct
+    type t = [`Real]
+    type repr = float
+    let access = access_realsxp
+    let access_opt = access_realsxp_opt
+    let alloc = alloc_real_vector
+    let assign = assign_realsxp
+    let assign_opt = assign_realsxp_opt
+  end
+  include Atomic_vector_impl(Elt)
+end
+
+module Lglsxp = struct
+  module Elt = struct
+    type t = [`Lgl]
+    type repr = bool
+    let access = access_lglsxp
+    let access_opt = access_lglsxp_opt
+    let alloc = alloc_lglsxp
+    let assign = assign_lglsxp
+    let assign_opt = assign_lglsxp_opt
+  end
+  include Atomic_vector_impl(Elt)
+end
+
+module Strsxp = struct
+  module Elt = struct
+    type t = [`Str]
+    type repr = string
+    let access = access_strsxp
+    let access_opt = access_strsxp_opt
+    let alloc = alloc_str_vector
+    let assign = assign_strsxp
+    let assign_opt = assign_strsxp_opt
+  end
+  include Atomic_vector_impl(Elt)
+end
+
+module Vecsxp = struct
+  module Elt = struct
+    type t = [`Vec]
+    type repr = sexp
+    let access = access_vecsxp
+    let alloc = alloc_vecsxp
+    let assign = assign_vecsxp
+  end
+  include Vector_impl(Elt)
 end
 
 (* === INITIALISATION ===== *)

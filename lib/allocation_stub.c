@@ -102,3 +102,12 @@ CAMLprim value ocamlr_alloc_realsxp (value i) {
 CAMLprim value ocamlr_alloc_strsxp (value i) {
   return(Val_sexp(allocVector(STRSXP, Int_val(i))));
 }
+
+/**  Allocates a vector of SEXPs (R list).
+  *
+  *  @param i Size of the vector to allocate.
+  *  @return A newly allocated vector SEXPs.
+  */
+CAMLprim value ocamlr_alloc_vecsxp (value i) {
+  return(Val_sexp(allocVector(VECSXP, Int_val(i))));
+}

@@ -76,6 +76,11 @@ CAMLprim value ocamlr_assign_lglsxp (value lglsxp, value offset, value b) {
   return Val_unit;
 }
 
+CAMLprim value ocamlr_assign_lglsxp_opt (value lglsxp, value offset, value b) {
+  int rl = (b == Val_int(0)) ? NA_LOGICAL : Bool_val(Field(b,0)) ;
+  LOGICAL(Sexp_val(lglsxp))[Int_val(offset)] = rl;
+  return Val_unit;
+}
 
 /**  Sets the element of a vector of integers.
   *
@@ -147,5 +152,16 @@ CAMLprim value ocamlr_assign_realsxp_opt (value realsxp, value offset, value x) 
 
 CAMLprim value ocamlr_assign_strsxp (value strsxp, value offset, value s) {
   STRING_PTR(Sexp_val(strsxp))[Int_val(offset)] = mkChar(String_val(s));
+  return Val_unit;
+}
+
+CAMLprim value ocamlr_assign_strsxp_opt(value strsxp, value offset, value s) {
+  SEXP rs = (s == Val_int(0)) ? NA_STRING : mkChar(String_val(Field(s, 0)));
+  SET_STRING_ELT(Sexp_val(strsxp), Int_val(offset), rs);
+  return Val_unit;
+}
+
+CAMLprim value ocamlr_assign_vecsxp (value vecsxp, value offset, value sexp) {
+  SET_VECTOR_ELT(Sexp_val(vecsxp), Int_val(offset), Sexp_val(sexp));
   return Val_unit;
 }

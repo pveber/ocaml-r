@@ -278,6 +278,16 @@ CAMLprim value ocamlr_access_lglsxp (value lglsxp, value offset) {
   return(Val_bool(LOGICAL(Sexp_val(lglsxp))[Int_val(offset)]));
 }
 
+CAMLprim value ocamlr_access_lglsxp_opt(value lglsxp, value offset) {
+  int i = LOGICAL(Sexp_val(lglsxp))[Int_val(offset)];
+  if(i == NA_LOGICAL) return Val_int(0);
+  else {
+    value some_i = caml_alloc(1, 0);
+    Store_field(some_i, 0, Val_bool(i)) ;
+    return(some_i);
+  }
+}
+
 
 /**  Returns an element of a vector of integers.
   *
@@ -349,6 +359,16 @@ CAMLprim value ocamlr_access_strsxp (value strsxp, value offset) {
      r_internal_string_of_charsxp. */
 
   return(caml_copy_string(CHAR(STRING_ELT(Sexp_val(strsxp), (Int_val(offset))))));
+}
+
+CAMLprim value ocamlr_access_strsxp_opt (value strsxp, value offset) {
+  SEXP s = STRING_ELT(Sexp_val(strsxp), Int_val(offset));
+  if(s == NA_STRING) return Val_int(0);
+  else {
+    value some_s = caml_alloc(1,0);
+    Store_field(some_s, 0, caml_copy_string(CHAR(s)));
+    return(some_s);
+  }
 }
 
 /**  Returns an element of a vector of SEXPs.
