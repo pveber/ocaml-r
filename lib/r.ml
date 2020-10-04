@@ -407,9 +407,6 @@ class type ['a] s3 = object
   method classes : string list
 end
 
-
-
-
 (* Algebraic type reflecting R's dynamic typing. *)
 type sexptype =
   | NilSxp
@@ -452,7 +449,7 @@ let sexptype s = match (sexptype_of_sexp s) with
   | 8  -> BuiltinSxp
   | 9  -> CharSxp
   | 10 -> LglSxp
-    (* Integer range is not defined here. *)
+  (* Integer range is not defined here. *)
   | 13 -> IntSxp
   | 14 -> RealSxp
   | 15 -> CplxSxp
@@ -471,32 +468,63 @@ let sexptype s = match (sexptype_of_sexp s) with
   | 99 -> FunSxp
   | _ -> failwith "R value with type not specified in Rinternals.h"
 
-let string_of_sexptype = function
-  | NilSxp     -> "NilSxp"
-  | SymSxp     -> "SymSxp"
-  | ListSxp    -> "ListSxp"
-  | CloSxp     -> "CloSxp"
-  | EnvSxp     -> "EnvSxp"
-  | PromSxp    -> "PromSxp"
-  | LangSxp    -> "LangSxp"
-  | SpecialSxp -> "SpecialSxp"
-  | BuiltinSxp -> "BuiltinSxp"
-  | CharSxp    -> "CharSxp"
-  | LglSxp     -> "LglSxp"
-  | IntSxp     -> "IntSxp"
-  | RealSxp    -> "RealSxp"
-  | CplxSxp    -> "CplxSxp"
-  | StrSxp     -> "StrSxp"
-  | DotSxp     -> "DotSxp"
-  | AnySxp     -> "AnySxp"
-  | VecSxp     -> "VecSxp"
-  | ExprSxp    -> "ExprSxp"
-  | BcodeSxp   -> "BcodeSxp"
-  | ExtptrSxp  -> "ExtptrSxp"
-  | WeakrefSxp -> "WeakrefSxp"
-  | RawSxp     -> "RawSxp"
-  | S4Sxp      -> "S4Sxp"
-  | FunSxp     -> "FunSxp"
+module Sexptype = struct
+  type t = sexptype =
+    | NilSxp
+    | SymSxp
+    | ListSxp
+    | CloSxp
+    | EnvSxp
+    | PromSxp
+    | LangSxp
+    | SpecialSxp
+    | BuiltinSxp
+    | CharSxp
+    | LglSxp
+    | IntSxp
+    | RealSxp
+    | CplxSxp
+    | StrSxp
+    | DotSxp
+    | AnySxp
+    | VecSxp
+    | ExprSxp
+    | BcodeSxp
+    | ExtptrSxp
+    | WeakrefSxp
+    | RawSxp
+    | S4Sxp
+    | FunSxp
+
+  let of_sexp = sexptype
+
+  let to_string = function
+    | NilSxp     -> "NilSxp"
+    | SymSxp     -> "SymSxp"
+    | ListSxp    -> "ListSxp"
+    | CloSxp     -> "CloSxp"
+    | EnvSxp     -> "EnvSxp"
+    | PromSxp    -> "PromSxp"
+    | LangSxp    -> "LangSxp"
+    | SpecialSxp -> "SpecialSxp"
+    | BuiltinSxp -> "BuiltinSxp"
+    | CharSxp    -> "CharSxp"
+    | LglSxp     -> "LglSxp"
+    | IntSxp     -> "IntSxp"
+    | RealSxp    -> "RealSxp"
+    | CplxSxp    -> "CplxSxp"
+    | StrSxp     -> "StrSxp"
+    | DotSxp     -> "DotSxp"
+    | AnySxp     -> "AnySxp"
+    | VecSxp     -> "VecSxp"
+    | ExprSxp    -> "ExprSxp"
+    | BcodeSxp   -> "BcodeSxp"
+    | ExtptrSxp  -> "ExtptrSxp"
+    | WeakrefSxp -> "WeakrefSxp"
+    | RawSxp     -> "RawSxp"
+    | S4Sxp      -> "S4Sxp"
+    | FunSxp     -> "FunSxp"
+end
 
 let is_function x = match sexptype x with
   | CloSxp | SpecialSxp | BuiltinSxp | FunSxp -> true

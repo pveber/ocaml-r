@@ -166,6 +166,83 @@ module Strsxp : Atomic_vector with type t = strsxp
 module Vecsxp : Vector with type t = vecsxp
                         and type repr := Sexp.t
 
+
+(** {2 Value inspection} *)
+
+(**  Algebraic datatype reflecting R's dynamic typing. *)
+module Sexptype : sig
+  type t =
+    | NilSxp
+    | SymSxp
+    | ListSxp
+    | CloSxp
+    | EnvSxp
+    | PromSxp
+    | LangSxp
+    | SpecialSxp
+    | BuiltinSxp
+    | CharSxp
+    | LglSxp
+    | IntSxp
+    | RealSxp
+    | CplxSxp
+    | StrSxp
+    | DotSxp
+    | AnySxp
+    | VecSxp
+    | ExprSxp
+    | BcodeSxp
+    | ExtptrSxp
+    | WeakrefSxp
+    | RawSxp
+    | S4Sxp
+    | FunSxp
+
+  val of_sexp : sexp -> t
+  (**  Returns the R dynamic typing of a wrapped R value. *)
+
+  val to_string : t -> string
+end
+
+(**  Provides facilities to inspect internal structure of
+     SEXPs. Useful in the toplevel when you encounter
+     unexpected R values. *)
+module Pretty : sig
+
+  (**  Semantic interpretation and description of SEXPs. *)
+  type t =
+    | Recursive of t Lazy.t
+    | NULL
+    | SYMBOL of (string * t) option
+    | ARG of string
+    | PLACE
+    | LIST of pairlist
+    | CLOSURE of closure
+    | ENV of environment
+    | PROMISE of promise
+    | CALL of t * pairlist
+    | SPECIAL of int
+    | BUILTIN
+    | STRING of string
+    | STRINGS of string list
+    | INTS of int list
+    | VECSXP of t list
+    | BOOLS of bool list
+    | FLOATS of float list
+    | Unknown
+
+  and closure     = { formals: t; body: t; clos_env: t }
+  and environment = { frame: t }
+  and promise     = { value: t; expr: t; prom_env: t }
+
+  and pairlist = (t * t) list
+
+  (**  Analyses recursively the structure of a given SEXP. *)
+  val t_of_sexp : sexp -> t
+
+end
+
+
 type +'a t = private sexp
 (** Phantom-typed representation of R values. ['a] provides an
     information on the actual type of the underlying R value. *)
@@ -182,38 +259,6 @@ val realsxp_of_float_list : float list -> realsxp
 val strsxp_of_string_list : string list -> strsxp
 val realsxp_of_float_option_list : float option list -> realsxp
 
-(**  Algebraic datatype reflecting R's dynamic typing. *)
-type sexptype =
-  | NilSxp
-  | SymSxp
-  | ListSxp
-  | CloSxp
-  | EnvSxp
-  | PromSxp
-  | LangSxp
-  | SpecialSxp
-  | BuiltinSxp
-  | CharSxp
-  | LglSxp
-  | IntSxp
-  | RealSxp
-  | CplxSxp
-  | StrSxp
-  | DotSxp
-  | AnySxp
-  | VecSxp
-  | ExprSxp
-  | BcodeSxp
-  | ExtptrSxp
-  | WeakrefSxp
-  | RawSxp
-  | S4Sxp
-  | FunSxp
-
-val sexptype : sexp -> sexptype
-(**  Returns the R dynamic typing of a wrapped R value. *)
-
-val string_of_sexptype : sexptype -> string
 
 
 (** {2 High-level SEXP typing.} *)
@@ -404,43 +449,6 @@ val attributes : sexp -> (Specification.symbol * sexp) list
 
 val classes : sexp -> string list
 
-(**  Provides facilities to inspect internal structure of
-     SEXPs. Useful in the toplevel when you encounter
-     unexpected R values. *)
-module Pretty : sig
-
-  (**  Semantic interpretation and description of SEXPs. *)
-  type t =
-    | Recursive of t Lazy.t
-    | NULL
-    | SYMBOL of (string * t) option
-    | ARG of string
-    | PLACE
-    | LIST of pairlist
-    | CLOSURE of closure
-    | ENV of environment
-    | PROMISE of promise
-    | CALL of t * pairlist
-    | SPECIAL of int
-    | BUILTIN
-    | STRING of string
-    | STRINGS of string list
-    | INTS of int list
-    | VECSXP of t list
-    | BOOLS of bool list
-    | FLOATS of float list
-    | Unknown
-
-  and closure     = { formals: t; body: t; clos_env: t }
-  and environment = { frame: t }
-  and promise     = { value: t; expr: t; prom_env: t }
-
-  and pairlist = (t * t) list
-
-  (**  Analyses recursively the structure of a given SEXP. *)
-  val t_of_sexp : sexp -> t
-
-end
 
 
 (** {2 Parsing R code.} *)
