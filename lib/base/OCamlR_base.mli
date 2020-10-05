@@ -16,6 +16,9 @@ module Character : Atomic_vector with type repr := string
 
 module Factor : sig
   include module type of Integer
+  val of_integer : Integer.t -> t
+  val of_character : Character.t -> t
+  val levels : t -> Character.t
 end
 
 module List_ : sig

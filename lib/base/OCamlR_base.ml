@@ -35,6 +35,22 @@ module Character = Strsxp
 
 module Factor = struct
   include Integer
+
+  let factor_fun = symbol "factor"
+  let of_integer xs =
+    call factor_fun [ arg Integer.to_sexp xs ]
+    |> unsafe_of_sexp
+  let of_character xs =
+    call factor_fun [ arg Character.to_sexp xs ]
+    |> unsafe_of_sexp
+
+  let of_array xs = of_integer (of_array xs)
+  let of_list xs = of_integer (of_list xs)
+  let of_array_opt xs = of_integer (of_array_opt xs)
+
+  let levels x =
+    attr x "levels"
+    |> Character.unsafe_of_sexp
 end
 
 module List_ = struct

@@ -1,4 +1,5 @@
-open OCamlR.R
+open OCamlR
+open OCamlR_base
 
 let test_back_and_from ty to_r from_r cases =
   let f i case =
@@ -21,6 +22,14 @@ let test_intsxp_opt () =
       [||] ;
       Array.init 1_000 (fun _ -> None) ;
     ]
+
+let test_factor () =
+  Alcotest.(check (list string)) "levels" ["a";"b";"c"] (
+      Character.of_list ["b";"a";"a";"a";"c"]
+      |> Factor.of_character
+      |> Factor.levels
+      |> Character.to_list
+  )
 
 let test_strsxp () =
   test_back_and_from Alcotest.(list string) Strsxp.of_list Strsxp.to_list [
@@ -62,5 +71,6 @@ let () =
       test_case "Strsxp with NAs" `Quick test_strsxp_opt ;
     ] ;
     "vecsxp", [ test_case "Vecsxp" `Quick test_vecsxp ] ;
+    "factor", [ test_case "Factor construction" `Quick test_factor ] ;
   ]
 
