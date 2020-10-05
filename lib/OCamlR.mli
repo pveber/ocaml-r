@@ -25,7 +25,9 @@
 (*             guillaume.yziquel@citycable.ch                                    *)
 (* ***************************************************************************** *)
 
-(** Binding for the R interpreter. It encapsulates the functionalities
+(** Bindings for the R interpreter.
+
+    It encapsulates the functionalities
     of the [libR.so] shared library provided by the R software. This
     enables us to {b embed the R interpreter} into Objective Caml, to
     execute R code from Objective Caml and to exchange data structures
