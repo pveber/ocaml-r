@@ -101,22 +101,19 @@ type 'a pairlist = [< `Nil | `List] as 'a
 type vector = [ `Char | `Lgl | `Int  | `Real
               | `Str  | `Raw | `Expr | `Vec]
 
-module Sexp : sig
+module type SXP = sig
   type t
-
   val equal : t -> t -> bool
   val is_function : t -> bool
   val attr : t -> string -> sexp
   val _class_ : t -> string list
   val nil_map : t -> f:(t -> 'a) -> 'a option
   val print : t -> unit
+  external unsafe_of_sexp : sexp -> t = "%identity"
+  external to_sexp : t -> sexp = "%identity"
 end
 
-module type SXP = sig
-  include module type of Sexp
-  external unsafe_of_sexp : Sexp.t -> t = "%identity"
-  external to_sexp : t -> Sexp.t = "%identity"
-end
+module Sexp : SXP with type t = sexp
 
 module Nilsxp : sig
   include SXP with type t = nilsxp
