@@ -1,19 +1,38 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>index</title>
-    <link rel="stylesheet" href="./odoc.css"/>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  </head>
-  <body>
-    <main class="content">
-      <div class="by-name">
-      <h2>OCaml package documentation</h2>
-      <ol>
-      <li><a href="ocaml-r/index.html">ocaml-r</a></li>
-      </ol>
-      </div>
-    </main>
-  </body>
-</html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>index (ocaml-r.index)</title><link rel="stylesheet" href="../odoc.css"/><meta charset="utf-8"/><meta name="generator" content="odoc 1.5.0-389-g3a8647840"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script></head><body><nav><a href="../index.html">Up</a> – ocaml-r</nav><header><h1 id="ocamlr:-use-the-r-environment-for-statistical-computing-and-graphics-from-ocaml."><a href="#ocamlr:-use-the-r-environment-for-statistical-computing-and-graphics-from-ocaml." class="anchor"></a>OCamlR: use the R environment for statistical computing and graphics from OCaml.</h1><p>This package offers an API to build bindings to the <a href="https://www.r-project.org">R environment for statistical computing and graphics</a>. It provides functions to initialize an R interpreter, encode OCaml values to R values, retrieve R-side values, call R functions and decode R values into OCaml values. OCaml's type system is used when possible to enforce invariants on R's operations to allow a safer use. Some (very partial) bindings to R's standard librairies are available.</p><p>Here are the main entry points of the library:</p><ul><li><a href="../ocaml-r/OCamlR/index.html"><code>OCamlR</code></a>, low-level interaction with R</li><li><a href="../ocaml-r/OCamlR_base/index.html"><code>OCamlR_base</code></a>, bindings for <code>base</code></li><li><a href="../ocaml-r/OCamlR_stats/index.html"><code>OCamlR_stats</code></a>, bindings for <code>stats</code></li><li><a href="../ocaml-r/OCamlR_grDevices/index.html"><code>OCamlR_grDevices</code></a>, bindings for <code>grDevices</code></li><li><a href="../ocaml-r/OCamlR_graphics/index.html"><code>OCamlR_graphics</code></a>, bindings for <code>graphics</code></li><li><a href="../ocaml-r/OCamlR_math/index.html"><code>OCamlR_math</code></a>, R special math functions</li></ul><p>The following sections illustrate a few uses of the package.</p></header><nav class="toc"><ul><li><a href="#bindings-to-standard-r-libraries">Bindings to standard R libraries</a></li><li><a href="#using-the-rmath-library">Using the Rmath library</a></li><li><a href="#defining-new-bindings">Defining new bindings</a></li></ul></nav><div class="content"><h2 id="bindings-to-standard-r-libraries"><a href="#bindings-to-standard-r-libraries" class="anchor"></a>Bindings to standard R libraries</h2><p><code>ocaml-r</code> provides partial bindings for R libraries <code>base</code> (<a href="../ocaml-r/OCamlR_base/index.html"><code>OCamlR_base</code></a>), <code>stats</code> (<a href="../ocaml-r/OCamlR_stats/index.html"><code>OCamlR_stats</code></a>), <code>grDevices</code> (<a href="../ocaml-r/OCamlR_grDevices/index.html"><code>OCamlR_grDevices</code></a>), <code>graphics</code> (<a href="../ocaml-r/OCamlR_graphics/index.html"><code>OCamlR_graphics</code></a>), <code>utils</code> (<a href="../ocaml-r/OCamlR_utils/index.html"><code>OCamlR_utils</code></a>) and <code>methods</code> (<a href="../ocaml-r/OCamlR_methods/index.html"><code>OCamlR_methods</code></a>). The general design of these bindings is to offer one (OCaml) module for each R data type, where the type <code>t</code> is abstract. See for instance the signature for floating point arrays (aka <code>numeric</code> in R), <a href="../ocaml-r/OCamlR_base/Numeric/index.html"><code>OCamlR_base.Numeric</code></a>.</p><p>Thanks to abstraction, interacting with R is as simple as calling regular functions. Here is how to use the library to perform statistical tests:</p><pre><code># require &quot;ocaml-r.stats&quot;;;
+# open OCamlR_base;;
+# open OCamlR_stats;;
+# let sample = rnorm ~mean:1. ~sd:1. 10;;
+val sample : Numeric.t = &lt;abstr&gt;
+# let test = T'test.one_sample sample;;
+val test : T'test.t = &lt;abstr&gt;
+# T'test.p'value test;;
+- : float = 0.000223914842630059665
+# T'test.print test;;
+
+	One Sample t-test
+
+data:  c(2.07617445897347, 0.940542561435446, 2.05650431270334, 1.21388435907814, 0.143109357690333, 0.600620037187408, 1.65525155532367, 0.928790144562367, 1.66977862776445, 2.47640151281091)
+t = 5.9184, df = 9, p-value = 0.0002239
+alternative hypothesis: true mean is not equal to 0
+95 percent confidence interval:
+ 0.8501232 1.9020882
+sample estimates:
+mean of x
+ 1.376106
+
+- : unit = ()</code></pre><p>This example illustrates the simplest use of the package, that is calling R functions through already available bindings. A few more details are given in the next section.</p><p>Naming convention is to try to be as close as possible to the original names, when possible. Names that correspond to OCaml keywords are surrounded by underscores like in <code>_method_</code> or <code>_class_</code>. Dots are replaced by ticks, like in <code>p'value</code>.</p><p>When a datatype is a specialization of another one, like <code>data.frame</code> is a special case of <code>list</code>, the signature of the OCaml module of the former includes the signature of the latter.</p><p>Here are links to the most frequent R datatypes bindings:</p><ul><li><code>numeric</code> -&gt; <a href="../ocaml-r/OCamlR_base/Numeric/index.html"><code>OCamlR_base.Numeric</code></a></li><li><code>list</code> -&gt; <a href="../ocaml-r/OCamlR_base/List_/index.html"><code>OCamlR_base.List_</code></a></li><li><code>data.frame</code> -&gt; <a href="../ocaml-r/OCamlR_base/Dataframe/index.html"><code>OCamlR_base.Dataframe</code></a></li><li><code>factor</code> -&gt; <a href="../ocaml-r/OCamlR_base/Factor/index.html"><code>OCamlR_base.Factor</code></a></li></ul><h2 id="using-the-rmath-library"><a href="#using-the-rmath-library" class="anchor"></a>Using the Rmath library</h2><p><code>ocaml-r</code> also provides bindings to the <code>Rmath</code> library.</p><pre><code># #require &quot;ocaml-r.math&quot;;;
+# OCamlR_math.dchisq ~df:3. ~log:true 1.;;
+- : float = -1.41893853320467267</code></pre><h2 id="defining-new-bindings"><a href="#defining-new-bindings" class="anchor"></a>Defining new bindings</h2><pre><code>open OCamlR
+open OCamlR_base
+
+let sample_fun = symbol &quot;sample&quot;
+
+let sample ?replace ?prob ~size x =
+  call sample_fun [
+    arg Numeric.to_sexp x ;
+    arg Enc.int size ;
+    opt_arg Enc.bool &quot;replace&quot; replace ;
+    opt_arg Numeric.to_sexp &quot;prob&quot; prob ;
+  ]
+  |&gt; Numeric.unsafe_of_sexp</code></pre></div></body></html>
