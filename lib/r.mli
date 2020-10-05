@@ -133,6 +133,14 @@ module Langsxp : sig
   include SXP with type t = langsxp
 end
 
+module Symsxp : sig
+  include SXP with type t = symsxp
+
+  (** Semantic description of [SYMSXP] structures. *)
+  type description = (string * (sexp option)) option option
+  val description : t -> description
+end
+
 (** {3 Vector types}
 
     R is an array-oriented language. Therefore, simple values such as
@@ -250,11 +258,6 @@ module Pretty : sig
   (**  Analyses recursively the structure of a given SEXP. *)
   val t_of_sexp : Sexp.t -> t
 
-end
-
-module Specification : sig
-  (** Semantic description of [SYMSXP] structures. *)
-  type symbol = (string * (sexp option)) option option
 end
 
 (** {2 Parsing R code.} *)
@@ -491,5 +494,5 @@ module Low_level : sig
   val classes : sexp -> string list
 end
 
-val attributes : sexp -> (Specification.symbol * sexp) list
+val attributes : sexp -> (Symsxp.description * sexp) list
 val pairlist_of_list : (sexp * sexp) list -> [> internallist] sxp

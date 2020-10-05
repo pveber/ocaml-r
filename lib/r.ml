@@ -576,39 +576,6 @@ let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
 
 let is_nil x = sexptype (x :> sexp) = NilSxp
 
-module Specification = struct
-
-  type symbol = (string * (sexp option)) option option
-
-  let of_symbol (s : symsxp) =
-    let pname    = inspect_symsxp_pname    s
-    and value    = inspect_symsxp_value    s
-    and internal = inspect_symsxp_internal s in
-    match sexptype pname, sexptype value, sexptype internal with
-    | (NilSxp,  _, NilSxp) when sexp_equality (s : symsxp :> sexp) value -> None
-    | (CharSxp, SymSxp, NilSxp) -> (
-        match (sexp_equality (s : symsxp :> sexp) value) &&
-              ("" = string_of_charsxp (upcast pname : charsxp)) with
-        | true -> Some None
-        | false -> (
-            match (sexp_equality value (inspect_symsxp_value (upcast value : symsxp)))  &&
-                  (NilSxp = sexptype (inspect_symsxp_pname (upcast value : symsxp)))    &&
-                  (NilSxp = sexptype (inspect_symsxp_internal (upcast value : symsxp))) with
-            | true -> Some (Some ((string_of_charsxp (upcast pname : charsxp)), None))
-            | false -> assert false
-          )
-      )
-    | (CharSxp, _, (NilSxp | BuiltinSxp)) ->
-      let symbol_name = string_of_charsxp (upcast pname : charsxp) in
-      Some (Some (symbol_name, (Some value)))
-    | _ -> assert false
-
-end
-
-let attributes sexp =
-  let f (a, x) = (Specification.of_symbol a), x in
-  List.map f (list_of_pairlist (upcast sexp))
-
 module type Types = sig
 
   type t
@@ -616,260 +583,6 @@ module type Types = sig
   val build : (sexp -> t) -> sexp -> t
 
 end
-
-module Parsing (M : Types) = struct
-
-  (* General parsing function for internal R structures, i.e. SEXPs. *)
-
-  let t_of_sexp (s : sexp) =
-    let rec aux sexps_seen s =
-      let is_found (ss, _) = sexp_equality s ss in
-      begin match (try Some (List.find is_found sexps_seen) with _ -> None) with
-      | None -> let rec x = lazy (M.build (aux ((s, x)::sexps_seen)) s) in Lazy.force x
-      | Some (_, t_lazy) -> M.recursive t_lazy
-      end
-    in aux [] s
-
-end
-
-module CTypes = struct
-
-  (* Type definitions. *)
-
-  type t = | Recursive of t Lazy.t | Val of t_val
-
-  and t_val = {
-    (* sxpinfo : sxpinfo;   *)
-    (* attrib  : t;         *)
-    (* gengc_nextnode : t;  *)
-    (* gengc_prevnode : t;  *)
-    content : t_content
-  }
-
-  (* and sxpinfo = {
-    type  : sexptype;
-    obj   : int;
-    named : int;
-    gp    : int;
-    mark  : int;
-    debug : int;
-    trace : int;
-    spare : int;
-    gcgen : int;
-    gccls : int;
-  }*)
-
-  and t_content =
-    | NILSXP
-    | SYMSXP of sxp_sym
-    | LISTSXP of sxp_list
-    | CLOSXP of sxp_clos
-    | ENVSXP of sxp_env
-    | PROMSXP of sxp_prom
-    | LANGSXP of sxp_list
-    | SPECIALSXP
-    | BUILTINSXP of int
-    | CHARSXP of string
-    | LGLSXP of bool list
-    | INTSXP of int list
-    | REALSXP of float list
-    | CPLXSXP
-    | STRSXP of string list
-    | DOTSXP
-    | ANYSXP
-    | VECSXP of t list
-    | EXPRSXP
-    | BCODESXP
-    | EXTPTRSXP
-    | WEAKREFSXP
-    | RAWSXP
-    | S4SXP
-    | FUNSXP
-
-  and sxp_sym  = { pname: t; sym_value: t; internal: t }
-  and sxp_list = { carval: t; cdrval: t; tagval: t }
-  and sxp_env  = { frame: t; (*enclos: t; hashtab: t*) }
-  and sxp_clos = { formals: t; body: t; clos_env: t }
-  and sxp_prom = { prom_value: t; expr: t; prom_env: t }
-
-  let recursive x = Recursive (lazy (Lazy.force x))
-
-  let build rec_build s =
-    match sexptype s with
-    | NilSxp     -> Val { content = NILSXP }
-    | SymSxp     -> Val { content = SYMSXP {
-        pname      = rec_build (inspect_symsxp_pname    (upcast s : symsxp));
-        sym_value  = rec_build (inspect_symsxp_value    (upcast s : symsxp));
-        internal   = rec_build (inspect_symsxp_internal (upcast s : symsxp))}}
-    | ListSxp    ->
-      let s = (upcast s : listsxp) in
-      Val { content = LISTSXP {
-        carval     = rec_build (inspect_listsxp_carval  s);
-        cdrval     = rec_build ((inspect_listsxp_cdrval s) : internallist sxp :> sexp) ;
-        tagval     = rec_build (inspect_listsxp_tagval  s)}}
-    | CloSxp     -> Val { content = CLOSXP {
-        formals    = rec_build (inspect_closxp_formals  (upcast s : closxp));
-        body       = rec_build (inspect_closxp_body     (upcast s : closxp));
-        clos_env   = rec_build (inspect_closxp_env      (upcast s : closxp))}}
-    | EnvSxp     -> Val { content = ENVSXP {
-        frame      = rec_build (inspect_envsxp_frame    (upcast s : envsxp));
-     (* enclos     = rec_build (inspect_envsxp_enclos   s); *)
-     (* hashtab    = rec_build (inspect_envsxp_hashtab  s) *) }}
-    | PromSxp    -> Val { content = PROMSXP {
-        prom_value = rec_build (inspect_promsxp_value  (upcast s : promsxp));
-        expr       = rec_build (inspect_promsxp_expr   (upcast s : promsxp));
-        prom_env   = rec_build (inspect_promsxp_env    (upcast s : promsxp))}}
-    | LangSxp    ->
-      let s = (upcast s : langsxp) in
-      Val { content = LANGSXP {
-        carval     = rec_build (inspect_listsxp_carval s);
-        cdrval     = rec_build (inspect_listsxp_cdrval s : internallist sxp :> sexp);
-        tagval     = rec_build (inspect_listsxp_tagval s)}}
-    | SpecialSxp -> Val { content = SPECIALSXP }
-    | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset (upcast s : builtinsxp))}
-    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (upcast s : charsxp)) }
-    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lglsxp (upcast s : lglsxp))}
-    | IntSxp     -> Val { content = INTSXP (int_list_of_intsxp (upcast s : intsxp))}
-    | RealSxp    -> Val { content = REALSXP (float_list_of_realsxp (upcast s : realsxp))}
-    | CplxSxp    -> Val { content = CPLXSXP }
-    | StrSxp     -> Val { content = STRSXP (string_list_of_strsxp (upcast s: strsxp))}
-    | DotSxp     -> Val { content = DOTSXP }
-    | AnySxp     -> Val { content = ANYSXP }
-    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_rawsxp (upcast s : rawsxp)))}
-    | ExprSxp    -> Val { content = EXPRSXP }
-    | BcodeSxp   -> Val { content = BCODESXP }
-    | ExtptrSxp  -> Val { content = EXTPTRSXP }
-    | WeakrefSxp -> Val { content = WEAKREFSXP }
-    | RawSxp     -> Val { content = RAWSXP }
-    | S4Sxp      -> Val { content = S4SXP }
-    | FunSxp     -> Val { content = FUNSXP }
-
-end
-
-module PrettyTypes = struct
-
-  type t =
-    | Recursive of t Lazy.t
-    | NULL
-    | SYMBOL of (string * t) option
-    | ARG of string
-    | PLACE
-    | LIST of pairlist
-    | CLOSURE of closure
-    | ENV of environment
-    | PROMISE of promise
-    | CALL of t * pairlist
-    | SPECIAL of int
-    | BUILTIN
-    | STRING of string
-    | STRINGS of string list
-    | INTS of int list
-    | VECSXP of t list
-    | BOOLS of bool list
-    | FLOATS of float list
-    | Unknown
-
-  and closure     = { formals: t; body: t; clos_env: t }
-  and environment = { frame: t; (* enclos: t; hashtab: t *) }
-  and promise     = { value: t; expr: t; prom_env: t }
-
-  and pairlist = (t * t) list (* For strict list parsing, t list. *)
-
-  let recursive x = Recursive (lazy (Lazy.force x))
-
-  exception Esoteric of sexp
-
-  let symbol_of_symsxp builder (s : symsxp) =
-    match Specification.of_symbol s with
-    | exception Assert_failure _ -> raise (Esoteric (s : symsxp :> sexp))
-    | None -> SYMBOL None
-    | Some None -> PLACE
-    | Some (Some (symbol_name, None)) -> ARG symbol_name
-    | Some (Some (symbol_name, Some v)) -> SYMBOL (Some (symbol_name, (builder v)))
-
-  let list_of_listsxp builder (s : 'a nonempty_list sxp) =
-    let carval = inspect_listsxp_carval s
-    and cdrval = inspect_listsxp_cdrval s
-    and tagval = inspect_listsxp_tagval s in
-    (* Strict parsing of the LIST:
-    LIST begin match sexptype tagval with
-    | NilSxp ->  (builder carval) :: begin
-                 match builder cdrval with
-                 | LIST l -> l | NULL -> []
-                 | _ -> raise (Esoteric s) end
-    | _ -> raise Esoteric end *)
-    (* Lax parsing of the LIST: *)
-    LIST begin ((builder tagval), (builder carval))::
-      begin match builder (cdrval : _ sxp :> sexp) with
-      | LIST l -> l | NULL -> []
-      | _ -> raise (Esoteric (s : _ sxp :> sexp)) end
-    end
-
-  let rec build rec_build =
-    let phi = fun f -> f (build rec_build) in
-    function s -> match sexptype s with
-    | NilSxp     -> NULL
-    | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
-                    | Esoteric _ -> Unknown end
-    | ListSxp    -> begin try phi list_of_listsxp (upcast s : 'a nonempty_list sxp) with
-                    | Esoteric _ -> Unknown end
-    | CloSxp     -> CLOSURE {
-        formals  = rec_build (inspect_closxp_formals (upcast s : closxp));
-        body     = rec_build (inspect_closxp_body    (upcast s : closxp));
-        clos_env = rec_build (inspect_closxp_env     (upcast s : closxp))}
-    | EnvSxp     -> ENV {
-        frame    = rec_build (inspect_envsxp_frame   (upcast s : envsxp));
-     (* enclos  = rec_build (inspect_envsxp_enclos  s); *) (* We do not care for now. *)
-     (* hashtab = rec_build (inspect_envsxp_hashtab s)  *) }
-    | PromSxp    -> PROMISE {
-        value    = rec_build (inspect_promsxp_value  (upcast s : promsxp));
-        expr     = rec_build (inspect_promsxp_expr   (upcast s : promsxp));
-        prom_env = rec_build (inspect_promsxp_env    (upcast s : promsxp))}
-    | LangSxp    ->
-        let carval = inspect_listsxp_carval (upcast s : langsxp)
-        and cdrval = inspect_listsxp_cdrval (upcast s : langsxp)
-        and tagval = inspect_listsxp_tagval (upcast s : langsxp) in
-        begin match build rec_build (cdrval : _ sxp :> sexp) with
-        | LIST l -> begin match sexptype tagval with
-                    | NilSxp -> CALL ((build rec_build carval), l)
-                    | _ -> Unknown end
-        | _ -> Unknown end
-    | SpecialSxp -> SPECIAL (inspect_primsxp_offset (upcast s : specialsxp))
-    | BuiltinSxp -> BUILTIN
-    | CharSxp    -> STRING  (string_of_charsxp (upcast s : charsxp))
-    | LglSxp     -> BOOLS   (bool_list_of_lglsxp (upcast s : lglsxp))
-    | IntSxp     -> INTS    (int_list_of_intsxp (upcast s : intsxp))
-    | RealSxp    -> FLOATS  (float_list_of_realsxp (upcast s : realsxp))
-    | CplxSxp    -> Unknown
-    | StrSxp     -> STRINGS (string_list_of_strsxp (upcast s : strsxp))
-    | DotSxp     -> Unknown
-    | AnySxp     -> Unknown
-    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_rawsxp (upcast s : rawsxp)))
-    | ExprSxp    -> Unknown
-    | BcodeSxp   -> Unknown
-    | ExtptrSxp  -> Unknown
-    | WeakrefSxp -> Unknown
-    | RawSxp     -> Unknown
-    | S4Sxp      -> Unknown
-    | FunSxp     -> Unknown
-
-end
-
-module CParsed = Parsing (CTypes)
-
-module PrettyParsed = Parsing (PrettyTypes)
-
-module C = struct
-  include CTypes
-  include CParsed
-end
-
-module Pretty = struct
-  include PrettyTypes
-  include PrettyParsed
-end
-
-
 
 (* class s3 r = object *)
 (*   val __underlying = (r : 'a t :> sexp) *)
@@ -956,6 +669,40 @@ end
 module Langsxp = struct
   include Sxp.Impl(struct type t = [`Lang] end)(Sexp)
 end
+
+module Symsxp = struct
+  include Sxp.Impl(struct type t = [`Sym] end)(Sexp)
+
+  type description = (string * (sexp option)) option option
+
+  let description (s : symsxp) =
+    let pname    = inspect_symsxp_pname    s
+    and value    = inspect_symsxp_value    s
+    and internal = inspect_symsxp_internal s in
+    match sexptype pname, sexptype value, sexptype internal with
+    | (NilSxp,  _, NilSxp) when sexp_equality (s : symsxp :> sexp) value -> None
+    | (CharSxp, SymSxp, NilSxp) -> (
+        match (sexp_equality (s : symsxp :> sexp) value) &&
+              ("" = string_of_charsxp (upcast pname : charsxp)) with
+        | true -> Some None
+        | false -> (
+            match (sexp_equality value (inspect_symsxp_value (upcast value : symsxp)))  &&
+                  (NilSxp = sexptype (inspect_symsxp_pname (upcast value : symsxp)))    &&
+                  (NilSxp = sexptype (inspect_symsxp_internal (upcast value : symsxp))) with
+            | true -> Some (Some ((string_of_charsxp (upcast pname : charsxp)), None))
+            | false -> assert false
+          )
+      )
+    | (CharSxp, _, (NilSxp | BuiltinSxp)) ->
+      let symbol_name = string_of_charsxp (upcast pname : charsxp) in
+      Some (Some (symbol_name, (Some value)))
+    | _ -> assert false
+
+end
+
+let attributes sexp =
+  let f (a, x) = (Symsxp.description a), x in
+  List.map f (list_of_pairlist (upcast sexp))
 
 module type Vector = sig
   type t
@@ -1144,6 +891,259 @@ module Eval = struct
   let call phi (args: (string option * sexp) option list) =
     eval_langsxp (langsxp phi (prepare_args args))
 end
+
+module Parsing (M : Types) = struct
+
+  (* General parsing function for internal R structures, i.e. SEXPs. *)
+
+  let t_of_sexp (s : sexp) =
+    let rec aux sexps_seen s =
+      let is_found (ss, _) = sexp_equality s ss in
+      begin match (try Some (List.find is_found sexps_seen) with _ -> None) with
+      | None -> let rec x = lazy (M.build (aux ((s, x)::sexps_seen)) s) in Lazy.force x
+      | Some (_, t_lazy) -> M.recursive t_lazy
+      end
+    in aux [] s
+
+end
+
+module CTypes = struct
+
+  (* Type definitions. *)
+
+  type t = | Recursive of t Lazy.t | Val of t_val
+
+  and t_val = {
+    (* sxpinfo : sxpinfo;   *)
+    (* attrib  : t;         *)
+    (* gengc_nextnode : t;  *)
+    (* gengc_prevnode : t;  *)
+    content : t_content
+  }
+
+  (* and sxpinfo = {
+    type  : sexptype;
+    obj   : int;
+    named : int;
+    gp    : int;
+    mark  : int;
+    debug : int;
+    trace : int;
+    spare : int;
+    gcgen : int;
+    gccls : int;
+  }*)
+
+  and t_content =
+    | NILSXP
+    | SYMSXP of sxp_sym
+    | LISTSXP of sxp_list
+    | CLOSXP of sxp_clos
+    | ENVSXP of sxp_env
+    | PROMSXP of sxp_prom
+    | LANGSXP of sxp_list
+    | SPECIALSXP
+    | BUILTINSXP of int
+    | CHARSXP of string
+    | LGLSXP of bool list
+    | INTSXP of int list
+    | REALSXP of float list
+    | CPLXSXP
+    | STRSXP of string list
+    | DOTSXP
+    | ANYSXP
+    | VECSXP of t list
+    | EXPRSXP
+    | BCODESXP
+    | EXTPTRSXP
+    | WEAKREFSXP
+    | RAWSXP
+    | S4SXP
+    | FUNSXP
+
+  and sxp_sym  = { pname: t; sym_value: t; internal: t }
+  and sxp_list = { carval: t; cdrval: t; tagval: t }
+  and sxp_env  = { frame: t; (*enclos: t; hashtab: t*) }
+  and sxp_clos = { formals: t; body: t; clos_env: t }
+  and sxp_prom = { prom_value: t; expr: t; prom_env: t }
+
+  let recursive x = Recursive (lazy (Lazy.force x))
+
+  let build rec_build s =
+    match sexptype s with
+    | NilSxp     -> Val { content = NILSXP }
+    | SymSxp     -> Val { content = SYMSXP {
+        pname      = rec_build (inspect_symsxp_pname    (upcast s : symsxp));
+        sym_value  = rec_build (inspect_symsxp_value    (upcast s : symsxp));
+        internal   = rec_build (inspect_symsxp_internal (upcast s : symsxp))}}
+    | ListSxp    ->
+      let s = (upcast s : listsxp) in
+      Val { content = LISTSXP {
+        carval     = rec_build (inspect_listsxp_carval  s);
+        cdrval     = rec_build ((inspect_listsxp_cdrval s) : internallist sxp :> sexp) ;
+        tagval     = rec_build (inspect_listsxp_tagval  s)}}
+    | CloSxp     -> Val { content = CLOSXP {
+        formals    = rec_build (inspect_closxp_formals  (upcast s : closxp));
+        body       = rec_build (inspect_closxp_body     (upcast s : closxp));
+        clos_env   = rec_build (inspect_closxp_env      (upcast s : closxp))}}
+    | EnvSxp     -> Val { content = ENVSXP {
+        frame      = rec_build (inspect_envsxp_frame    (upcast s : envsxp));
+     (* enclos     = rec_build (inspect_envsxp_enclos   s); *)
+     (* hashtab    = rec_build (inspect_envsxp_hashtab  s) *) }}
+    | PromSxp    -> Val { content = PROMSXP {
+        prom_value = rec_build (inspect_promsxp_value  (upcast s : promsxp));
+        expr       = rec_build (inspect_promsxp_expr   (upcast s : promsxp));
+        prom_env   = rec_build (inspect_promsxp_env    (upcast s : promsxp))}}
+    | LangSxp    ->
+      let s = (upcast s : langsxp) in
+      Val { content = LANGSXP {
+        carval     = rec_build (inspect_listsxp_carval s);
+        cdrval     = rec_build (inspect_listsxp_cdrval s : internallist sxp :> sexp);
+        tagval     = rec_build (inspect_listsxp_tagval s)}}
+    | SpecialSxp -> Val { content = SPECIALSXP }
+    | BuiltinSxp -> Val { content = BUILTINSXP (inspect_primsxp_offset (upcast s : builtinsxp))}
+    | CharSxp    -> Val { content = CHARSXP (string_of_charsxp (upcast s : charsxp)) }
+    | LglSxp     -> Val { content = LGLSXP (bool_list_of_lglsxp (upcast s : lglsxp))}
+    | IntSxp     -> Val { content = INTSXP (int_list_of_intsxp (upcast s : intsxp))}
+    | RealSxp    -> Val { content = REALSXP (float_list_of_realsxp (upcast s : realsxp))}
+    | CplxSxp    -> Val { content = CPLXSXP }
+    | StrSxp     -> Val { content = STRSXP (string_list_of_strsxp (upcast s: strsxp))}
+    | DotSxp     -> Val { content = DOTSXP }
+    | AnySxp     -> Val { content = ANYSXP }
+    | VecSxp     -> Val { content = VECSXP (List.map rec_build (sexp_list_of_rawsxp (upcast s : rawsxp)))}
+    | ExprSxp    -> Val { content = EXPRSXP }
+    | BcodeSxp   -> Val { content = BCODESXP }
+    | ExtptrSxp  -> Val { content = EXTPTRSXP }
+    | WeakrefSxp -> Val { content = WEAKREFSXP }
+    | RawSxp     -> Val { content = RAWSXP }
+    | S4Sxp      -> Val { content = S4SXP }
+    | FunSxp     -> Val { content = FUNSXP }
+
+end
+
+module PrettyTypes = struct
+
+  type t =
+    | Recursive of t Lazy.t
+    | NULL
+    | SYMBOL of (string * t) option
+    | ARG of string
+    | PLACE
+    | LIST of pairlist
+    | CLOSURE of closure
+    | ENV of environment
+    | PROMISE of promise
+    | CALL of t * pairlist
+    | SPECIAL of int
+    | BUILTIN
+    | STRING of string
+    | STRINGS of string list
+    | INTS of int list
+    | VECSXP of t list
+    | BOOLS of bool list
+    | FLOATS of float list
+    | Unknown
+
+  and closure     = { formals: t; body: t; clos_env: t }
+  and environment = { frame: t; (* enclos: t; hashtab: t *) }
+  and promise     = { value: t; expr: t; prom_env: t }
+
+  and pairlist = (t * t) list (* For strict list parsing, t list. *)
+
+  let recursive x = Recursive (lazy (Lazy.force x))
+
+  exception Esoteric of sexp
+
+  let symbol_of_symsxp builder (s : symsxp) =
+    match Symsxp.description s with
+    | exception Assert_failure _ -> raise (Esoteric (s : symsxp :> sexp))
+    | None -> SYMBOL None
+    | Some None -> PLACE
+    | Some (Some (symbol_name, None)) -> ARG symbol_name
+    | Some (Some (symbol_name, Some v)) -> SYMBOL (Some (symbol_name, (builder v)))
+
+  let list_of_listsxp builder (s : 'a nonempty_list sxp) =
+    let carval = inspect_listsxp_carval s
+    and cdrval = inspect_listsxp_cdrval s
+    and tagval = inspect_listsxp_tagval s in
+    (* Strict parsing of the LIST:
+    LIST begin match sexptype tagval with
+    | NilSxp ->  (builder carval) :: begin
+                 match builder cdrval with
+                 | LIST l -> l | NULL -> []
+                 | _ -> raise (Esoteric s) end
+    | _ -> raise Esoteric end *)
+    (* Lax parsing of the LIST: *)
+    LIST begin ((builder tagval), (builder carval))::
+      begin match builder (cdrval : _ sxp :> sexp) with
+      | LIST l -> l | NULL -> []
+      | _ -> raise (Esoteric (s : _ sxp :> sexp)) end
+    end
+
+  let rec build rec_build =
+    let phi = fun f -> f (build rec_build) in
+    function s -> match sexptype s with
+    | NilSxp     -> NULL
+    | SymSxp     -> begin try phi symbol_of_symsxp (Obj.magic s) with
+                    | Esoteric _ -> Unknown end
+    | ListSxp    -> begin try phi list_of_listsxp (upcast s : 'a nonempty_list sxp) with
+                    | Esoteric _ -> Unknown end
+    | CloSxp     -> CLOSURE {
+        formals  = rec_build (inspect_closxp_formals (upcast s : closxp));
+        body     = rec_build (inspect_closxp_body    (upcast s : closxp));
+        clos_env = rec_build (inspect_closxp_env     (upcast s : closxp))}
+    | EnvSxp     -> ENV {
+        frame    = rec_build (inspect_envsxp_frame   (upcast s : envsxp));
+     (* enclos  = rec_build (inspect_envsxp_enclos  s); *) (* We do not care for now. *)
+     (* hashtab = rec_build (inspect_envsxp_hashtab s)  *) }
+    | PromSxp    -> PROMISE {
+        value    = rec_build (inspect_promsxp_value  (upcast s : promsxp));
+        expr     = rec_build (inspect_promsxp_expr   (upcast s : promsxp));
+        prom_env = rec_build (inspect_promsxp_env    (upcast s : promsxp))}
+    | LangSxp    ->
+        let carval = inspect_listsxp_carval (upcast s : langsxp)
+        and cdrval = inspect_listsxp_cdrval (upcast s : langsxp)
+        and tagval = inspect_listsxp_tagval (upcast s : langsxp) in
+        begin match build rec_build (cdrval : _ sxp :> sexp) with
+        | LIST l -> begin match sexptype tagval with
+                    | NilSxp -> CALL ((build rec_build carval), l)
+                    | _ -> Unknown end
+        | _ -> Unknown end
+    | SpecialSxp -> SPECIAL (inspect_primsxp_offset (upcast s : specialsxp))
+    | BuiltinSxp -> BUILTIN
+    | CharSxp    -> STRING  (string_of_charsxp (upcast s : charsxp))
+    | LglSxp     -> BOOLS   (bool_list_of_lglsxp (upcast s : lglsxp))
+    | IntSxp     -> INTS    (int_list_of_intsxp (upcast s : intsxp))
+    | RealSxp    -> FLOATS  (float_list_of_realsxp (upcast s : realsxp))
+    | CplxSxp    -> Unknown
+    | StrSxp     -> STRINGS (string_list_of_strsxp (upcast s : strsxp))
+    | DotSxp     -> Unknown
+    | AnySxp     -> Unknown
+    | VecSxp     -> VECSXP  (List.map rec_build (sexp_list_of_rawsxp (upcast s : rawsxp)))
+    | ExprSxp    -> Unknown
+    | BcodeSxp   -> Unknown
+    | ExtptrSxp  -> Unknown
+    | WeakrefSxp -> Unknown
+    | RawSxp     -> Unknown
+    | S4Sxp      -> Unknown
+    | FunSxp     -> Unknown
+
+end
+
+module CParsed = Parsing (CTypes)
+
+module PrettyParsed = Parsing (PrettyTypes)
+
+module C = struct
+  include CTypes
+  include CParsed
+end
+
+module Pretty = struct
+  include PrettyTypes
+  include PrettyParsed
+end
+
 
 
 (* === INITIALISATION ===== *)
