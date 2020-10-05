@@ -58,7 +58,7 @@ let transform_arg_name_list l =
   List.filter l ~f:String.(fun x -> x <> "...")
 
 let generate_stub_ml name str =
-  let open R.Pretty in
+  let open Pretty in
   match str with
   | CLOSURE { formals ; _ } ->
     let args = match formals with
@@ -73,14 +73,14 @@ let generate_stub_ml name str =
     in
     let param_of_arg x = sprintf "?%s" (ocamlify x) in
     let r_arg_of_arg x =
-      sprintf {|R.Eval.opt_arg (fun x -> x) "%s" %s|} x (ocamlify x)
+      sprintf {|Eval.opt_arg (fun x -> x) "%s" %s|} x (ocamlify x)
     in
     let args = List.map args ~f:name_of_arg in
     let args = transform_arg_name_list args in
     let ocaml_name = ocamlify name in
     sprintf {|
-let %s_symbol = R.symbol "%s"
-let %s %s () = R.Eval.call %s_symbol [ %s ]|}
+let %s_symbol = symbol "%s"
+let %s %s () = Eval.call %s_symbol [ %s ]|}
       ocaml_name
       name
       ocaml_name
@@ -88,30 +88,30 @@ let %s %s () = R.Eval.call %s_symbol [ %s ]|}
       ocaml_name
       (String.concat ~sep:" ; " (List.map args ~f:r_arg_of_arg))
   | STRINGS _ ->
-    sprintf {|let %s : R.Sexp.t = R.Eval.string "%s"|} (ocamlify name) name
+    sprintf {|let %s : Sexp.t = Eval.string "%s"|} (ocamlify name) name
   | BOOLS _ ->
-    sprintf {|let %s : R.Sexp.t = R.Eval.string "%s"|} (ocamlify name) name
+    sprintf {|let %s : Sexp.t = Eval.string "%s"|} (ocamlify name) name
   | FLOATS _ ->
-    sprintf {|let %s : R.Sexp.t = R.Eval.string "%s"|} (ocamlify name) name
+    sprintf {|let %s : Sexp.t = Eval.string "%s"|} (ocamlify name) name
   | VECSXP _ -> "" (* TODO *)
   | BUILTIN
   | SPECIAL _ -> "" (* FIXME: how to handle this case? *)
   | _ -> failwithf "not supported: %s" name ()
 
 let generate_stub_ml_for_package p =
-  let () = ignore @@ R.Eval.string {|require(utils, quietly=TRUE)|} in
-  let () = ignore @@ R.Eval.string (sprintf {|require(%s, quietly=TRUE)|} p) in
-  let r_list = R.Eval.string (sprintf {|ls("package:%s")|} p) in
-  let funs = filter_names (R.Dec.strings r_list) in
+  let () = ignore @@ Eval.string {|require(utils, quietly=TRUE)|} in
+  let () = ignore @@ Eval.string (sprintf {|require(%s, quietly=TRUE)|} p) in
+  let r_list = Eval.string (sprintf {|ls("package:%s")|} p) in
+  let funs = filter_names (Dec.strings r_list) in
   Caml.print_endline "open OCamlR" ;
   Caml.print_endline (
     sprintf
-      {|let () = ignore (R.Eval.string "require(%s, quietly=TRUE)")|}
+      {|let () = ignore (Eval.string "require(%s, quietly=TRUE)")|}
       p
   ) ;
   Array.iter funs ~f:(fun name ->
-        let value = R.symbol name in
-        let str = R.Pretty.t_of_sexp value in
+        let value = symbol name in
+        let str = Pretty.t_of_sexp value in
         generate_stub_ml name str
         |> Caml.print_endline
     )

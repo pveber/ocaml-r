@@ -1,4 +1,4 @@
-open OCamlR.R
+open OCamlR
 open OCamlR_base
 open OCamlR_wraputils
 

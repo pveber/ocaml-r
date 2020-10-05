@@ -1,6 +1,6 @@
 (**  Runtime R base library. *)
 
-open OCamlR.R
+open OCamlR
 
 module Environment : sig
   include SXP

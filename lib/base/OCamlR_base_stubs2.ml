@@ -1,5 +1,5 @@
-open OCamlR.R
-open OCamlR.R.Eval
+open OCamlR
+open OCamlR.Eval
 
 let id x = x
 

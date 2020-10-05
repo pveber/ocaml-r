@@ -1,4 +1,4 @@
-open OCamlR.R
+open OCamlR
 
 module Stubs = OCamlR_base_stubs
 module Stubs2 = OCamlR_base_stubs2

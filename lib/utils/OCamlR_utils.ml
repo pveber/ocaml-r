@@ -5,15 +5,15 @@ open OCamlR_base
 module Stubs = OCamlR_utils_stubs
 
 let data ?envir name =
-  let open R.Eval in
-  call (R.symbol "data") R.Enc.[
+  let open Eval in
+  call (symbol "data") Enc.[
     arg string name ;
     opt_arg Environment.to_sexp "envir" envir ;
   ]
   |> ignore
 
 let r_numerals o =
-  R.Enc.string (
+  Enc.string (
     match o with
     | `allow'loss -> "allow.loss"
     | `warn'loss -> "warn.loss"
@@ -25,7 +25,7 @@ let read'table
     ?numerals ?row'names ?col'names
     ?na'strings ?check'names ?strip'white
     ?comment'char ?stringsAsFactors file =
-  let open R.Enc in
+  let open Enc in
   Stubs.read'table
     ~file:(file |> string)
     ?header:(header |?> bool)
@@ -44,7 +44,7 @@ let read'table
   |> Dataframe.unsafe_of_sexp
 
 let write'table ?file ?sep ?col'names ?row'names ?quote x =
-  let open R.Enc in
+  let open Enc in
   Stubs.write'table
     ?file:(file |?> string)
     ?sep:(sep |?> string)

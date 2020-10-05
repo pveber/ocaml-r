@@ -4,7 +4,7 @@
 open OCamlR_base
 
 module Formula : sig
-  include OCamlR.R.SXP
+  include OCamlR.SXP
   val of_string : string -> t
 end
 

@@ -1,4 +1,4 @@
-open OCamlR.R
+open OCamlR
 
 val length : Sexp.t -> Sexp.t
 

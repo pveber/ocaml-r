@@ -1,34 +1,34 @@
 open OCamlR
 
-let () = ignore (R.Eval.string "require(stats, quietly=TRUE)")
+let () = ignore (Eval.string "require(stats, quietly=TRUE)")
 
 let id x = x
 
 module Symbol = struct
-  let rnorm = R.symbol "rnorm"
-  let dnorm = R.symbol "dnorm"
-  let pnorm = R.symbol "pnorm"
-  let qnorm = R.symbol "qnorm"
+  let rnorm = symbol "rnorm"
+  let dnorm = symbol "dnorm"
+  let pnorm = symbol "pnorm"
+  let qnorm = symbol "qnorm"
 
   (* The log normal distribution. *)
-  let dlnorm = R.symbol "dlnorm"
-  let plnorm = R.symbol "plnorm"
-  let qlnorm = R.symbol "qlnorm"
-  let rlnorm = R.symbol "rlnorm"
+  let dlnorm = symbol "dlnorm"
+  let plnorm = symbol "plnorm"
+  let qlnorm = symbol "qlnorm"
+  let rlnorm = symbol "rlnorm"
 
-  let cor = R.symbol "cor"
-  let lm = R.symbol "lm"
-  let stl = R.symbol "stl"
+  let cor = symbol "cor"
+  let lm = symbol "lm"
+  let stl = symbol "stl"
 
-  let fisher'test = R.symbol "fisher.test"
-  let poisson_test = R.symbol "poisson.test"
-  let shapiro_test = R.symbol "shapiro.test"
-  let fitted = R.symbol "fitted"
-  let sSgompertz = R.symbol "SSgompertz"
+  let fisher'test = symbol "fisher.test"
+  let poisson_test = symbol "poisson.test"
+  let shapiro_test = symbol "shapiro.test"
+  let fitted = symbol "fitted"
+  let sSgompertz = symbol "SSgompertz"
 end
 
 let rnorm ?mean ?sd n =
-  let open R.Eval in
+  let open Eval in
   call Symbol.rnorm [
     arg id n ;
     opt_arg id "mean" mean ;
@@ -36,7 +36,7 @@ let rnorm ?mean ?sd n =
   ]
 
 let fisher'test ?alternative v v' =
-  let open R.Eval in
+  let open Eval in
   call Symbol.fisher'test [
     arg id v ;
     arg id v' ;
@@ -44,7 +44,7 @@ let fisher'test ?alternative v v' =
   ]
 
 let cor x ?y ?use ?cor_method () =
-  let open R.Eval in
+  let open Eval in
   call Symbol.cor [
     arg (fun x -> x) x                   ;
     opt_arg (fun x -> x) "y" y               ;
@@ -52,7 +52,7 @@ let cor x ?y ?use ?cor_method () =
     opt_arg (fun x -> x) "method" cor_method ]
 
 let lm formula ?data ?subset ?weights ?na_action ?lm_method ?model ?x ?y ?qr ?singular_ok ?contrasts ?offset () =
-  let open R.Eval in
+  let open Eval in
   call Symbol.lm [
     arg (fun x -> x)                formula     ;
     opt_arg (fun x -> x) "data"         data        ;
@@ -70,8 +70,8 @@ let lm formula ?data ?subset ?weights ?na_action ?lm_method ?model ?x ?y ?qr ?si
 
 (* let fisher'test_2x2 ?alternative ~ff ~ft ~tf ~tt () = *)
 (*   let data = List.map float [ ff ; ft ; tf ; tt ] in *)
-(*   let open R.Eval in
+(*   let open Eval in
      call Stub.fisher'test [ *)
 (*     arg (fun x -> matrix ~nrow:2 ~ncol:2 x) data ; *)
-(*     opt_arg (fun x -> R.string (string_of_test_kind x)) "alternative" alternative ; *)
+(*     opt_arg (fun x -> string (string_of_test_kind x)) "alternative" alternative ; *)
 (*   ] *)
