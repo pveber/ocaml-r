@@ -1,4 +1,5 @@
 open OCamlR
+open OCamlR.Eval
 open OCamlR_base
 open OCamlR_wraputils
 
@@ -29,7 +30,7 @@ let rnorm ?mean ?sd n =
     ?sd:(sd |?> Enc.float)
     ~n:(n |> Enc.int)
     ()
-  |> Dec.floats
+  |> Numeric.unsafe_of_sexp
 
 
 let string_of_test_kind = function
@@ -37,86 +38,106 @@ let string_of_test_kind = function
   | `greater -> "greater"
   | `less -> "less"
 
-class type test = object
-  method p'value : float
-  method method_ : string
-  method data'name : string
-  method alternative : string
+let enc_test_kind x = Enc.string (string_of_test_kind x)
+
+module type Test = sig
+  type t
+  val p'value : t -> float
+  val _method_ : t -> string
+  val data'name : t -> string
+  val alternative : t -> string
 end
 
-class test_impl o = object
-  method p'value = List_.subset2_exn o "p.value" Dec.float
-  method method_ = List_.subset2_exn o "method" Dec.string
-  method data'name = List_.subset2_exn o "data.name" Dec.string
-  method alternative = List_.subset2_exn o "alternative" Dec.string
-end
+(**
+   Note that not all access operations really are available,
+   the selection is performed via signature shadowing.
+*)
+module Test_impl = struct
+  type t = List_.t
 
-class fisher'test o = object
-  inherit test_impl o
-  method conf'int =
+  let p'value o = List_.subset2_exn o "p.value" Dec.float
+  let _method_ o = List_.subset2_exn o "method" Dec.string
+  let data'name o = List_.subset2_exn o "data.name" Dec.string
+  let alternative o = List_.subset2_exn o "alternative" Dec.string
+  let conf'int o =
     List_.subset2 o "conf.int" Dec.floats
     |> Option.map (function
         | [| x ; y |] -> (x, y)
         | _ -> assert false
       )
-  method estimate = List_.subset2_exn o "estimate" Dec.float
-  method null'value = List_.subset2_exn o "null.value" Dec.float
+  let estimate o = List_.subset2_exn o "estimate" Dec.float
+  let null'value o = List_.subset2_exn o "null.value" Dec.float
+  let statistic o = List_.subset2_exn o "statistic" Dec.float
 end
 
-let fisher'test ?alternative v v' =
-  S.fisher'test
-    ?alternative:(alternative |?> string_of_test_kind |?> Enc.string)
-    ~x:(Logical.to_sexp v)
-    ~y:(Logical.to_sexp v')
-    ()
-  |> List_.unsafe_of_sexp
-  |> new fisher'test
+module Fisher'test = struct
+  include Test_impl
 
-class test_impl_with_statistic o = object
-  inherit test_impl o
-  method statistic = List_.subset2_exn o "statistic" Dec.float
+  let logicals ?alternative v v' =
+    S.fisher'test
+      ?alternative:(alternative |?> string_of_test_kind |?> Enc.string)
+      ~x:(Logical.to_sexp v)
+      ~y:(Logical.to_sexp v')
+      ()
+    |> List_.unsafe_of_sexp
 end
 
-let chisq'test_contingency_table ?correct ?simulate'p'value ?b mat =
-  S.chisq'test
-    ~x:(Matrix.to_sexp mat)
-    ?correct:(o correct Enc.bool)
-    ?simulate'p'value:(o simulate'p'value Enc.bool)
-    ?_B:(o b Enc.int)
-    ()
-  |> List_.unsafe_of_sexp
-  |> new test_impl_with_statistic
+module T'test = struct
+  include Test_impl
 
-class ks'test o = object
-  inherit test_impl_with_statistic o
+  let one_sample ?alternative x =
+    call S.t'test_symbol [
+      opt_arg enc_test_kind "alternative" alternative ;
+      arg ~name:"x" Numeric.to_sexp x ;
+    ]
+    |> List_.unsafe_of_sexp
 end
 
-let ks'test ?alternative v v' =
-  let open Eval in
-  call Symbol.ks'test Enc.[
-    arg floats v ;
-    arg floats v' ;
-    opt_arg (fun x -> string (string_of_test_kind x)) "alternative" alternative ;
-  ]
-  |> List_.unsafe_of_sexp
-  |> new ks'test
+module Chisq'test = struct
+  include Test_impl
 
-let string_of_p'adjust_method = function
-  | `fdr -> "fdr"
-  | `holm -> "holm"
-  | `hochberg -> "hochberg"
-  | `hommel -> "hommel"
-  | `bonferroni -> "bonferroni"
-  | `BH -> "BH"
-  | `BY -> "BY"
+  let contingency_table ?correct ?simulate'p'value ?b mat =
+    S.chisq'test
+      ~x:(Matrix.to_sexp mat)
+      ?correct:(o correct Enc.bool)
+      ?simulate'p'value:(o simulate'p'value Enc.bool)
+      ?_B:(o b Enc.int)
+      ()
+    |> List_.unsafe_of_sexp
+end
+
+module Ks'test = struct
+  include Test_impl
+
+  let make ?alternative v v' =
+    let open Eval in
+    call Symbol.ks'test Enc.[
+        arg Numeric.to_sexp v ;
+        arg Numeric.to_sexp v' ;
+        opt_arg (fun x -> string (string_of_test_kind x)) "alternative" alternative ;
+      ]
+    |> List_.unsafe_of_sexp
+end
+
+let enc_p'adjust_method x =
+  Enc.string (
+    match x with
+    | `fdr -> "fdr"
+    | `holm -> "holm"
+    | `hochberg -> "hochberg"
+    | `hommel -> "hommel"
+    | `bonferroni -> "bonferroni"
+    | `BH -> "BH"
+    | `BY -> "BY"
+  )
 
 let p'adjust ?method_ data =
   let open Eval in
-  call Symbol.p'adjust Enc.[
-      arg floats data ;
-      opt_arg (fun x -> string (string_of_p'adjust_method x)) "method" method_
+  call Symbol.p'adjust [
+      arg Numeric.to_sexp data ;
+      opt_arg enc_p'adjust_method "method" method_ ;
     ]
-  |> Dec.floats
+  |> Numeric.unsafe_of_sexp
 
 module Ecdf = struct
   type t = List_.t
