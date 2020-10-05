@@ -96,11 +96,10 @@ Here are links to the most frequent R datatypes bindings:
 open OCamlR
 open OCamlR_base
 
-let sample_symbol = symbol "sample"
+let sample_fun = symbol "sample"
 
 let sample ?replace ?prob ~size x =
-  let open Eval in
-  call sample_symbol [
+  call sample_fun [
     arg Numeric.to_sexp x ;
     arg Enc.int size ;
     opt_arg Enc.bool "replace" replace ;

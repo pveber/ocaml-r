@@ -2,7 +2,7 @@ open OCamlR
 open OCamlR_base
 open OCamlR_stats
 
-let () = ignore (Eval.string "require(graphics, quietly=TRUE)")
+let () = ignore (eval_string "require(graphics, quietly=TRUE)")
 
 module Symbol = struct
 
@@ -32,7 +32,6 @@ let r_breaks =
   | `m `FD -> string "FD"
 
 let hist ?breaks ?freq ?include_lowest ?right ?(main = "") ?(xlab = "") ?ylab ?xlim ?ylim ?plot x =
-  let open Eval in
   call Symbol.hist Enc.[
       arg floats x ;
       opt_arg r_breaks "breaks" breaks ;
@@ -88,7 +87,6 @@ let r_log_scale t =
   )
 
 let plot ?main ?(xlab = "") ?(ylab = "") ?xlim ?ylim ?plot_type ?lwd ?col ?log ~x ?y () =
-  let open Eval in
   call Symbol.plot Enc.[
       arg floats x ;
       opt_arg floats "y" y ;
@@ -124,7 +122,6 @@ let int_of_line_type = function
   | `twodash -> 6
 
 let lines ?lty ?lwd ?col ~x ?y () =
-  let open Eval in
   call OCamlR_graphics_stubs2.lines_symbol Enc.[
       arg floats x ;
       opt_arg floats "y" y ;
@@ -146,7 +143,6 @@ let string_of_position = function
   | `center -> "center"
 
 let legend ?col ?lty ?lwd ?pch x legend =
-  let open Eval in
   call OCamlR_graphics_stubs2.legend_symbol Enc.[
       arg (fun x -> string (string_of_position x)) x ;
       arg strings legend ;
@@ -158,14 +154,12 @@ let legend ?col ?lty ?lwd ?pch x legend =
   |> ignore
 
 let par ?mfrow () =
-  let open Eval in
   call Symbol.par [
       opt_arg int_tup "mfrow" mfrow ;
     ]
   |> ignore
 
 let dataframe_boxplot ?main ?xlab ?ylab formula data =
-  let open Eval in
   call Symbol.boxplot Enc.[
       arg Formula.to_sexp formula ;
       arg Dataframe.to_sexp ~name:"data" data ;
@@ -176,7 +170,6 @@ let dataframe_boxplot ?main ?xlab ?ylab formula data =
   |> ignore
 
 let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
-  let open Eval in
   call OCamlR_graphics_stubs2.abline_symbol Enc.[
       opt_arg float "a" a ;
       opt_arg float "b" b ;

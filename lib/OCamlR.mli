@@ -315,31 +315,29 @@ module Dec : Conversion with type 'a t = Sexp.t -> 'a
 val symbol : ?generic:bool -> string -> Sexp.t
 (**  Retrieves an R symbol from the symbol table, given its name. *)
 
-module Eval : sig
-  val string : string -> Sexp.t
-  (**  [string] takes a string containing R code, and feeds it to the
-       R interpreter. You get the resulting value back. The typing of this
-       function is deliberately unsafe in order to allow the user to type
-       it precisely.
-    *
-       Bug: currently, if you try to execute a statement that refers to
-       symbols that haven't been loaded, you get a segfault. For instance,
-       evaluating a string containing the [rbinom] symbol without the
-       [R.stats] package being loaded raises a segfault. *)
+val eval_string : string -> Sexp.t
+(** [string] takes a string containing R code, and feeds it to the R
+   interpreter. You get the resulting value back. The typing of this
+   function is deliberately unsafe in order to allow the user to type
+   it precisely.
 
-  (** Convenience functions to wrap up arguments, when mapping R
+   Bug: currently, if you try to execute a statement that refers to
+   symbols that haven't been loaded, you get a segfault. For instance,
+   evaluating a string containing the [rbinom] symbol without the
+   [R.stats] package being loaded raises a segfault. *)
+
+(** Convenience functions to wrap up arguments, when mapping R
      functions to Objective Caml functions. *)
-  type arg
-  val arg     : 'a Enc.t -> ?name:string -> 'a  -> arg
-  val opt_arg : 'a Enc.t -> string -> 'a option -> arg
+type arg
+val arg     : 'a Enc.t -> ?name:string -> 'a  -> arg
+val opt_arg : 'a Enc.t -> string -> 'a option -> arg
 
-  val call : Sexp.t -> arg list -> Sexp.t
-  (**  [eval f args] evaluates an the R function [f] with respect to a list of
-       arguments. Argument [None] is ignored, and [Some (name, sexp)] is the
-       argument whose optional name is [name] and whose value is [sexp]. The
-       typing of this function is deliberately unsafe in order to allow the
-       user to type it precisely. *)
-end
+val call : Sexp.t -> arg list -> Sexp.t
+(** [call f args] evaluates an the R function [f] with respect to a
+   list of arguments. Argument [None] is ignored, and [Some (name,
+   sexp)] is the argument whose optional name is [name] and whose
+   value is [sexp]. The typing of this function is deliberately unsafe
+   in order to allow the user to type it precisely. *)
 
 (** {2 Initialisation}
 

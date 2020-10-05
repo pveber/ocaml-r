@@ -1,5 +1,4 @@
 open OCamlR
-open OCamlR.Eval
 
 let id x = x
 
@@ -21,24 +20,24 @@ module Symbol = struct
   let max = symbol ~generic:true "max"
 end
 
-let length l = Eval.call Symbol.length [ arg id l ]
+let length l = call Symbol.length [ arg id l ]
 
 let dim x =
-  Eval.call Symbol.dim [ arg id x ]
+  call Symbol.dim [ arg id x ]
 
-let subset x i = Eval.call Symbol.subset [
+let subset x i = call Symbol.subset [
     arg id x ;
     arg id i ;
   ]
 
-let subset_ii x i j = Eval.call Symbol.subset [
+let subset_ii x i j = call Symbol.subset [
     arg id x ;
     arg id i ;
     arg id j ;
   ]
 
 
-let subset2_i x i = Eval.call Symbol.subset2 [
+let subset2_i x i = call Symbol.subset2 [
     arg id x  ;
     arg id i
   ]
@@ -51,7 +50,7 @@ module Matrix = struct
   let subset2 = subset2_i
 end
 
-let rle x = Eval.call Symbol.rle [ arg id x ]
+let rle x = call Symbol.rle [ arg id x ]
 
 let sample x n ?replace ?prob () =
   call Symbol.sample [
@@ -61,6 +60,6 @@ let sample x n ?replace ?prob () =
     opt_arg id "prob" prob
   ]
 
-let min x = Eval.call Symbol.min [ arg id x ]
-let max x = Eval.call Symbol.max [ arg id x ]
+let min x = call Symbol.min [ arg id x ]
+let max x = call Symbol.max [ arg id x ]
 

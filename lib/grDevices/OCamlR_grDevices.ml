@@ -1,6 +1,6 @@
 open OCamlR
 
-let () = ignore (Eval.string "require(grDevices, quietly=TRUE)")
+let () = ignore (eval_string "require(grDevices, quietly=TRUE)")
 
 module Stub = struct
 
@@ -30,7 +30,6 @@ let r_length_unit x = Enc.string (string_of_length_unit x)
 
 let png ?width ?height ?unit ?pointsize path =
   ignore (
-    let open Eval in
     call Stub.png [
       arg Enc.string                  path ;
       opt_arg Enc.float       "width"     width ;
@@ -41,7 +40,6 @@ let png ?width ?height ?unit ?pointsize path =
 
 let pdf ?width ?height ?pointsize path =
   ignore (
-    let open Eval in
     call Stub.pdf [
       arg Enc.string                  path ;
       opt_arg Enc.float       "width"     width ;
@@ -51,7 +49,6 @@ let pdf ?width ?height ?pointsize path =
 
 let postscript ?width ?height ?pointsize path =
   ignore (
-    let open Eval in
     call Stub.postscript [
       arg Enc.string                  path ;
       opt_arg Enc.float       "width"     width ;
@@ -61,7 +58,6 @@ let postscript ?width ?height ?pointsize path =
 
 let svg ?width ?height ?pointsize path =
   ignore (
-    let open Eval in
     call Stub.svg [
       arg Enc.string                  path ;
       opt_arg Enc.float       "width"     width ;
@@ -71,6 +67,5 @@ let svg ?width ?height ?pointsize path =
 
 let dev_off () =
   ignore (
-    let open Eval in
     call Stub.dev_off []
   )

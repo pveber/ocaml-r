@@ -1,6 +1,6 @@
 open OCamlR
 
-let () = ignore (Eval.string "require(stats, quietly=TRUE)")
+let () = ignore (eval_string "require(stats, quietly=TRUE)")
 
 let id x = x
 
@@ -28,7 +28,6 @@ module Symbol = struct
 end
 
 let rnorm ?mean ?sd n =
-  let open Eval in
   call Symbol.rnorm [
     arg id n ;
     opt_arg id "mean" mean ;
@@ -36,7 +35,6 @@ let rnorm ?mean ?sd n =
   ]
 
 let fisher'test ?alternative v v' =
-  let open Eval in
   call Symbol.fisher'test [
     arg id v ;
     arg id v' ;
@@ -44,7 +42,6 @@ let fisher'test ?alternative v v' =
   ]
 
 let cor x ?y ?use ?cor_method () =
-  let open Eval in
   call Symbol.cor [
     arg (fun x -> x) x                   ;
     opt_arg (fun x -> x) "y" y               ;
@@ -52,7 +49,6 @@ let cor x ?y ?use ?cor_method () =
     opt_arg (fun x -> x) "method" cor_method ]
 
 let lm formula ?data ?subset ?weights ?na_action ?lm_method ?model ?x ?y ?qr ?singular_ok ?contrasts ?offset () =
-  let open Eval in
   call Symbol.lm [
     arg (fun x -> x)                formula     ;
     opt_arg (fun x -> x) "data"         data        ;

@@ -6,7 +6,6 @@ module Stubs2 = OCamlR_base_stubs2
 let subset2_symbol = symbol ~generic:true "[["
 
 let gen_raw_subset2 label_dec x label =
-  let open Eval in
   call subset2_symbol [
       arg Enc.sexp x ;
       arg label_dec label ;
@@ -82,7 +81,7 @@ module Dataframe = struct
   type column = string * column_data
 
   let rarg_of_column_data name =
-    let f g x = Eval.arg g ~name x in
+    let f g x = arg g ~name x in
     function
     | Numeric x -> f Numeric.to_sexp x
     | Logical x -> f Logical.to_sexp x
@@ -101,11 +100,10 @@ module Dataframe = struct
     List.map
       (fun (label, col) -> rarg_of_column_data label col)
       cols
-    |> Eval.call (symbol "data.frame")
+    |> call (symbol "data.frame")
     |> unsafe_of_sexp
 
   let rbind x y =
-    let open Eval in
     call Stubs.rbind_symbol [
       arg to_sexp x ;
       arg to_sexp y
@@ -113,8 +111,7 @@ module Dataframe = struct
     |> unsafe_of_sexp
 
   let cbind x y =
-    let open Eval in
-    Eval.call Stubs.cbind_symbol [
+    call Stubs.cbind_symbol [
       arg to_sexp x ;
       arg to_sexp y ;
     ]

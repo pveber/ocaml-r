@@ -1,5 +1,4 @@
 open OCamlR
-open OCamlR.Eval
 open OCamlR_base
 open OCamlR_wraputils
 
@@ -110,7 +109,6 @@ module Ks'test = struct
   include Test_impl
 
   let make ?alternative v v' =
-    let open Eval in
     call Symbol.ks'test Enc.[
         arg Numeric.to_sexp v ;
         arg Numeric.to_sexp v' ;
@@ -132,7 +130,6 @@ let enc_p'adjust_method x =
   )
 
 let p'adjust ?method_ data =
-  let open Eval in
   call Symbol.p'adjust [
       arg Numeric.to_sexp data ;
       opt_arg enc_p'adjust_method "method" method_ ;
@@ -146,7 +143,6 @@ module Ecdf = struct
     |> List_.unsafe_of_sexp
 
   let plot ?(main = "") ?xlab ?ylab ?xlim ?ylim o =
-    let open Eval in
     call OCamlR_stats_stubs2.plot'ecdf_symbol Enc.[
       arg ~name:"x" List_.to_sexp o ;
       opt_arg string "xlab" xlab ;

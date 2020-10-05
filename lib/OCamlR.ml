@@ -876,25 +876,23 @@ end
    in a callback when the R interpreter is initialised. *)
 exception Runtime_error of langsxp * string
 
-module Eval = struct
-  let string s = eval_langsxp (parse s)
-  (* TODO: May segfault if stumbling on a symbol that
-   * hasn't yet been loaded. *)
+let eval_string s = eval_langsxp (parse s)
+(* TODO: May segfault if stumbling on a symbol that
+   hasn't yet been loaded. *)
 
-  let rec prepare_args = function
-    | (Some x)::l -> x::(prepare_args l)
-    | None::l     -> prepare_args l
-    | []          -> []
+let rec prepare_args = function
+  | (Some x)::l -> x::(prepare_args l)
+  | None::l     -> prepare_args l
+  | []          -> []
 
-  type arg = (string option * sexp) option
-  let arg f ?name x = Some (name, f x)
-  let opt_arg f name x = match x with
-    | None -> None
-    | Some x -> Some ((Some name), f x)
+type arg = (string option * sexp) option
+let arg f ?name x = Some (name, f x)
+let opt_arg f name x = match x with
+  | None -> None
+  | Some x -> Some ((Some name), f x)
 
-  let call phi (args: (string option * sexp) option list) =
-    eval_langsxp (langsxp phi (prepare_args args))
-end
+let call phi (args: (string option * sexp) option list) =
+  eval_langsxp (langsxp phi (prepare_args args))
 
 module Parsing (M : Types) = struct
 

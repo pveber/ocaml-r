@@ -1,6 +1,6 @@
 open OCamlR
 
-let () = ignore (Eval.string "require(graphics, quietly=TRUE)")
+let () = ignore (eval_string "require(graphics, quietly=TRUE)")
 
 let id x = x
 
@@ -12,7 +12,6 @@ module Symbol = struct
 end
 
 let plot ?main ?xlab ?ylab ?xlim ?ylim ?y x =
-  let open Eval in
   call Symbol.plot [
     arg id x ;
     opt_arg id "y" y ;
@@ -25,7 +24,6 @@ let plot ?main ?xlab ?ylab ?xlim ?ylim ?y x =
 
 let plot2
     ?main ?xlab ?ylab ?xlim ?ylim x y =
-  let open Eval in
   call Symbol.plot [
     arg id x ;
     arg id y ;
@@ -37,7 +35,6 @@ let plot2
   ]
 
 let par ?mfrow () =
-  let open Eval in
   call Symbol.par [
     opt_arg id "mfrow" mfrow ;
   ]

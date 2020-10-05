@@ -5,7 +5,6 @@ open OCamlR_base
 module Stubs = OCamlR_utils_stubs
 
 let data ?envir name =
-  let open Eval in
   call (symbol "data") Enc.[
     arg string name ;
     opt_arg Environment.to_sexp "envir" envir ;
