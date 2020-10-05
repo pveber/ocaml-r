@@ -41,7 +41,7 @@ let string_of_test_kind = function
 let enc_test_kind x = Enc.string (string_of_test_kind x)
 
 module type Test = sig
-  type t
+  include module type of List_
   val p'value : t -> float
   val _method_ : t -> string
   val data'name : t -> string
@@ -53,7 +53,7 @@ end
    the selection is performed via signature shadowing.
 *)
 module Test_impl = struct
-  type t = List_.t
+  include List_
 
   let p'value o = List_.subset2_exn o "p.value" Dec.float
   let _method_ o = List_.subset2_exn o "method" Dec.string

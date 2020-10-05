@@ -32,7 +32,7 @@ val rnorm : ?mean:float -> ?sd:float -> int -> Numeric.t
 
 (** Common interface for test results *)
 module type Test = sig
-  type t
+  include module type of List_
   val p'value : t -> float
   val _method_ : t -> string
   val data'name : t -> string
