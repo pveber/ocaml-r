@@ -107,6 +107,7 @@ module Sexp : sig
   val attr : t -> string -> sexp
   val _class_ : t -> string list
   val nil_map : t -> f:(t -> 'a) -> 'a option
+  val print : t -> unit
 end
 
 module type SXP = sig

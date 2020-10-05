@@ -40,6 +40,7 @@ module type SXP = sig
   val attr : t -> string -> sexp
   val _class_ : t -> string list
   val nil_map : t -> f:(t -> 'a) -> 'a option
+  val print : t -> unit
   external unsafe_of_sexp : sexp -> t = "%identity"
   external to_sexp : t -> sexp = "%identity"
 end
@@ -372,6 +373,7 @@ module Low_level = struct
   let classes sexp =
     string_list_of_t (upcast (get_attrib sexp "class") : strsxp)
 
+  external print_value : sexp -> unit = "ocamlr_print_value"
 end
 
 open Low_level
@@ -650,6 +652,8 @@ module Sexp = struct
   let nil_map x ~f =
     if is_nil x then None
     else Some (f x)
+
+  let print = print_value
 end
 
 module Nilsxp = struct
