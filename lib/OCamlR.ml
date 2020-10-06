@@ -817,21 +817,26 @@ module Vecsxp = struct
   include Vector_impl(Elt)
 end
 
+
 module type Conversion = sig
   type 'a t
-  val sexp         : sexp t
+  val sexp         : Sexp.t t
   val int          : int t
   val ints         : int array t
-  val maybe_int    : int option t
+  val int_opt      : int option t
+  val int_opts     : int option array t
   val bool         : bool t
   val bools        : bool array t
-  val maybe_bool   : bool option t
+  val bool_opt     : bool option t
+  val bool_opts    : bool option array t
   val float        : float t
   val floats       : float array t
-  val maybe_float  : float option t
+  val float_opt    : float option t
+  val float_opts   : float option array t
   val string       : string t
   val strings      : string array t
-  val maybe_string : string option t
+  val string_opt   : string option t
+  val string_opts  : string option array t
 end
 
 module Enc = struct
@@ -839,16 +844,20 @@ module Enc = struct
   let sexp x = x
   let int i = (Intsxp.of_array [| i |] :> sexp)
   let ints x = (Intsxp.of_array x :> sexp)
-  let maybe_int i = (Intsxp.of_array_opt [| i |] :> sexp)
+  let int_opt i = (Intsxp.of_array_opt [| i |] :> sexp)
+  let int_opts i = (Intsxp.of_array_opt i :> sexp)
   let bool i = (Lglsxp.of_array [| i |] :> sexp)
   let bools x = (Lglsxp.of_array x :> sexp)
-  let maybe_bool i = (Lglsxp.of_array_opt [| i |] :> sexp)
+  let bool_opt i = (Lglsxp.of_array_opt [| i |] :> sexp)
+  let bool_opts i = (Lglsxp.of_array_opt i :> sexp)
   let float i = (Realsxp.of_array [| i |] :> sexp)
   let floats x = (Realsxp.of_array x :> sexp)
-  let maybe_float i = (Realsxp.of_array_opt [| i |] :> sexp)
+  let float_opt i = (Realsxp.of_array_opt [| i |] :> sexp)
+  let float_opts i = (Realsxp.of_array_opt i :> sexp)
   let string i = (Strsxp.of_array [| i |] :> sexp)
   let strings x = (Strsxp.of_array x :> sexp)
-  let maybe_string i = (Strsxp.of_array_opt [| i |] :> sexp)
+  let string_opt i = (Strsxp.of_array_opt [| i |] :> sexp)
+  let string_opts i = (Strsxp.of_array_opt i :> sexp)
 end
 
 module Dec = struct
@@ -856,16 +865,20 @@ module Dec = struct
   let sexp x = x
   let int i = Intsxp.(to_array (unsafe_of_sexp i)).(0)
   let ints x = Intsxp.(to_array (unsafe_of_sexp x))
-  let maybe_int i = Intsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let int_opt i = Intsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let int_opts i = Intsxp.(to_array_opt (unsafe_of_sexp i))
   let bool i = Lglsxp.(to_array (unsafe_of_sexp i)).(0)
   let bools x = Lglsxp.(to_array (unsafe_of_sexp x))
-  let maybe_bool i = Lglsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let bool_opt i = Lglsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let bool_opts i = Lglsxp.(to_array_opt (unsafe_of_sexp i))
   let float i = Realsxp.(to_array (unsafe_of_sexp i)).(0)
   let floats x = Realsxp.(to_array (unsafe_of_sexp x))
-  let maybe_float i = Realsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let float_opt i = Realsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let float_opts i = Realsxp.(to_array_opt (unsafe_of_sexp i))
   let string i = Strsxp.(to_array (unsafe_of_sexp i)).(0)
   let strings x = Strsxp.(to_array (unsafe_of_sexp x))
-  let maybe_string i = Strsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let string_opt i = Strsxp.(to_array_opt (unsafe_of_sexp i)).(0)
+  let string_opts i = Strsxp.(to_array_opt (unsafe_of_sexp i))
 end
 
 

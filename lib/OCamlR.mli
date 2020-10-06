@@ -294,16 +294,20 @@ module type Conversion = sig
   val sexp         : Sexp.t t
   val int          : int t
   val ints         : int array t
-  val maybe_int    : int option t
+  val int_opt      : int option t
+  val int_opts     : int option array t
   val bool         : bool t
   val bools        : bool array t
-  val maybe_bool   : bool option t
+  val bool_opt     : bool option t
+  val bool_opts    : bool option array t
   val float        : float t
   val floats       : float array t
-  val maybe_float  : float option t
+  val float_opt    : float option t
+  val float_opts   : float option array t
   val string       : string t
   val strings      : string array t
-  val maybe_string : string option t
+  val string_opt   : string option t
+  val string_opts  : string option array t
 end
 
 module Enc : Conversion with type 'a t = 'a -> Sexp.t
