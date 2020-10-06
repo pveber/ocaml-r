@@ -291,7 +291,8 @@ module Low_level = struct
      in OCaml? An 'a option mapping to None? *)
   external null_creator : unit -> [> `Nil] sxp = "ocamlr_null"
   external dots_symbol_creator : unit -> [> `Dot] sxp = "ocamlr_dots_symbol"
-  external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
+  external missing_arg_creator : unit -> symsxp = "ocamlr_missing_arg"
+  external is_missing_arg : symsxp -> bool = "ocamlr_missing_arg"
   external base_env_creator : unit -> sexp = "ocamlr_base_env"
 
   (* R_GlobalEnv is not a constant, but rather a constant pointer,
@@ -677,6 +678,9 @@ end
 
 module Symsxp = struct
   include Sxp.Impl(struct type t = [`Sym] end)(Sexp)
+
+  let missing_arg = missing_arg_creator
+  let is_missing_arg = is_missing_arg
 
   type description = (string * (sexp option)) option option
 

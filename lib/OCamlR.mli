@@ -136,6 +136,9 @@ end
 module Symsxp : sig
   include SXP with type t = symsxp
 
+  val missing_arg : unit -> t
+  val is_missing_arg : t -> bool
+
   (** Semantic description of [SYMSXP] structures. *)
   type description = (string * (sexp option)) option option
   val description : t -> description
@@ -476,7 +479,7 @@ module Low_level : sig
 
   external null_creator : unit -> [`Nil] sxp = "ocamlr_null"
   external dots_symbol_creator : unit -> [`Dot] sxp = "ocamlr_dots_symbol"
-  external missing_arg_creator : unit -> sexp = "ocamlr_missing_arg"
+  external missing_arg_creator : unit -> symsxp = "ocamlr_missing_arg"
   external base_env_creator : unit -> sexp = "ocamlr_base_env"
 
   external global_env : unit -> sexp = "ocamlr_global_env"
