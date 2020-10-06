@@ -7,6 +7,8 @@ module Environment : sig
 
   val create : unit -> t
   (** wrapper for [new.env] *)
+
+  val get : t -> class_:string -> string -> Sexp.t option
 end
 
 module Numeric : Atomic_vector with type repr := float

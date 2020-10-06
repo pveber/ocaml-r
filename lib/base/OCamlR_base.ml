@@ -21,7 +21,7 @@ module Environment = struct
     Stubs.new'env ()
     |> unsafe_of_sexp
 
-  let unsafe_get env ~class_ x =
+  let get env ~class_ x =
     let y = raw_subset2 (to_sexp env) x in
     let cls = Sexp._class_ y in
     if List.mem class_ cls then Some y
@@ -84,7 +84,7 @@ module Dataframe = struct
     | _ -> assert false
 
   let of_env (env : Environment.t) x =
-    Environment.unsafe_get env ~class_:"data.frame" x
+    Environment.get env ~class_:"data.frame" x
     |> Option.map unsafe_of_sexp
 
   type column_data =
