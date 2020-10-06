@@ -4,7 +4,7 @@ open OCamlR_base
 let test_back_and_from ty to_r from_r cases =
   let f i case =
     (to_r case |> from_r)
-    |> Alcotest.(check ty) (string_of_int i) case 
+    |> Alcotest.(check ty) (string_of_int i) case
   in
   List.iteri f cases
 
@@ -21,6 +21,24 @@ let test_intsxp_opt () =
       [| Some 1 ; None ; Some (-10) |] ;
       [||] ;
       Array.init 1_000 (fun _ -> None) ;
+    ]
+
+let test_realsxp_get () =
+  test_back_and_from Alcotest.(array (float 0.000001)) Realsxp.of_array (fun vec ->
+      let n = Realsxp.length vec in
+      Array.init n (Realsxp.get vec)
+    )
+    [
+      [| 3.14 ; -12312312312.1 |] ;
+    ]
+
+let test_realsxp_get_opt () =
+  test_back_and_from Alcotest.(array (option (float 0.000001))) Realsxp.of_array_opt (fun vec ->
+      let n = Realsxp.length vec in
+      Array.init n (Realsxp.get_opt vec)
+    )
+    [
+      [| Some 3.14 ; None ; Some (-12312312312.1) |] ;
     ]
 
 let test_matrix () =
@@ -78,8 +96,11 @@ let () =
       test_case "of_list, to_list" `Quick test_strsxp ;
       test_case "of_array_opt, to_array_opt" `Quick test_strsxp_opt ;
     ] ;
+    "realsxp", [
+      test_case "of_array_opt, to_array_opt" `Quick test_realsxp_get_opt ;
+      test_case "get" `Quick test_realsxp_get ;
+    ] ;
     "vecsxp", [ test_case "of_list, to_list" `Quick test_vecsxp ] ;
     "factor", [ test_case "of_character, levels" `Quick test_factor ] ;
     "matrix", [ test_case "dim, subset" `Quick test_factor ] ;
   ]
-
