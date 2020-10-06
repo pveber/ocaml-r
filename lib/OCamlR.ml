@@ -183,6 +183,7 @@ module Low_level = struct
   external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
   external access_intsxp_opt  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
   external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
+  external access_realsxp2 : realsxp -> int -> int -> float    = "ocamlr_access_realsxp2"
   external access_realsxp_opt : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
   external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
   external access_strsxp_opt  : strsxp  -> int -> string option = "ocamlr_access_strsxp_opt"

@@ -330,6 +330,12 @@ CAMLprim value ocamlr_access_realsxp (value realsxp, value offset) {
   return(caml_copy_double(REAL(Sexp_val(realsxp))[Int_val(offset)]));
 }
 
+CAMLprim value ocamlr_access_realsxp2 (value realsxp, value row, value column) {
+  SEXP mat = Sexp_val(realsxp);
+  int nr = nrows(mat);
+  int k = Int_val(column) * nr + Int_val(row);
+  return caml_copy_double(REAL(mat)[k]);
+}
 
 /**  Returns an element of a vector of real numbers, accounting for NAs
   *

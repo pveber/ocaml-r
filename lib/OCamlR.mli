@@ -467,6 +467,7 @@ module Low_level : sig
   external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
   external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
   external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
+  external access_realsxp2 : realsxp -> int -> int -> float = "ocamlr_access_realsxp2"
   external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
   external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
   external access_exprsxp : exprsxp -> int -> langsxp  = "ocamlr_access_vecsxp"

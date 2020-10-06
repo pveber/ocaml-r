@@ -23,6 +23,14 @@ let test_intsxp_opt () =
       Array.init 1_000 (fun _ -> None) ;
     ]
 
+let test_matrix () =
+  test_back_and_from Alcotest.(array (array (float 0.000001))) Matrix.of_arrays (fun mat ->
+      let nr, nc = Matrix.dim mat in
+      Array.init nr (fun i ->
+          Array.init nc (Matrix.subset mat i)
+        )
+    )
+
 let test_factor () =
   Alcotest.(check (list string)) "levels" ["a";"b";"c"] (
       Character.of_list ["b";"a";"a";"a";"c"]
@@ -72,5 +80,6 @@ let () =
     ] ;
     "vecsxp", [ test_case "Vecsxp" `Quick test_vecsxp ] ;
     "factor", [ test_case "Factor construction" `Quick test_factor ] ;
+    "matrix", [ test_case "dim, subset" `Quick test_factor ] ;
   ]
 

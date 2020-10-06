@@ -150,6 +150,9 @@ module Matrix = struct
     in
     Stubs.matrix ~data ~nrow:(Enc.int (Array.length m)) ~byrow:(Enc.bool true) ()
     |> unsafe_of_sexp
+
+  let subset m i j =
+    Low_level.access_realsxp2 m i j
 end
 
 let sample ?replace ?prob ~size x =
