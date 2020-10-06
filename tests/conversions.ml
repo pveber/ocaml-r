@@ -45,10 +45,12 @@ let test_matrix () =
   test_back_and_from Alcotest.(array (array (float 0.000001))) Matrix.of_arrays (fun mat ->
       let nr, nc = Matrix.dim mat in
       Array.init nr (fun i ->
-          Array.init nc (Matrix.subset mat i)
+          Array.init nc (Matrix.get2 mat i)
         )
     )
-
+    [
+      [| [| 1. ; 2. |] ; [| 3. ; 4. |] |] ;
+    ]
 let test_factor () =
   Alcotest.(check (list string)) "levels" ["a";"b";"c"] (
       Character.of_list ["b";"a";"a";"a";"c"]
@@ -102,5 +104,5 @@ let () =
     ] ;
     "vecsxp", [ test_case "of_list, to_list" `Quick test_vecsxp ] ;
     "factor", [ test_case "of_character, levels" `Quick test_factor ] ;
-    "matrix", [ test_case "dim, subset" `Quick test_factor ] ;
+    "matrix", [ test_case "dim, subset" `Quick test_matrix ] ;
   ]

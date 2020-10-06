@@ -72,5 +72,5 @@ module Matrix : sig
   include module type of Numeric
   val dim : t -> int * int
   val of_arrays : float array array -> t
-  val subset : t -> int -> int -> float
+  val get2 : t -> int -> int -> float
 end
