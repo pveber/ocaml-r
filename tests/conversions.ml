@@ -51,6 +51,18 @@ let test_matrix () =
     [
       [| [| 1. ; 2. |] ; [| 3. ; 4. |] |] ;
     ]
+
+let test_matrix_slice () =
+  let test label f m k ~expected =
+    Alcotest.(check' (array (float 0.000001)))
+      ~msg:label ~expected
+      ~actual:(f (Matrix.of_arrays m) k |> Numeric.to_array)
+  in
+  let m = [| [| 1. ; 2. |] ; [| 3. ; 4. |] |] in
+  Matrix.print (Matrix.of_arrays m) ;
+  test "get_row" Matrix.get_row m 2 ~expected:[| 3. ; 4. |] ;
+  test "get_col" Matrix.get_col m 1 ~expected:[| 1. ; 3. |]
+
 let test_factor () =
   Alcotest.(check (list string)) "levels" ["a";"b";"c"] (
       Character.of_list ["b";"a";"a";"a";"c"]
@@ -104,5 +116,8 @@ let () =
     ] ;
     "vecsxp", [ test_case "of_list, to_list" `Quick test_vecsxp ] ;
     "factor", [ test_case "of_character, levels" `Quick test_factor ] ;
-    "matrix", [ test_case "dim, subset" `Quick test_matrix ] ;
+    "matrix", [
+      test_case "dim, subset" `Quick test_matrix ;
+      test_case "get_row, get_col" `Quick test_matrix_slice ;
+    ] ;
   ]

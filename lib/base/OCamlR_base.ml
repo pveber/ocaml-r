@@ -153,6 +153,25 @@ module Matrix = struct
 
   let get2 m i j =
     Low_level.access_realsxp2 m i j
+
+  let subset_symbol = symbol "["
+  let missing_arg = (Symsxp.missing_arg () :> sexp)
+
+  let get_row m i =
+    call subset_symbol [
+      arg Numeric.to_sexp m  ;
+      arg Enc.int i ;
+      arg Enc.sexp missing_arg ;
+    ]
+    |> Numeric.unsafe_of_sexp
+
+  let get_col m j =
+    call subset_symbol [
+      arg Numeric.to_sexp m  ;
+      arg Enc.sexp missing_arg ;
+      arg Enc.int j ;
+    ]
+    |> Numeric.unsafe_of_sexp
 end
 
 let sample ?replace ?prob ~size x =

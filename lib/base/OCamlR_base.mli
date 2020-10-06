@@ -73,4 +73,6 @@ module Matrix : sig
   val dim : t -> int * int
   val of_arrays : float array array -> t
   val get2 : t -> int -> int -> float
+  val get_row : t -> int -> Numeric.t
+  val get_col : t -> int -> Numeric.t
 end
