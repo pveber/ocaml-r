@@ -718,12 +718,14 @@ module type Vector = sig
   val of_list : repr list -> t
   val to_array : t -> repr array
   val to_list : t -> repr list
+  val get : t -> int -> repr
 end
 
 module type Atomic_vector = sig
   include Vector
   val of_array_opt : repr option array -> t
   val to_array_opt : t -> repr option array
+  val get_opt : t -> int -> repr option
 end
 
 module type Vector_ops = sig
@@ -747,12 +749,14 @@ module Vector_impl(K : Vector_ops) = struct
   let of_list = vector_of_list K.alloc K.assign
   let to_array = array_of_vector K.access
   let of_array = vector_of_array K.alloc K.assign
+  let get = K.access
 end
 
 module Atomic_vector_impl(K : Atomic_vector_ops) = struct
   include Vector_impl(K)
   let to_array_opt = array_of_vector K.access_opt
   let of_array_opt = vector_of_array K.alloc K.assign_opt
+  let get_opt = K.access_opt
 end
 
 module Intsxp = struct

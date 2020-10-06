@@ -71,15 +71,15 @@ let () =
   let open Alcotest in
   run "Conversions" [
     "intsxp", [
-      test_case "Intsxp" `Quick test_intsxp ;
-      test_case "Intsxp with NAs" `Quick test_intsxp_opt ;
+      test_case "of_list, to_list" `Quick test_intsxp ;
+      test_case "of_array_opt, to_array_opt" `Quick test_intsxp_opt ;
     ] ;
     "strsxp", [
-      test_case "Strsxp" `Quick test_strsxp ;
-      test_case "Strsxp with NAs" `Quick test_strsxp_opt ;
+      test_case "of_list, to_list" `Quick test_strsxp ;
+      test_case "of_array_opt, to_array_opt" `Quick test_strsxp_opt ;
     ] ;
-    "vecsxp", [ test_case "Vecsxp" `Quick test_vecsxp ] ;
-    "factor", [ test_case "Factor construction" `Quick test_factor ] ;
+    "vecsxp", [ test_case "of_list, to_list" `Quick test_vecsxp ] ;
+    "factor", [ test_case "of_character, levels" `Quick test_factor ] ;
     "matrix", [ test_case "dim, subset" `Quick test_factor ] ;
   ]
 

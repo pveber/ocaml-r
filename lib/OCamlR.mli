@@ -156,12 +156,14 @@ module type Vector = sig
   val of_list : repr list -> t
   val to_array : t -> repr array
   val to_list : t -> repr list
+  val get : t -> int -> repr
 end
 
 module type Atomic_vector = sig
   include Vector
   val of_array_opt : repr option array -> t
   val to_array_opt : t -> repr option array
+  val get_opt : t -> int -> repr option
 end
 
 (** R array of integer values *)
