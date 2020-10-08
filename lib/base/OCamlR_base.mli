@@ -25,6 +25,15 @@ module Factor : sig
   val levels : t -> Character.t
 end
 
+module Matrix : sig
+  include module type of Numeric
+  val dim : t -> int * int
+  val of_arrays : float array array -> t
+  val get2 : t -> int -> int -> float
+  val get_row : t -> int -> Numeric.t
+  val get_col : t -> int -> Numeric.t
+end
+
 module List_ : sig
   include SXP
   val as_vecsxp : t -> Vecsxp.t
@@ -56,6 +65,8 @@ module Dataframe : sig
 
   val get_row : t -> int -> t
   val get_col : t -> int -> column
+
+  val as'matrix : t -> Matrix.t
 end
 
 
@@ -73,12 +84,3 @@ val saveRDS :
   ?compress:bool ->
   file:string ->
   Sexp.t -> unit
-
-module Matrix : sig
-  include module type of Numeric
-  val dim : t -> int * int
-  val of_arrays : float array array -> t
-  val get2 : t -> int -> int -> float
-  val get_row : t -> int -> Numeric.t
-  val get_col : t -> int -> Numeric.t
-end

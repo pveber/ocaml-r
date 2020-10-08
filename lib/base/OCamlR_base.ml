@@ -63,6 +63,43 @@ module Factor = struct
     |> Character.unsafe_of_sexp
 end
 
+module Matrix = struct
+  include Numeric
+
+  let dim (x : t) =
+    match Stubs2.dim (to_sexp x) |> Dec.ints with
+    | [| i ; j |] -> (i, j)
+    | _ -> assert false
+
+  let of_arrays m =
+    let data =
+      Array.to_list m
+      |> Array.concat
+      |> Enc.floats
+    in
+    Stubs.matrix ~data ~nrow:(Enc.int (Array.length m)) ~byrow:(Enc.bool true) ()
+    |> unsafe_of_sexp
+
+  let get2 m i j =
+    Low_level.access_realsxp2 m i j
+
+  let get_row m i =
+    call subset_symbol [
+      arg Numeric.to_sexp m  ;
+      arg Enc.int i ;
+      arg Enc.sexp missing_arg ;
+    ]
+    |> Numeric.unsafe_of_sexp
+
+  let get_col m j =
+    call subset_symbol [
+      arg Numeric.to_sexp m  ;
+      arg Enc.sexp missing_arg ;
+      arg Enc.int j ;
+    ]
+    |> Numeric.unsafe_of_sexp
+end
+
 module List_ = struct
   include Vecsxp
 
@@ -167,43 +204,12 @@ module Dataframe = struct
       arg Enc.int j ;
     ]
     |> classify_column
-end
 
-module Matrix = struct
-  include Numeric
-
-  let dim (x : t) =
-    match Stubs2.dim (to_sexp x) |> Dec.ints with
-    | [| i ; j |] -> (i, j)
-    | _ -> assert false
-
-  let of_arrays m =
-    let data =
-      Array.to_list m
-      |> Array.concat
-      |> Enc.floats
-    in
-    Stubs.matrix ~data ~nrow:(Enc.int (Array.length m)) ~byrow:(Enc.bool true) ()
-    |> unsafe_of_sexp
-
-  let get2 m i j =
-    Low_level.access_realsxp2 m i j
-
-  let get_row m i =
-    call subset_symbol [
-      arg Numeric.to_sexp m  ;
-      arg Enc.int i ;
-      arg Enc.sexp missing_arg ;
+  let as'matrix df =
+    call Stubs.as'matrix'data'frame_symbol [
+      arg to_sexp df ;
     ]
-    |> Numeric.unsafe_of_sexp
-
-  let get_col m j =
-    call subset_symbol [
-      arg Numeric.to_sexp m  ;
-      arg Enc.sexp missing_arg ;
-      arg Enc.int j ;
-    ]
-    |> Numeric.unsafe_of_sexp
+    |> Matrix.unsafe_of_sexp
 end
 
 let sample ?replace ?prob ~size x =
