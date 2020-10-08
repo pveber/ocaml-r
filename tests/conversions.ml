@@ -1,6 +1,9 @@
 open OCamlR
 open OCamlR_base
 
+let test_inherits () =
+  Alcotest.(check bool) "inherits" true (inherits (eval_string "c(1)") "numeric")
+
 let test_back_and_from ty to_r from_r cases =
   let f i case =
     (to_r case |> from_r)

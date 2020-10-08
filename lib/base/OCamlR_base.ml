@@ -14,6 +14,14 @@ let gen_raw_subset2 label_dec x label =
 let raw_subset2 = gen_raw_subset2 Enc.string
 let raw_subset2_i = gen_raw_subset2 Enc.int
 
+let inherits_symbol = symbol "inherits"
+let inherits x s =
+  call inherits_symbol [
+    arg (fun x -> x) x ;
+    arg Enc.string s
+  ]
+  |> Dec.bool
+
 module Environment = struct
   include Envsxp
 

@@ -2,6 +2,8 @@
 
 open OCamlR
 
+val inherits : Sexp.t -> string -> bool
+
 module Environment : sig
   include SXP
 
