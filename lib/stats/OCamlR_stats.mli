@@ -1,4 +1,3 @@
-
 (** Runtime R statistics library. *)
 
 open OCamlR_base
@@ -75,7 +74,7 @@ module Chisq'test : sig
     ?correct:bool ->
     ?simulate'p'value:bool ->
     ?b:int ->
-    Matrix.t ->
+    Integer.Matrix.t ->
     t
 end
 

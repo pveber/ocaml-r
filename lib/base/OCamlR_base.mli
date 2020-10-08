@@ -13,10 +13,27 @@ module Environment : sig
   val get : t -> class_:string -> string -> Sexp.t option
 end
 
-module Numeric : Atomic_vector with type repr := float
-module Logical : Atomic_vector with type repr := bool
-module Integer : Atomic_vector with type repr := int
-module Character : Atomic_vector with type repr := string
+module type Matrix = sig
+  include Atomic_vector
+  type vector
+  val dim : t -> int * int
+  val as_vector : t -> vector
+  val of_arrays : repr array array -> t
+  val get2 : t -> int -> int -> repr
+  val get_row : t -> int -> vector
+  val get_col : t -> int -> vector
+end
+
+module type Vector = sig
+  include Atomic_vector
+  module Matrix : Matrix with type repr := repr
+                          and type vector := t
+end
+
+module Numeric : Vector with type repr := float
+module Logical : Vector with type repr := bool
+module Integer : Vector with type repr := int
+module Character : Vector with type repr := string
 
 module Factor : sig
   include module type of Integer
@@ -25,14 +42,13 @@ module Factor : sig
   val levels : t -> Character.t
 end
 
-module Matrix : sig
-  include module type of Numeric
-  val dim : t -> int * int
-  val of_arrays : float array array -> t
-  val get2 : t -> int -> int -> float
-  val get_row : t -> int -> Numeric.t
-  val get_col : t -> int -> Numeric.t
-end
+type matrix = [
+  | `Numeric   of Numeric.Matrix.t
+  | `Logical   of Logical.Matrix.t
+  | `Integer   of Integer.Matrix.t
+  | `Factor    of Factor.Matrix.t
+  | `Character of Character.Matrix.t
+]
 
 module List_ : sig
   include SXP
@@ -52,7 +68,7 @@ module Dataframe : sig
   val as_list : t -> List_.t
 
   type column = [
-      `Numeric of Numeric.t
+    | `Numeric of Numeric.t
     | `Integer of Integer.t
     | `Logical of Logical.t
     | `Character of Character.t
@@ -66,7 +82,7 @@ module Dataframe : sig
   val get_row : t -> int -> t
   val get_col : t -> int -> column
 
-  val as'matrix : t -> Matrix.t
+  val as'matrix : t -> matrix
 end
 
 

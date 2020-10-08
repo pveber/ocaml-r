@@ -167,27 +167,28 @@ module type Atomic_vector = sig
   val of_array_opt : repr option array -> t
   val to_array_opt : t -> repr option array
   val get_opt : t -> int -> repr option
+  val get2 : t -> int -> int -> repr
 end
 
 (** R array of integer values *)
 module Intsxp : Atomic_vector with type t = intsxp
-                               and type repr := int
+                               and type repr = int
 
 (** R array of boolean values *)
 module Lglsxp : Atomic_vector with type t = lglsxp
-                               and type repr := bool
+                               and type repr = bool
 
 (** R array of float values *)
 module Realsxp : Atomic_vector with type t = realsxp
-                                and type repr := float
+                                and type repr = float
 
 (** R array of string values *)
 module Strsxp : Atomic_vector with type t = strsxp
-                               and type repr := string
+                               and type repr = string
 
 (** R list *)
 module Vecsxp : Vector with type t = vecsxp
-                        and type repr := Sexp.t
+                        and type repr = Sexp.t
 
 
 (** {2 Value inspection} *)

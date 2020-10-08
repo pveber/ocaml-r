@@ -97,7 +97,7 @@ module Chisq'test = struct
 
   let contingency_table ?correct ?simulate'p'value ?b mat =
     S.chisq'test
-      ~x:(Matrix.to_sexp mat)
+      ~x:(Integer.Matrix.to_sexp mat)
       ?correct:(o correct Enc.bool)
       ?simulate'p'value:(o simulate'p'value Enc.bool)
       ?_B:(o b Enc.int)

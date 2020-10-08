@@ -179,13 +179,16 @@ module Low_level = struct
   external inspect_promsxp_env     : promsxp        -> sexp          = "ocamlr_inspect_promsxp_env"
 
   external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
+  external access_lglsxp2 : lglsxp -> int -> int -> bool = "ocamlr_access_lglsxp2"
   external access_lglsxp_opt : lglsxp  -> int -> bool option = "ocamlr_access_lglsxp_opt"
   external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"
+  external access_intsxp2 : intsxp -> int -> int -> int = "ocamlr_access_intsxp2"
   external access_intsxp_opt  : intsxp  -> int -> int option = "ocamlr_access_intsxp_opt"
   external access_realsxp : realsxp -> int -> float    = "ocamlr_access_realsxp"
   external access_realsxp2 : realsxp -> int -> int -> float    = "ocamlr_access_realsxp2"
   external access_realsxp_opt : realsxp -> int -> float option = "ocamlr_access_realsxp_opt"
   external access_strsxp  : strsxp  -> int -> string   = "ocamlr_access_strsxp"
+  external access_strsxp2 : strsxp -> int -> int -> string = "ocamlr_access_strsxp2"
   external access_strsxp_opt  : strsxp  -> int -> string option = "ocamlr_access_strsxp_opt"
   external access_vecsxp  : vecsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
   external access_rawsxp  : rawsxp  -> int -> sexp     = "ocamlr_access_vecsxp"
@@ -730,6 +733,7 @@ module type Atomic_vector = sig
   val of_array_opt : repr option array -> t
   val to_array_opt : t -> repr option array
   val get_opt : t -> int -> repr option
+  val get2 : t -> int -> int -> repr
 end
 
 module type Vector_ops = sig
@@ -742,12 +746,14 @@ end
 
 module type Atomic_vector_ops = sig
   include Vector_ops
+  val access2    : t sxp -> int -> int -> repr
   val access_opt : t sxp -> int -> repr option
   val assign_opt : t sxp -> int -> repr option -> unit
 end
 
 module Vector_impl(K : Vector_ops) = struct
   include Sxp.Impl(struct type t = K.t end)(Sexp)
+  type repr = K.repr
   let length (x : t) = length_of_vector x
   let to_list = list_of_vector K.access
   let of_list = vector_of_list K.alloc K.assign
@@ -758,6 +764,7 @@ end
 
 module Atomic_vector_impl(K : Atomic_vector_ops) = struct
   include Vector_impl(K)
+  let get2 = K.access2
   let to_array_opt = array_of_vector K.access_opt
   let of_array_opt = vector_of_array K.alloc K.assign_opt
   let get_opt = K.access_opt
@@ -768,6 +775,7 @@ module Intsxp = struct
     type t = [`Int]
     type repr = int
     let access = access_intsxp
+    let access2 = access_intsxp2
     let access_opt = access_intsxp_opt
     let alloc = alloc_intsxp
     let assign = assign_intsxp
@@ -781,6 +789,7 @@ module Realsxp = struct
     type t = [`Real]
     type repr = float
     let access = access_realsxp
+    let access2 = access_realsxp2
     let access_opt = access_realsxp_opt
     let alloc = alloc_real_vector
     let assign = assign_realsxp
@@ -794,6 +803,7 @@ module Lglsxp = struct
     type t = [`Lgl]
     type repr = bool
     let access = access_lglsxp
+    let access2 = access_lglsxp2
     let access_opt = access_lglsxp_opt
     let alloc = alloc_lglsxp
     let assign = assign_lglsxp
@@ -807,6 +817,7 @@ module Strsxp = struct
     type t = [`Str]
     type repr = string
     let access = access_strsxp
+    let access2 = access_strsxp2
     let access_opt = access_strsxp_opt
     let alloc = alloc_str_vector
     let assign = assign_strsxp

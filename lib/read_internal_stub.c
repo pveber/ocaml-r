@@ -278,6 +278,13 @@ CAMLprim value ocamlr_access_lglsxp (value lglsxp, value offset) {
   return(Val_bool(LOGICAL(Sexp_val(lglsxp))[Int_val(offset)]));
 }
 
+CAMLprim value ocamlr_access_lglsxp2 (value lglsxp, value row, value column) {
+  SEXP mat = Sexp_val(lglsxp);
+  int nr = nrows(mat);
+  int k = Int_val(column) * nr + Int_val(row);
+  return Val_bool(LOGICAL(mat)[k]);
+}
+
 CAMLprim value ocamlr_access_lglsxp_opt(value lglsxp, value offset) {
   int i = LOGICAL(Sexp_val(lglsxp))[Int_val(offset)];
   if(i == NA_LOGICAL) return Val_int(0);
@@ -302,6 +309,13 @@ CAMLprim value ocamlr_access_intsxp (value intsxp, value offset) {
      is here somewhat confusing (or confused)... Is offset an int? */
 
   return(Val_int(INTEGER(Sexp_val(intsxp))[Int_val(offset)]));
+}
+
+CAMLprim value ocamlr_access_intsxp2 (value intsxp, value row, value column) {
+  SEXP mat = Sexp_val(intsxp);
+  int nr = nrows(mat);
+  int k = Int_val(column) * nr + Int_val(row);
+  return Val_int(INTEGER(mat)[k]);
 }
 
 /**  Returns an element of a vector of integers, accounting for NAs
@@ -364,7 +378,14 @@ CAMLprim value ocamlr_access_strsxp (value strsxp, value offset) {
   /* Same comments as for r_access_int_vecsxp and for
      r_internal_string_of_charsxp. */
 
-  return(caml_copy_string(CHAR(STRING_ELT(Sexp_val(strsxp), (Int_val(offset))))));
+  return(caml_copy_string(CHAR(STRING_ELT(Sexp_val(strsxp), Int_val(offset)))));
+}
+
+CAMLprim value ocamlr_access_strsxp2 (value strsxp, value row, value column) {
+  SEXP mat = Sexp_val(strsxp);
+  int nr = nrows(mat);
+  int k = Int_val(column) * nr + Int_val(row);
+  return caml_copy_string(CHAR(STRING_ELT(mat, k)));
 }
 
 CAMLprim value ocamlr_access_strsxp_opt (value strsxp, value offset) {

@@ -38,10 +38,69 @@ module Environment = struct
     else None
 end
 
-module Numeric = Realsxp
-module Logical = Lglsxp
-module Integer = Intsxp
-module Character = Strsxp
+module type Matrix = sig
+  include Atomic_vector
+  type vector
+  val dim : t -> int * int
+  val as_vector : t -> vector
+  val of_arrays : repr array array -> t
+  val get2 : t -> int -> int -> repr
+  val get_row : t -> int -> vector
+  val get_col : t -> int -> vector
+end
+
+module Make_matrix(V : Atomic_vector) = struct
+  include V
+
+  let dim (x : t) =
+    match Stubs2.dim (to_sexp x) |> Dec.ints with
+    | [| i ; j |] -> (i, j)
+    | _ -> assert false
+
+  let as_vector x = x
+
+  let of_arrays m =
+    let data =
+      Array.to_list m
+      |> Array.concat
+      |> V.of_array
+      |> to_sexp
+    in
+    Stubs.matrix ~data ~nrow:(Enc.int (Array.length m)) ~byrow:(Enc.bool true) ()
+    |> unsafe_of_sexp
+
+  let get_row m i =
+    call subset_symbol [
+      arg V.to_sexp m  ;
+      arg Enc.int i ;
+      arg Enc.sexp missing_arg ;
+    ]
+    |> V.unsafe_of_sexp
+
+  let get_col m j =
+    call subset_symbol [
+      arg V.to_sexp m  ;
+      arg Enc.sexp missing_arg ;
+      arg Enc.int j ;
+    ]
+    |> V.unsafe_of_sexp
+end
+
+module type Vector = sig
+  include Atomic_vector
+  module Matrix : Matrix with type repr := repr
+                          and type vector := t
+end
+
+module Make_vector(V : Atomic_vector) = struct
+  include V
+  module Matrix = Make_matrix(V)
+end
+
+module Numeric = Make_vector(Realsxp)
+module Logical = Make_vector(Lglsxp)
+module Integer = Make_vector(Intsxp)
+module Character = Make_vector(Strsxp)
 
 module Factor = struct
   include Integer
@@ -63,42 +122,24 @@ module Factor = struct
     |> Character.unsafe_of_sexp
 end
 
-module Matrix = struct
-  include Numeric
+type matrix = [
+  | `Numeric   of Numeric.Matrix.t
+  | `Logical   of Logical.Matrix.t
+  | `Integer   of Integer.Matrix.t
+  | `Factor    of Factor.Matrix.t
+  | `Character of Character.Matrix.t
+]
 
-  let dim (x : t) =
-    match Stubs2.dim (to_sexp x) |> Dec.ints with
-    | [| i ; j |] -> (i, j)
-    | _ -> assert false
-
-  let of_arrays m =
-    let data =
-      Array.to_list m
-      |> Array.concat
-      |> Enc.floats
-    in
-    Stubs.matrix ~data ~nrow:(Enc.int (Array.length m)) ~byrow:(Enc.bool true) ()
-    |> unsafe_of_sexp
-
-  let get2 m i j =
-    Low_level.access_realsxp2 m i j
-
-  let get_row m i =
-    call subset_symbol [
-      arg Numeric.to_sexp m  ;
-      arg Enc.int i ;
-      arg Enc.sexp missing_arg ;
-    ]
-    |> Numeric.unsafe_of_sexp
-
-  let get_col m j =
-    call subset_symbol [
-      arg Numeric.to_sexp m  ;
-      arg Enc.sexp missing_arg ;
-      arg Enc.int j ;
-    ]
-    |> Numeric.unsafe_of_sexp
-end
+let classify_atomic_data x =
+  match Sexptype.of_sexp x with
+  | IntSxp ->
+    if inherits x "factor"
+    then Some (`Factor (Factor.unsafe_of_sexp x))
+    else Some (`Integer (Integer.unsafe_of_sexp x))
+  | RealSxp -> Some (`Numeric (Numeric.unsafe_of_sexp x))
+  | StrSxp -> Some (`Character (Character.unsafe_of_sexp x))
+  | LglSxp -> Some (`Logical (Logical.unsafe_of_sexp x))
+  | _ -> None
 
 module List_ = struct
   include Vecsxp
@@ -181,21 +222,15 @@ module Dataframe = struct
     |> unsafe_of_sexp
 
   let classify_column x =
-    match Sexptype.of_sexp x with
-    | IntSxp ->
-      if inherits x "factor"
-      then `Factor (Factor.unsafe_of_sexp x)
-      else `Integer (Integer.unsafe_of_sexp x)
-    | RealSxp -> `Numeric (Numeric.unsafe_of_sexp x)
-    | StrSxp -> `Character (Character.unsafe_of_sexp x)
-    | LglSxp -> `Logical (Logical.unsafe_of_sexp x)
-    | t ->
+    match classify_atomic_data x with
+    | Some x -> x
+    | None ->
       let msg =
         Printf.sprintf
           "OCamlR_base.Dataframe.classify_column: unsupported %s sexp"
-          (Sexptype.to_string t)
-      in
-      invalid_arg msg
+          (Sexptype.to_string (Sexptype.of_sexp x))
+    in
+    invalid_arg msg
 
   let get_col m j =
     call subset_symbol [
@@ -209,7 +244,8 @@ module Dataframe = struct
     call Stubs.as'matrix'data'frame_symbol [
       arg to_sexp df ;
     ]
-    |> Matrix.unsafe_of_sexp
+    |> classify_atomic_data
+    |> Option.get
 end
 
 let sample ?replace ?prob ~size x =
