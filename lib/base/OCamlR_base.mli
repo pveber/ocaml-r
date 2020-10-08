@@ -42,16 +42,20 @@ module Dataframe : sig
 
   val as_list : t -> List_.t
 
-  type column
-  val numeric : string -> Numeric.t -> column
-  val integer : string -> Integer.t -> column
-  val logical : string -> Logical.t -> column
-  val character : string -> Character.t -> column
-  val factor : string -> Factor.t -> column
+  type column = [
+      `Numeric of Numeric.t
+    | `Integer of Integer.t
+    | `Logical of Logical.t
+    | `Character of Character.t
+    | `Factor of Factor.t
+  ]
 
-  val create : column list -> t
+  val create : (string * column) list -> t
   val rbind : t -> t -> t
   val cbind : t -> t -> t
+
+  val get_row : t -> int -> t
+  val get_col : t -> int -> column
 end
 
 

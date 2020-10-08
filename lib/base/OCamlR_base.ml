@@ -3,7 +3,9 @@ open OCamlR
 module Stubs = OCamlR_base_stubs
 module Stubs2 = OCamlR_base_stubs2
 
+let subset_symbol = symbol "["
 let subset2_symbol = symbol ~generic:true "[["
+let missing_arg = (Symsxp.missing_arg () :> sexp)
 
 let gen_raw_subset2 label_dec x label =
   call subset2_symbol [
@@ -95,30 +97,22 @@ module Dataframe = struct
     Environment.get env ~class_:"data.frame" x
     |> Option.map unsafe_of_sexp
 
-  type column_data =
-    | Numeric of Numeric.t
-    | Logical of Logical.t
-    | Character of Character.t
-    | Factor of Factor.t
-    | Integer of Integer.t
-
-  type column = string * column_data
+  type column = [
+      `Numeric of Numeric.t
+    | `Integer of Integer.t
+    | `Logical of Logical.t
+    | `Character of Character.t
+    | `Factor of Factor.t
+  ]
 
   let rarg_of_column_data name =
     let f g x = arg g ~name x in
     function
-    | Numeric x -> f Numeric.to_sexp x
-    | Logical x -> f Logical.to_sexp x
-    | Character x -> f Character.to_sexp x
-    | Integer x -> f Integer.to_sexp x
-    | Factor x -> f Factor.to_sexp x
-
-  let numeric name x = name, Numeric x
-  let integer name x = name, Integer x
-  let logical name x = name, Logical x
-  let character name x = name, Character  x
-  let factor name x = name, Factor x
-
+    | `Numeric x -> f Numeric.to_sexp x
+    | `Logical x -> f Logical.to_sexp x
+    | `Character x -> f Character.to_sexp x
+    | `Integer x -> f Integer.to_sexp x
+    | `Factor x -> f Factor.to_sexp x
 
   let create cols =
     List.map
@@ -140,6 +134,39 @@ module Dataframe = struct
       arg to_sexp y ;
     ]
     |> unsafe_of_sexp
+
+  let get_row m i =
+    call subset_symbol [
+      arg to_sexp m  ;
+      arg Enc.int i ;
+      arg Enc.sexp missing_arg ;
+    ]
+    |> unsafe_of_sexp
+
+  let classify_column x =
+    match Sexptype.of_sexp x with
+    | IntSxp ->
+      if inherits x "factor"
+      then `Factor (Factor.unsafe_of_sexp x)
+      else `Integer (Integer.unsafe_of_sexp x)
+    | RealSxp -> `Numeric (Numeric.unsafe_of_sexp x)
+    | StrSxp -> `Character (Character.unsafe_of_sexp x)
+    | LglSxp -> `Logical (Logical.unsafe_of_sexp x)
+    | t ->
+      let msg =
+        Printf.sprintf
+          "OCamlR_base.Dataframe.classify_column: unsupported %s sexp"
+          (Sexptype.to_string t)
+      in
+      invalid_arg msg
+
+  let get_col m j =
+    call subset_symbol [
+      arg to_sexp m  ;
+      arg Enc.sexp missing_arg ;
+      arg Enc.int j ;
+    ]
+    |> classify_column
 end
 
 module Matrix = struct
@@ -161,9 +188,6 @@ module Matrix = struct
 
   let get2 m i j =
     Low_level.access_realsxp2 m i j
-
-  let subset_symbol = symbol "["
-  let missing_arg = (Symsxp.missing_arg () :> sexp)
 
   let get_row m i =
     call subset_symbol [
