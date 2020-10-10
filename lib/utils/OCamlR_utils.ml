@@ -5,14 +5,14 @@ open OCamlR_base
 module Stubs = OCamlR_utils_stubs
 
 let data ?envir name =
-  R.eval (R.symbol "data") [
-    R.arg R.string name ;
-    R.opt Environment.r "envir" envir ;
+  call (symbol "data") Enc.[
+    arg string name ;
+    opt_arg Environment.to_sexp "envir" envir ;
   ]
   |> ignore
 
 let r_numerals o =
-  R.string (
+  Enc.string (
     match o with
     | `allow'loss -> "allow.loss"
     | `warn'loss -> "warn.loss"
@@ -24,29 +24,31 @@ let read'table
     ?numerals ?row'names ?col'names
     ?na'strings ?check'names ?strip'white
     ?comment'char ?stringsAsFactors file =
+  let open Enc in
   Stubs.read'table
-    ~file:(file |> R.string)
-    ?header:(header |?> R.bool)
-    ?sep:(sep |?> R.string)
-    ?quote:(quote |?> R.string)
-    ?dec:(dec |?> R.string)
+    ~file:(file |> string)
+    ?header:(header |?> bool)
+    ?sep:(sep |?> string)
+    ?quote:(quote |?> string)
+    ?dec:(dec |?> string)
     ?numerals:(numerals |?> r_numerals)
-    ?col'names:(col'names |?> R.bool)
-    ?row'names:(row'names |?> R.bool)
-    ?na'strings:(na'strings |?> R.string)
-    ?check'names:(check'names |?> R.bool)
-    ?strip'white:(strip'white |?> R.bool)
-    ?comment'char:(comment'char |?> R.string)
-    ?stringsAsFactors:(stringsAsFactors |?> R.bool)
+    ?col'names:(col'names |?> bool)
+    ?row'names:(row'names |?> bool)
+    ?na'strings:(na'strings |?> string)
+    ?check'names:(check'names |?> bool)
+    ?strip'white:(strip'white |?> bool)
+    ?comment'char:(comment'char |?> string)
+    ?stringsAsFactors:(stringsAsFactors |?> bool)
     ()
-  |> Dataframe.Unsafe.of_r
+  |> Dataframe.unsafe_of_sexp
 
 let write'table ?file ?sep ?col'names ?row'names ?quote x =
+  let open Enc in
   Stubs.write'table
-    ?file:(file |?> R.string)
-    ?sep:(sep |?> R.string)
-    ?col'names:(col'names |?> R.bool)
-    ?row'names:(row'names |?> R.bool)
-    ?quote:(quote |?> R.bool)
-    ~x:(Dataframe.r x) ()
+    ?file:(file |?> string)
+    ?sep:(sep |?> string)
+    ?col'names:(col'names |?> bool)
+    ?row'names:(row'names |?> bool)
+    ?quote:(quote |?> bool)
+    ~x:(Dataframe.to_sexp x) ()
   |> ignore

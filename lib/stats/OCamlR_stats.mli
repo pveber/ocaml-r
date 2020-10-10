@@ -1,12 +1,9 @@
-
 (** Runtime R statistics library. *)
 
 open OCamlR_base
 
 module Formula : sig
-  type t
-  include module type of S3 with type t := t
-
+  include OCamlR.SXP
   val of_string : string -> t
 end
 
@@ -25,77 +22,74 @@ end
 
 (** {2 Random number generation} *)
 
-val rnorm : ?mean:float -> ?sd:float -> int -> float array
+val rnorm : ?mean:float -> ?sd:float -> int -> Numeric.t
 (** Random generation for the normal distribution. [mean] and [sd] default to [0.]
     and [1.] respectively. *)
 
 
 (** {2 Tests} *)
 
-val fisher'test :
-  ?alternative:[`two_sided | `greater | `less] ->
-  Logical.t ->
-  Logical.t ->
-  < p'value : float ;
-    conf'int : (float * float) option  ;
-    estimate : float ;
-    null'value : float ;
-    alternative : string ;
-    method_ : string ;
-    data'name : string >
+(** Common interface for test results *)
+module type Test = sig
+  include module type of List_
+  val p'value : t -> float
+  val _method_ : t -> string
+  val data'name : t -> string
+  val alternative : t -> string
+end
 
-(* val fisher'test_2x2 :
- *   ?alternative:[`two_sided | `greater | `less] ->
- *   ff:int -> ft:int -> tf:int -> tt:int -> unit ->
- *   < p'value : float ;
- *     conf'int : (float * float) option  ;
- *     estimate : float ;
- *     null'value : float ;
- *     alternative : string ;
- *     method_ : string ;
- *     data'name : string > *)
+(** Student's T test *)
+module T'test : sig
+  include Test
+  val conf'int : t -> (float * float) option
+  val estimate : t -> float
+  val null'value : t -> float
 
-val chisq'test_contingency_table :
-  ?correct:bool ->
-  ?simulate'p'value:bool ->
-  ?b:int ->
-  Matrix.t ->
-  < statistic : float ;
-    p'value : float ;
-    method_ : string ;
-    data'name : string >
+  val one_sample :
+    ?alternative:[`two_sided | `greater | `less] ->
+    Numeric.t ->
+    t
+end
 
-val ks'test :
-  ?alternative:[`two_sided | `greater | `less] ->
-  float array -> float array ->
-  < statistic : float ;
-    p'value : float ;
-    alternative : string ;
-    method_ : string ;
-    data'name : string >
+(** Fisher's exact test for independence *)
+module Fisher'test : sig
+  include Test
+  val conf'int : t -> (float * float) option
+  val estimate : t -> float
+  val null'value : t -> float
+
+  val logicals :
+    ?alternative:[`two_sided | `greater | `less] ->
+    Logical.t ->
+    Logical.t ->
+    t
+end
+
+(** Chi-squared test for independence *)
+module Chisq'test : sig
+  include Test
+  val statistic : t -> float
+
+  val contingency_table :
+    ?correct:bool ->
+    ?simulate'p'value:bool ->
+    ?b:int ->
+    Integer.Matrix.t ->
+    t
+end
+
+(** Kolmogorov-Smirnov test *)
+module Ks'test : sig
+  include Test
+  val statistic : t -> float
+  val make :
+    ?alternative:[`two_sided | `greater | `less] ->
+    Numeric.t ->
+    Numeric.t ->
+    t
+end
 
 val p'adjust :
   ?method_ : [`holm | `hochberg | `hommel | `bonferroni | `BH | `BY | `fdr] ->
-  float array -> float array
-
-
-
-
-(* module Stub : sig *)
-
-
-
-(*   (\** {5 Misc} *\) *)
-
-(*   val cor : 'a R.t -> ?y:'b R.t -> ?use:'c R.t -> ?cor_method:'d R.t -> unit -> 'e R.t *)
-(*   (\**  Calculates correlations. *\) *)
-
-(*   val lm : 'a R.t -> ?data:'b R.t -> ?subset:'c R.t -> ?weights:'d R.t -> *)
-(*     ?na_action:'e R.t -> ?lm_method:'f R.t -> ?model:'g R.t -> ?x:'h R.t -> *)
-(*     ?y:'i R.t -> ?qr:'j R.t -> ?singular_ok:'k R.t -> ?contrasts:'l R.t -> *)
-(*     ?offset:'m R.t -> unit -> 'n R.t *)
-(*   (\**  Makes a linear regression. *\) *)
-
-
-
-(* end *)
+  Numeric.t ->
+  Numeric.t

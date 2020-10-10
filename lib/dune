@@ -2,6 +2,7 @@
  (name             OCamlR)
  (public_name      ocaml-r)
  (libraries        unix)
+ (private_modules  Standard_environment)
  (c_names          initialisation_stub
                    sexp
 		   databridge
@@ -23,6 +24,10 @@
   (action  (run %{discover})))
 
 (rule
- (targets standard.ml)
+ (targets standard_environment.ml)
  (deps    (:script standard.R))
  (action  (with-stdout-to %{targets} (run Rscript %{script}))))
+
+(documentation
+  (package ocaml-r)
+  (mld_files index))

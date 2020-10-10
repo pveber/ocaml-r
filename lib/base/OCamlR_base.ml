@@ -1,342 +1,270 @@
 open OCamlR
-open OCamlR_wraputils
 
 module Stubs = OCamlR_base_stubs
 module Stubs2 = OCamlR_base_stubs2
 
-let ( |? ) o f = match o with
-  | Some x -> Some (f x)
-  | None -> None
+let subset_symbol = symbol "["
+let subset2_symbol = symbol ~generic:true "[["
+let missing_arg = (Symsxp.missing_arg () :> sexp)
 
-let subset x i = Stubs2.subset x (R.int i)
-let subset_ii x i j = Stubs2.subset_ii x (R.int i) (R.int j)
-let subset2_i x i = Stubs2.subset2_i x (R.int i)
-let subset2_s x s = Stubs2.subset2_s x (R.string s)
+let gen_raw_subset2 label_dec x label =
+  call subset2_symbol [
+      arg Enc.sexp x ;
+      arg label_dec label ;
+  ]
 
-module type Atomic_vector = sig
-  type t
-  type format
-  type elt
-  val r : t -> format R.t
-  val length : t -> int
-  val to_array : t -> elt array
-  val of_array : elt array -> t
-end
+let raw_subset2 = gen_raw_subset2 Enc.string
+let raw_subset2_i = gen_raw_subset2 Enc.int
 
-module Atomic_vector_impl(X : sig
-    type format
-    type elt
-    val to_array : format R.t -> elt array
-    val of_array : elt array -> format R.t
-  end) = struct
-  include X
-  type t = X.format R.t
-
-  let r x = x
-  let to_array = X.to_array
-  let of_array = X.of_array
-  let length =
-    let symbol = R.symbol "length" in
-    fun (x : t) ->
-      R.int_of_t (R.eval symbol [ R.arg ident x ])
-end
-
-module Numeric = struct
-  module E = struct
-    type format = R.reals
-    type elt = float
-    let to_array = R.floats_of_t
-    let of_array = R.floats
-  end
-  include Atomic_vector_impl(E)
-end
-
-module Integer = struct
-  module E = struct
-    type format = R.integers
-    type elt = int
-    let to_array = R.ints_of_t
-    let of_array = R.ints
-  end
-  include Atomic_vector_impl(E)
-end
-
-module Logical = struct
-  module E = struct
-    type format = R.logicals
-    type elt = bool
-    let to_array = R.bools_of_t
-    let of_array = R.bools
-  end
-  include Atomic_vector_impl(E)
-end
-
-module Character = struct
-  module E = struct
-    type format = R.strings
-    type elt = string
-    let to_array = R.strings_of_t
-    let of_array = R.strings
-  end
-  include Atomic_vector_impl(E)
-end
-
-module Factor = struct
-  include Character
-end
-
-module S3 = struct
-  type t = t R.t
-  let r x = x
-  let _class_ =
-    let symbol = R.symbol "class" in
-    fun (x : t) ->
-      R.strings_of_t (R.eval symbol [ R.arg ident x ])
-  let unsafe_of_r x = R.cast (x : _ R.t :> R.sexp)
-end
+let inherits_symbol = symbol "inherits"
+let inherits x s =
+  call inherits_symbol [
+    arg (fun x -> x) x ;
+    arg Enc.string s
+  ]
+  |> Dec.bool
 
 module Environment = struct
-  include S3
-  let create () = Stubs.new'env ()
-  let unsafe_get env ~class_ x =
-    let y = Stubs2.subset2_s env (R.string x) in
-    let cls = R.classes (y : _ R.t :> R.sexp) in
-    if List.mem class_ cls then
-      Some y
+  include Envsxp
+
+  let create () =
+    Stubs.new'env ()
+    |> unsafe_of_sexp
+
+  let get env ~class_ x =
+    let y = raw_subset2 (to_sexp env) x in
+    let cls = Sexp._class_ y in
+    if List.mem class_ cls then Some y
     else None
 end
 
-module List_ = struct
-  include S3
-
-  let length x =
-    OCamlR_base_stubs2.length x
-    |> R.int_of_t
-
-  module Unsafe = struct
-    let of_r r = R.cast (r : _ R.t :> R.sexp)
-
-    let subset2 x y =
-      OCamlR_base_stubs2.subset2_s x (R.string y)
-
-    let subset2_i x i =
-      OCamlR_base_stubs2.subset2_i x (R.int i)
-  end
+module type Matrix = sig
+  include Atomic_vector
+  type vector
+  val dim : t -> int * int
+  val as_vector : t -> vector
+  val of_arrays : repr array array -> t
+  val get2 : t -> int -> int -> repr
+  val get_row : t -> int -> vector
+  val get_col : t -> int -> vector
 end
 
-module Dataframe = struct
-  include List_
-
-  let as_list x = x
-
-  let dim x =
-    match Stubs.dim'data'frame ~x () |> R.ints_of_t with
-    | [| i ; j |] -> (i, j)
-    | _ -> assert false
-
-  let of_env env x =
-    Environment.unsafe_get env ~class_:"data.frame" x
-
-  type column_data =
-    | Numeric of Numeric.t
-    | Logical of Logical.t
-    | Character of Character.t
-    | Factor of Factor.t
-    | Integer of Integer.t
-
-  type column = string * column_data
-
-  let rarg_of_column_data name =
-    let f x = R.arg (fun x -> x) ~name x in
-    function
-    | Numeric x -> f x
-    | Logical x -> f x
-    | Character x -> f x
-    | Integer x -> f x
-    | Factor x -> f x
-
-  let numeric name x = name, Numeric x
-  let integer name x = name, Integer x
-  let logical name x = name, Logical x
-  let character name x = name, Character  x
-  let factor name x = name, Factor x
-
-
-  let create cols =
-    List.map
-      (fun (label, col) -> rarg_of_column_data label col)
-      cols
-    |> R.eval (R.symbol "data.frame")
-
-  let rbind x y =
-    R.eval Stubs.rbind_symbol [
-      R.arg (fun x -> x) x ;
-      R.arg (fun x -> x) y
-    ]
-
-  let cbind x y =
-    R.eval Stubs.cbind_symbol [
-      R.arg (fun x -> x) x ;
-      R.arg (fun x -> x) y
-    ]
-end
-
-module Matrix = struct
-  include S3
+module Make_matrix(V : Atomic_vector) = struct
+  include V
 
   let dim (x : t) =
-    match Stubs2.dim x |> R.ints_of_t with
+    match Stubs2.dim (to_sexp x) |> Dec.ints with
     | [| i ; j |] -> (i, j)
     | _ -> assert false
+
+  let as_vector x = x
 
   let of_arrays m =
     let data =
       Array.to_list m
       |> Array.concat
-      |> R.floats
+      |> V.of_array
+      |> to_sexp
     in
-    Stubs.matrix ~data ~nrow:(R.int (Array.length m)) ~byrow:(R.bool true) ()
+    Stubs.matrix ~data ~nrow:(Enc.int (Array.length m)) ~byrow:(Enc.bool true) ()
+    |> unsafe_of_sexp
+
+  let get_row m i =
+    call subset_symbol [
+      arg V.to_sexp m  ;
+      arg Enc.int i ;
+      arg Enc.sexp missing_arg ;
+    ]
+    |> V.unsafe_of_sexp
+
+  let get_col m j =
+    call subset_symbol [
+      arg V.to_sexp m  ;
+      arg Enc.sexp missing_arg ;
+      arg Enc.int j ;
+    ]
+    |> V.unsafe_of_sexp
+end
+
+module type Vector = sig
+  include Atomic_vector
+  module Matrix : Matrix with type repr := repr
+                          and type vector := t
+end
+
+module Make_vector(V : Atomic_vector) = struct
+  include V
+  module Matrix = Make_matrix(V)
+end
+
+module Numeric = Make_vector(Realsxp)
+module Logical = Make_vector(Lglsxp)
+module Integer = Make_vector(Intsxp)
+module Character = Make_vector(Strsxp)
+
+module Factor = struct
+  include Integer
+
+  let factor_fun = symbol "factor"
+  let of_integer xs =
+    call factor_fun [ arg Integer.to_sexp xs ]
+    |> unsafe_of_sexp
+  let of_character xs =
+    call factor_fun [ arg Character.to_sexp xs ]
+    |> unsafe_of_sexp
+
+  let of_array xs = of_integer (of_array xs)
+  let of_list xs = of_integer (of_list xs)
+  let of_array_opt xs = of_integer (of_array_opt xs)
+
+  let levels x =
+    attr x "levels"
+    |> Character.unsafe_of_sexp
+end
+
+type matrix = [
+  | `Numeric   of Numeric.Matrix.t
+  | `Logical   of Logical.Matrix.t
+  | `Integer   of Integer.Matrix.t
+  | `Factor    of Factor.Matrix.t
+  | `Character of Character.Matrix.t
+]
+
+let classify_atomic_data x =
+  match Sexptype.of_sexp x with
+  | IntSxp ->
+    if inherits x "factor"
+    then Some (`Factor (Factor.unsafe_of_sexp x))
+    else Some (`Integer (Integer.unsafe_of_sexp x))
+  | RealSxp -> Some (`Numeric (Numeric.unsafe_of_sexp x))
+  | StrSxp -> Some (`Character (Character.unsafe_of_sexp x))
+  | LglSxp -> Some (`Logical (Logical.unsafe_of_sexp x))
+  | _ -> None
+
+module List_ = struct
+  include Vecsxp
+
+  let as_vecsxp x = x
+
+  let gen_subset2 subset2 x field dec =
+    subset2 (to_sexp x) field
+    |> Sexp.nil_map ~f:dec
+
+  let subset2 x field dec = gen_subset2 raw_subset2 x field dec
+  let subset2_i x field dec = gen_subset2 raw_subset2_i x field dec
+
+  let gen_subset2_exn f label x field dec =
+    match f x field dec with
+    | None -> failwith label
+    | Some y -> y
+
+  let subset2_exn x field dec = gen_subset2_exn subset2 "subset2_exn" x field dec
+  let subset2_i_exn x field dec = gen_subset2_exn subset2_i "subset2_i_exn" x field dec
+end
+
+module Dataframe = struct
+  include List_
+  let as_list x = x
+
+  let dim x =
+    match Stubs.dim'data'frame ~x:(to_sexp x) () |> Dec.ints with
+    | [| i ; j |] -> (i, j)
+    | _ -> assert false
+
+  let of_env (env : Environment.t) x =
+    Environment.get env ~class_:"data.frame" x
+    |> Option.map unsafe_of_sexp
+
+  type column = [
+      `Numeric of Numeric.t
+    | `Integer of Integer.t
+    | `Logical of Logical.t
+    | `Character of Character.t
+    | `Factor of Factor.t
+  ]
+
+  let rarg_of_column_data name =
+    let f g x = arg g ~name x in
+    function
+    | `Numeric x -> f Numeric.to_sexp x
+    | `Logical x -> f Logical.to_sexp x
+    | `Character x -> f Character.to_sexp x
+    | `Integer x -> f Integer.to_sexp x
+    | `Factor x -> f Factor.to_sexp x
+
+  let create cols =
+    List.map
+      (fun (label, col) -> rarg_of_column_data label col)
+      cols
+    |> call (symbol "data.frame")
+    |> unsafe_of_sexp
+
+  let rbind x y =
+    call Stubs.rbind_symbol [
+      arg to_sexp x ;
+      arg to_sexp y
+    ]
+    |> unsafe_of_sexp
+
+  let cbind x y =
+    call Stubs.cbind_symbol [
+      arg to_sexp x ;
+      arg to_sexp y ;
+    ]
+    |> unsafe_of_sexp
+
+  let get_row m i =
+    call subset_symbol [
+      arg to_sexp m  ;
+      arg Enc.int i ;
+      arg Enc.sexp missing_arg ;
+    ]
+    |> unsafe_of_sexp
+
+  let classify_column x =
+    match classify_atomic_data x with
+    | Some x -> x
+    | None ->
+      let msg =
+        Printf.sprintf
+          "OCamlR_base.Dataframe.classify_column: unsupported %s sexp"
+          (Sexptype.to_string (Sexptype.of_sexp x))
+    in
+    invalid_arg msg
+
+  let get_col m j =
+    call subset_symbol [
+      arg to_sexp m  ;
+      arg Enc.sexp missing_arg ;
+      arg Enc.int j ;
+    ]
+    |> classify_column
+
+  let as'matrix df =
+    call Stubs.as'matrix'data'frame_symbol [
+      arg to_sexp df ;
+    ]
+    |> classify_atomic_data
+    |> Option.get
 end
 
 let sample ?replace ?prob ~size x =
   Stubs.sample
-    ~x:(R.floats x)
-    ~size:(R.int size)
-    ?replace:(replace |? R.bool)
-    ?prob:(prob |? R.floats)
+    ~x:(Enc.floats x)
+    ~size:(Enc.int size)
+    ?replace:(Option.map Enc.bool replace)
+    ?prob:(Option.map Enc.floats prob)
     ()
-  |> R.floats_of_t
+  |> Dec.floats
 
 let readRDS fn =
-  Stubs.readRDS ~file:(R.string fn) ()
+  Stubs.readRDS ~file:(Enc.string fn) ()
 
 let saveRDS ?ascii ?compress ~file obj =
   Stubs.saveRDS
     ~object_:obj
-    ~file:(R.string file)
-    ?ascii:(ascii |? R.bool)
-    ?compress:(compress |? R.bool)
+    ~file:(Enc.string file)
+    ?ascii:(Option.map Enc.bool ascii)
+    ?compress:(Option.map Enc.bool compress)
     ()
   |> ignore
-
-(* module Stub = struct *)
-
-(*   (\*   Information about the content of R standard library: *)
-(*     *  http://stat.ethz.ch/R-manual/R-patched/doc/html/packages.html *\) *)
-
-(*   (\*   Information about the R base package: *)
-(*     *  http://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html *\) *)
-
-(*   let sample = R.symbol "sample" *)
-
-(*   let lapply = R.symbol "lapply" *)
-
-(*   let tilde = R.symbol "~" *)
-
-(*   let dollar = R.symbol "$" *)
-
-(*   let dot_subset2 = R.symbol ".subset2" *)
-
-(*   let t = R.symbol "t" *)
-
-(*   let cbind = R.symbol "cbind" *)
-
-(*   let rbind = R.symbol "rbind" *)
-
-(*   let matrix = R.symbol "matrix" *)
-
-
-(* end *)
-
-(* let lapply (x : 'a list R.t) (func : 'b R.t) : 'c list R.t = *)
-(*   (\* It would be nice to solve once and for all the typing of *)
-(*      R.t values by using the 'private' keyword to access the *)
-(*      underlying R.sexp value by subtyping, and by using *)
-(*      polymorphic variants for the parametrised typing of R.t. *\) *)
-(*   (\* There is a ... in the args of lapply, for params passed *)
-(*      to the function 'func'. Might be intelligent to wrap it up. *\) *)
-(*   R.eval Stub.lapply [ *)
-(*     (R.arg (fun x -> x) x)    ; *)
-(*     (R.arg (fun x -> x) func) ] *)
-
-(* class array_ r = object (self) *)
-(*   inherit R.s3 r *)
-(*   method dim : float list R.t =  *)
-(*     R.eval Stub.dim [ *)
-(*       R.arg (fun x -> x) r *)
-(*     ] *)
-(* end *)
-
-(* class matrix r = object (self) *)
-(*   inherit array_ r *)
-(*   method floats : float array array = assert false *)
-(* end *)
-
-(* let matrix ?byrow ~nrow ~ncol v =  *)
-(*   R.eval Stub.matrix [ *)
-(*     R.arg R.floats v ; *)
-(*     R.arg R.int            nrow ; *)
-(*     R.arg R.int            ncol ; *)
-(*     R.opt R.bool   "byrow" byrow ; *)
-(*   ] *)
-
-(* let matrix_by_rows = function *)
-(* | [] -> matrix ~nrow:0 ~ncol:0 [] *)
-(* | h :: t as data ->  *)
-(*     let ncol = List.length h in *)
-(*     let () =  *)
-(*       if List.exists (fun r -> List.length r <> ncol) data *)
-(*       then raise (Invalid_argument "Rbase.matrix_by_rows: not all lines have the same dimension") *)
-(*     in *)
-(*     let nrow = List.length data in *)
-(*     matrix ~byrow:true ~nrow ~ncol (List.concat data) *)
-
-(* let tilde (x : 'a R.t) (y : 'a R.t) : 'c R.t = *)
-(*   R.eval Stub.tilde [ *)
-(*     (R.arg (fun x -> x) x)    ; *)
-(*     (R.arg (fun x -> x) y)    ] *)
-
-
-(* let component (x : 'a R.t) (y : string) : 'c R.t = *)
-(*   R.eval Stub.dollar [ *)
-(*     (R.arg (fun x -> x) x)    ; *)
-(*     (R.arg R.string     y)    ] *)
-
-(* let dot_subset2 l i = *)
-(*   R.eval Stub.dot_subset2 [ R.arg (fun x -> x) l ;  *)
-(*                             R.arg R.int i ] *)
-
-
-
-(* (\* let listing r = new listing r *\) *)
-
-(* (\* let subset2 = R.symbol ~generic: true ".subset2" *\) *)
-
-(* (\* class ['a] dataframe r = object (self) *\) *)
-(* (\*   inherit ['a] listing r *\) *)
-(* (\*   method row_names = R.strings_of_t (self#attribute "row.names") *\) *)
-(* (\*   method column : 'a. int -> 'a R.t = fun x -> R.eval subset2 [ *\) *)
-(* (\*     R.arg (fun x -> x) (R.cast __underlying)  ; *\) *)
-(* (\*     R.arg R.int        x           ] *\) *)
-(* (\*   method element : 'a. int -> int -> 'a R.t = fun x y -> R.eval subset2 [ *\) *)
-(* (\*     R.arg (fun x -> x) (R.cast __underlying)     ; *\) *)
-(* (\*     R.arg R.int        x              ; *\) *)
-(* (\*     R.arg R.int        y              ] *\) *)
-(* (\* end *\) *)
-
-(* (\* let dataframe r = new dataframe r *\) *)
-
-(* (\* class date r = object (self) *\) *)
-(* (\*   inherit R.s3 r *\) *)
-(* (\*   method as_float = R.float_of_t (Obj.magic __underlying) *\) *)
-(* (\*   method as_date = CalendarLib.Calendar.Date.from_unixfloat (86400. *. self#as_float) *\) *)
-(* (\* end *\) *)
-
-
-
-
-
-(* let to_list (listing : 'a list #listing R.t) = *)
-(*   List.map *)
-(*     R.cast *)
-(*     (R.sexps_of_t (R.cast (listing : 'c R.t :> R.sexp) : R.sexp list R.t)) *)

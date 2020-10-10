@@ -69,7 +69,7 @@ CAMLprim value ocamlr_alloc_list (value i) {
   *  @param i Size of the logical vector to allocate.
   *  @return A newly allocated logical vector.
   */
-CAMLprim value ocamlr_alloc_lgl_vector (value i) {
+CAMLprim value ocamlr_alloc_lglsxp (value i) {
   return(Val_sexp(allocVector(LGLSXP, Int_val(i))));
 }
 
@@ -79,7 +79,7 @@ CAMLprim value ocamlr_alloc_lgl_vector (value i) {
   *  @param i Size of the vector of integers to allocate.
   *  @return A newly allocated vector of integers.
   */
-CAMLprim value ocamlr_alloc_int_vector (value i) {
+CAMLprim value ocamlr_alloc_intsxp (value i) {
   return(Val_sexp(allocVector(INTSXP, Int_val(i))));
 }
 
@@ -89,7 +89,7 @@ CAMLprim value ocamlr_alloc_int_vector (value i) {
   *  @param i Size of the vector of real numbers to allocate.
   *  @return A newly allocated vector of real numbers.
   */
-CAMLprim value ocamlr_alloc_real_vector (value i) {
+CAMLprim value ocamlr_alloc_realsxp (value i) {
   return(Val_sexp(allocVector(REALSXP, Int_val(i))));
 }
 
@@ -99,6 +99,15 @@ CAMLprim value ocamlr_alloc_real_vector (value i) {
   *  @param i Size of the vector of strings to allocate.
   *  @return A newly allocated vector of strings.
   */
-CAMLprim value ocamlr_alloc_str_vector (value i) {
+CAMLprim value ocamlr_alloc_strsxp (value i) {
   return(Val_sexp(allocVector(STRSXP, Int_val(i))));
+}
+
+/**  Allocates a vector of SEXPs (R list).
+  *
+  *  @param i Size of the vector to allocate.
+  *  @return A newly allocated vector SEXPs.
+  */
+CAMLprim value ocamlr_alloc_vecsxp (value i) {
+  return(Val_sexp(allocVector(VECSXP, Int_val(i))));
 }

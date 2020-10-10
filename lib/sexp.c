@@ -80,3 +80,13 @@ CAMLprim value ocamlr_sexp_equality (value s1, value s2) {
 CAMLprim value ocamlr_sexptype_of_sexp (value sexp) {
   return Val_int(TYPEOF(Sexp_val(sexp)));
 }
+
+/* Printing an SEXP */
+CAMLprim value ocamlr_print_value(value sexp) {
+  Rf_PrintValue(Sexp_val(sexp));
+  return Val_unit;
+}
+
+CAMLprim value is_missing_arg(value sexp) {
+  return Val_bool(Sexp_val(sexp) == R_MissingArg);
+}

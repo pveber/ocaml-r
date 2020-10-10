@@ -2,54 +2,55 @@ open OCamlR
 open OCamlR_base
 open OCamlR_stats
 
-let () = ignore (R.eval_string "require(graphics, quietly=TRUE)")
+let () = ignore (eval_string "require(graphics, quietly=TRUE)")
 
 module Symbol = struct
 
-  let hist = R.symbol "hist"
-  let plot = R.symbol ~generic:true "plot"
-  let boxplot = R.symbol "boxplot"
-  let par = R.symbol "par"
+  let hist = symbol "hist"
+  let plot = symbol ~generic:true "plot"
+  let boxplot = symbol "boxplot"
+  let par = symbol "par"
 
 end
 
 class hist o = object
-  method breaks = R.floats_of_t (subset2_s o "breaks")
-  method counts = R.floats_of_t (subset2_s o "counts")
-  method density = R.floats_of_t (subset2_s o "density")
-  method mids = R.floats_of_t (subset2_s o "mids")
-  method xname = R.string_of_t (subset2_s o "xname")
-  method equidist = R.bool_of_t (subset2_s o "equidist")
+  method breaks = List_.subset2_exn o "breaks" Dec.floats
+  method counts = List_.subset2_exn o "counts" Dec.floats
+  method density = List_.subset2_exn o "density" Dec.floats
+  method mids = List_.subset2_exn o "mids" Dec.floats
+  method xname = List_.subset2_exn o "xname" Dec.string
+  method equidist = List_.subset2_exn o "equidist" Dec.bool
 end
 
-let any x = (x : _ #R.ty R.t :> < > R.t)
-
-let r_breaks = function
-  | `n n -> any (R.int n)
-  | `l v -> any (R.floats v)
-  | `m `Sturges -> any (R.string "Sturges")
-  | `m `Scott -> any (R.string "Scott")
-  | `m `FD -> any (R.string "FD")
+let r_breaks =
+  let open Enc in
+  function
+  | `n n -> int n
+  | `l v -> floats v
+  | `m `Sturges -> string "Sturges"
+  | `m `Scott -> string "Scott"
+  | `m `FD -> string "FD"
 
 let hist ?breaks ?freq ?include_lowest ?right ?(main = "") ?(xlab = "") ?ylab ?xlim ?ylim ?plot x =
-  R.eval Symbol.hist [
-    R.arg R.floats x ;
-    R.opt r_breaks "breaks" breaks ;
-    R.opt R.bool "freq" freq ;
-    R.opt R.bool "include_lowest" include_lowest ;
-    R.opt R.bool "right"right ;
-    R.arg R.string ~name:"main" main;
-    R.arg R.string ~name:"xlab" xlab ;
-    R.opt R.string "ylab" ylab ;
-    R.opt R.float  "xlim" xlim ;
-    R.opt R.float "ylim" ylim ;
-    R.opt R.bool "plot" plot ;
-  ]
+  call Symbol.hist Enc.[
+      arg floats x ;
+      opt_arg r_breaks "breaks" breaks ;
+      opt_arg bool "freq" freq ;
+      opt_arg bool "include_lowest" include_lowest ;
+      opt_arg bool "right"right ;
+      arg string ~name:"main" main;
+      arg string ~name:"xlab" xlab ;
+      opt_arg string "ylab" ylab ;
+      opt_arg float  "xlim" xlim ;
+      opt_arg float "ylim" ylim ;
+      opt_arg bool "plot" plot ;
+    ]
+  |> List_.unsafe_of_sexp
   |> new hist
 
-let float_tup (x, y) = R.floats [| x ; y |]
+let float_tup (x, y) = Enc.floats [| x ; y |]
 
-let int_tup (x, y) = R.ints [| x ; y |]
+let int_tup (x, y) = Enc.ints [| x ; y |]
 
 type plot_type = [
   | `Points
@@ -65,7 +66,7 @@ type plot_type = [
 type log_scale = [ `X | `Y | `XY ]
 
 let r_plot_type t =
-  R.string (
+  Enc.string (
     match t with
     | `Points -> "p"
     | `Lines -> "l"
@@ -78,7 +79,7 @@ let r_plot_type t =
   )
 
 let r_log_scale t =
-  R.string (
+  Enc.string (
     match t with
     | `X -> "x"
     | `Y -> "y"
@@ -86,19 +87,19 @@ let r_log_scale t =
   )
 
 let plot ?main ?(xlab = "") ?(ylab = "") ?xlim ?ylim ?plot_type ?lwd ?col ?log ~x ?y () =
-  R.eval Symbol.plot [
-    R.arg R.floats x ;
-    R.opt R.floats "y" y ;
-    R.opt R.string "main" main ;
-    R.arg R.string ~name:"xlab" xlab ;
-    R.arg R.string ~name:"ylab" ylab ;
-    R.opt float_tup "xlim" xlim ;
-    R.opt float_tup "ylim" ylim ;
-    R.opt r_plot_type "type" plot_type ;
-    R.opt R.int "lwd" lwd ;
-    R.opt R.string "col" col ;
-    R.opt r_log_scale "log" log ;
-  ]
+  call Symbol.plot Enc.[
+      arg floats x ;
+      opt_arg floats "y" y ;
+      opt_arg string "main" main ;
+      arg string ~name:"xlab" xlab ;
+      arg string ~name:"ylab" ylab ;
+      opt_arg float_tup "xlim" xlim ;
+      opt_arg float_tup "ylim" ylim ;
+      opt_arg r_plot_type "type" plot_type ;
+      opt_arg int "lwd" lwd ;
+      opt_arg string "col" col ;
+      opt_arg r_log_scale "log" log ;
+    ]
   |> ignore
 
 type line_type = [
@@ -121,13 +122,13 @@ let int_of_line_type = function
   | `twodash -> 6
 
 let lines ?lty ?lwd ?col ~x ?y () =
-  R.eval OCamlR_graphics_stubs2.lines_symbol [
-    R.arg R.floats x ;
-    R.opt R.floats "y" y ;
-    R.opt (fun x -> R.int (int_of_line_type x)) "lty" lty ;
-    R.opt R.int "lwd" lwd ;
-    R.opt R.string "col" col ;
-  ]
+  call OCamlR_graphics_stubs2.lines_symbol Enc.[
+      arg floats x ;
+      opt_arg floats "y" y ;
+      opt_arg (fun x -> int (int_of_line_type x)) "lty" lty ;
+      opt_arg int "lwd" lwd ;
+      opt_arg string "col" col ;
+    ]
   |> ignore
 
 let string_of_position = function
@@ -142,40 +143,40 @@ let string_of_position = function
   | `center -> "center"
 
 let legend ?col ?lty ?lwd ?pch x legend =
-  R.eval OCamlR_graphics_stubs2.legend_symbol [
-    R.arg (fun x -> R.string (string_of_position x)) x ;
-    R.arg R.strings legend ;
-    R.opt R.strings "col" col ;
-    R.opt (fun x -> R.ints (Array.map int_of_line_type x)) "lty" lty ;
-    R.opt R.floats "lwd" lwd ;
-    R.opt R.ints "pch" pch ;
-  ]
+  call OCamlR_graphics_stubs2.legend_symbol Enc.[
+      arg (fun x -> string (string_of_position x)) x ;
+      arg strings legend ;
+      opt_arg strings "col" col ;
+      opt_arg (fun x -> ints (Array.map int_of_line_type x)) "lty" lty ;
+      opt_arg floats "lwd" lwd ;
+      opt_arg ints "pch" pch ;
+    ]
   |> ignore
 
 let par ?mfrow () =
-  R.eval Symbol.par [
-    R.opt int_tup "mfrow" mfrow ;
-  ]
+  call Symbol.par [
+      opt_arg int_tup "mfrow" mfrow ;
+    ]
   |> ignore
 
 let dataframe_boxplot ?main ?xlab ?ylab formula data =
-  R.eval Symbol.boxplot [
-    R.arg Formula.r formula ;
-    R.arg Dataframe.r ~name:"data" data ;
-    R.opt R.string "main" main ;
-    R.opt R.string "xlab" xlab ;
-    R.opt R.string "ylab" ylab ;
-  ]
+  call Symbol.boxplot Enc.[
+      arg Formula.to_sexp formula ;
+      arg Dataframe.to_sexp ~name:"data" data ;
+      opt_arg string "main" main ;
+      opt_arg string "xlab" xlab ;
+      opt_arg string "ylab" ylab ;
+    ]
   |> ignore
 
 let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
-  R.eval OCamlR_graphics_stubs2.abline_symbol [
-    R.opt R.float "a" a ;
-    R.opt R.float "b" b ;
-    R.opt R.float "h" h ;
-    R.opt R.float "v" v ;
-    R.opt (fun x -> R.int (int_of_line_type x)) "lty" lty ;
-    R.opt R.int "lwd" lwd ;
-    R.opt R.string "col" col ;
-  ]
+  call OCamlR_graphics_stubs2.abline_symbol Enc.[
+      opt_arg float "a" a ;
+      opt_arg float "b" b ;
+      opt_arg float "h" h ;
+      opt_arg float "v" v ;
+      opt_arg (fun x -> int (int_of_line_type x)) "lty" lty ;
+      opt_arg int "lwd" lwd ;
+      opt_arg string "col" col ;
+    ]
   |> ignore

@@ -1,6 +1,6 @@
 open OCamlR
 
-let () = ignore (R.eval_string "require(methods, quietly=TRUE)")
+let () = ignore (eval_string "require(methods, quietly=TRUE)")
 
 module Stub = struct
 

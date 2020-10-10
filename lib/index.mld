@@ -1,0 +1,109 @@
+{0 OCamlR: use the R environment for statistical computing and graphics from OCaml.}
+
+This package offers an API to build bindings to the
+{{:https://www.r-project.org}R environment for statistical computing
+and graphics}. It provides functions to initialize an R interpreter,
+encode OCaml values to R values, retrieve R-side values, call R
+functions and decode R values into OCaml values. OCaml's type system
+is used when possible to enforce invariants on R's operations to allow
+a safer use. Some (very partial) bindings to R's standard librairies
+are available.
+
+Here are the main entry points of the library:
+- {!OCamlR}, low-level interaction with R
+- {!OCamlR_base}, bindings for [base]
+- {!OCamlR_stats}, bindings for [stats]
+- {!OCamlR_grDevices}, bindings for [grDevices]
+- {!OCamlR_graphics}, bindings for [graphics]
+- {!OCamlR_math}, R special math functions
+
+The following sections illustrate a few uses of the package.
+
+{1 Bindings to standard R libraries}
+
+[ocaml-r] provides partial bindings for R libraries [base]
+({!OCamlR_base}), [stats] ({!OCamlR_stats}), [grDevices]
+({!OCamlR_grDevices}), [graphics] ({!OCamlR_graphics}), [utils]
+({!OCamlR_utils}) and [methods] ({!OCamlR_methods}). The general
+design of these bindings is to offer one (OCaml) module for each R
+data type, where the type [t] is abstract. See for instance the
+signature for floating point arrays (aka [numeric] in R),
+{!OCamlR_base.Numeric}.
+
+Thanks to abstraction, interacting with R is as simple as calling
+regular functions. Here is how to use the library to perform
+statistical tests:
+
+{[
+# require "ocaml-r.stats";;
+# open OCamlR_base;;
+# open OCamlR_stats;;
+# let sample = rnorm ~mean:1. ~sd:1. 10;;
+val sample : Numeric.t = <abstr>
+# let test = T'test.one_sample sample;;
+val test : T'test.t = <abstr>
+# T'test.p'value test;;
+- : float = 0.000223914842630059665
+# T'test.print test;;
+
+	One Sample t-test
+
+data:  c(2.07617445897347, 0.940542561435446, 2.05650431270334, 1.21388435907814, 0.143109357690333, 0.600620037187408, 1.65525155532367, 0.928790144562367, 1.66977862776445, 2.47640151281091)
+t = 5.9184, df = 9, p-value = 0.0002239
+alternative hypothesis: true mean is not equal to 0
+95 percent confidence interval:
+ 0.8501232 1.9020882
+sample estimates:
+mean of x
+ 1.376106
+
+- : unit = ()
+]}
+
+This example illustrates the simplest use of the package, that is
+calling R functions through already available bindings. A few more
+details are given in the next section.
+
+
+Naming convention is to try to be as close as possible to the original
+names, when possible. Names that correspond to OCaml keywords are
+surrounded by underscores like in [_method_] or [_class_]. Dots are
+replaced by ticks, like in [p'value].
+
+When a datatype is a specialization of another one, like [data.frame]
+is a special case of [list], the signature of the OCaml module of the
+former includes the signature of the latter.
+
+Here are links to the most frequent R datatypes bindings:
+- [numeric] -> {!OCamlR_base.Numeric}
+- [list] -> {!OCamlR_base.List_}
+- [data.frame] -> {!OCamlR_base.Dataframe}
+- [factor] -> {!OCamlR_base.Factor}
+
+{1 Using the Rmath library}
+
+[ocaml-r] also provides bindings to the [Rmath] library.
+
+{[
+# #require "ocaml-r.math";;
+# OCamlR_math.dchisq ~df:3. ~log:true 1.;;
+- : float = -1.41893853320467267
+]}
+
+{1 Defining new bindings}
+
+{[
+open OCamlR
+open OCamlR_base
+
+let sample_fun = symbol "sample"
+
+let sample ?replace ?prob ~size x =
+  call sample_fun [
+    arg Numeric.to_sexp x ;
+    arg Enc.int size ;
+    opt_arg Enc.bool "replace" replace ;
+    opt_arg Numeric.to_sexp "prob" prob ;
+  ]
+  |> Numeric.unsafe_of_sexp
+]}

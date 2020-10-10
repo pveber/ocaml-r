@@ -27,4 +27,4 @@
 
 open OCamlR
 
-include R.Interpreter (R.Standard)
+include Interpreter_initialization(Standard_environment)

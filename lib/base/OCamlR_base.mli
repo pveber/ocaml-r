@@ -2,77 +2,89 @@
 
 open OCamlR
 
-module S3 : sig
-  type t
-
-  val r : t -> t R.t
-  val _class_ : t -> string array
-  val unsafe_of_r : _ R.t -> t
-end
+val inherits : Sexp.t -> string -> bool
 
 module Environment : sig
-  type t
-  include module type of S3 with type t := t
+  include SXP
 
   val create : unit -> t
   (** wrapper for [new.env] *)
+
+  val get : t -> class_:string -> string -> Sexp.t option
 end
 
-module type Atomic_vector = sig
-  type t
-  type format
-  type elt
-  val r : t -> format R.t
-  val length : t -> int
-  val to_array : t -> elt array
-  val of_array : elt array -> t
+module type Matrix = sig
+  include Atomic_vector
+  type vector
+  val dim : t -> int * int
+  val as_vector : t -> vector
+  val of_arrays : repr array array -> t
+  val get2 : t -> int -> int -> repr
+  val get_row : t -> int -> vector
+  val get_col : t -> int -> vector
 end
 
-module Numeric : Atomic_vector with type elt = float and type format = R.reals
-module Logical : Atomic_vector with type elt = bool and type format = R.logicals
-module Integer : Atomic_vector with type elt = int and type format = R.integers
-module Character : Atomic_vector with type elt = string and type format = R.strings
-module Factor : Atomic_vector with type elt = string and type format = R.strings
+module type Vector = sig
+  include Atomic_vector
+  module Matrix : Matrix with type repr := repr
+                          and type vector := t
+end
+
+module Numeric : Vector with type repr := float
+module Logical : Vector with type repr := bool
+module Integer : Vector with type repr := int
+module Character : Vector with type repr := string
+
+module Factor : sig
+  include module type of Integer
+  val of_integer : Integer.t -> t
+  val of_character : Character.t -> t
+  val levels : t -> Character.t
+end
+
+type matrix = [
+  | `Numeric   of Numeric.Matrix.t
+  | `Logical   of Logical.Matrix.t
+  | `Integer   of Integer.Matrix.t
+  | `Factor    of Factor.Matrix.t
+  | `Character of Character.Matrix.t
+]
 
 module List_ : sig
-  type t
-  include module type of S3 with type t := t
-  val length : t -> int
-
-  module Unsafe : sig
-    val of_r : _ R.t -> t
-    val subset2 : t -> string -> _ R.t
-    val subset2_i : t -> int -> _ R.t
-  end
+  include SXP
+  val as_vecsxp : t -> Vecsxp.t
+  val subset2 : t -> string -> 'a Dec.t -> 'a option
+  val subset2_i : t -> int -> 'a Dec.t -> 'a option
+  val subset2_exn : t -> string -> 'a Dec.t -> 'a
+  val subset2_i_exn : t -> int -> 'a Dec.t -> 'a
 end
 
 module Dataframe : sig
-  type t
-  include module type of List_ with type t := t
+  include module type of List_
 
   val of_env : Environment.t -> string -> t option
   val dim : t -> int * int
 
   val as_list : t -> List_.t
 
-  type column
-  val numeric : string -> Numeric.t -> column
-  val integer : string -> Integer.t -> column
-  val logical : string -> Logical.t -> column
-  val character : string -> Character.t -> column
-  val factor : string -> Factor.t -> column
+  type column = [
+    | `Numeric of Numeric.t
+    | `Integer of Integer.t
+    | `Logical of Logical.t
+    | `Character of Character.t
+    | `Factor of Factor.t
+  ]
 
-  val create : column list -> t
+  val create : (string * column) list -> t
   val rbind : t -> t -> t
   val cbind : t -> t -> t
+
+  val get_row : t -> int -> t
+  val get_col : t -> int -> column
+
+  val as'matrix : t -> matrix
 end
 
-module Matrix : sig
-  type t
-  include module type of S3 with type t := t
-  val dim : t -> int * int
-  val of_arrays : float array array -> t
-end
 
 val sample :
   ?replace:bool ->
@@ -81,19 +93,10 @@ val sample :
   float array ->
   float array
 
-val readRDS : string -> _ R.t
+val readRDS : string -> Sexp.t
+
 val saveRDS :
   ?ascii:bool ->
   ?compress:bool ->
   file:string ->
-  _ R.t -> unit
-
-(** {2 Low-level access}
-
-    Use with great care!
-*)
-
-val subset : _ R.t -> int -> 'b R.t
-val subset_ii : _ R.t -> int -> int -> 'b R.t
-val subset2_s : _ R.t -> string -> 'b R.t
-val subset2_i : _ R.t -> int -> 'b R.t
+  Sexp.t -> unit
