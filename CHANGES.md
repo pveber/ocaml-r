@@ -1,7 +1,7 @@
 OCaml-R release notes
 =====================
 
-ocaml-r-0.4.0 2020-10-10
+ocaml-r-0.4.0 2020-10-11
 ------------------------
 
 This version implements a massive API refactoring, which generalizes
@@ -10,6 +10,8 @@ datatype is represented as an abstract type of a dedicated module. The
 `t` type of the module is a bare SEXP (or at rather a custom block
 wrapping a bare SEXP). S3 inheritance is represented by module (type)
 inclusion.
+
+- addition of an (alco)test suite
 
 ocaml-r-0.3.1 2020-07-29
 ------------------------
