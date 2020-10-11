@@ -45,10 +45,10 @@ let test_realsxp_get_opt () =
     ]
 
 let test_matrix () =
-  test_back_and_from Alcotest.(array (array (float 0.000001))) Matrix.of_arrays (fun mat ->
-      let nr, nc = Matrix.dim mat in
+  test_back_and_from Alcotest.(array (array (float 0.000001))) Numeric.Matrix.of_arrays (fun mat ->
+      let nr, nc = Numeric.Matrix.dim mat in
       Array.init nr (fun i ->
-          Array.init nc (Matrix.get2 mat i)
+          Array.init nc (Numeric.Matrix.get2 mat i)
         )
     )
     [
@@ -59,12 +59,12 @@ let test_matrix_slice () =
   let test label f m k ~expected =
     Alcotest.(check' (array (float 0.000001)))
       ~msg:label ~expected
-      ~actual:(f (Matrix.of_arrays m) k |> Numeric.to_array)
+      ~actual:(f (Numeric.Matrix.of_arrays m) k |> Numeric.to_array)
   in
   let m = [| [| 1. ; 2. |] ; [| 3. ; 4. |] |] in
-  Matrix.print (Matrix.of_arrays m) ;
-  test "get_row" Matrix.get_row m 2 ~expected:[| 3. ; 4. |] ;
-  test "get_col" Matrix.get_col m 1 ~expected:[| 1. ; 3. |]
+  Numeric.Matrix.print (Numeric.Matrix.of_arrays m) ;
+  test "get_row" Numeric.Matrix.get_row m 2 ~expected:[| 3. ; 4. |] ;
+  test "get_col" Numeric.Matrix.get_col m 1 ~expected:[| 1. ; 3. |]
 
 let test_factor () =
   Alcotest.(check (list string)) "levels" ["a";"b";"c"] (

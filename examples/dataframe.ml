@@ -4,15 +4,17 @@
 
 open OCamlR_base
 
+module FT = OCamlR_stats.Fisher'test
+
 let res =
-  OCamlR_stats.fisher'test 
+  FT.logicals
     (Logical.of_array [| true ; true ; false ; false ; true ; false|])
     (Logical.of_array [| true ; true ; true ; false ; true ; false|])
 
 let () =
   Printf.printf
     "%f %f\n%s\n"
-    res#estimate
-    res#p'value
-    res#alternative
+    (FT.estimate res)
+    (FT.p'value res)
+    (FT.alternative res)
 ;;
