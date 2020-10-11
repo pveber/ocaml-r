@@ -1,7 +1,9 @@
 (library
- (name            OCamlR_math)
- (public_name     ocaml-r.math)
- (wrapped         false)
- (c_names         r_math_stubs)
- (c_flags         (:include ../c_flags.sexp))
- (c_library_flags (:include ../c_library_flags.sexp)))
+  (name            OCamlR_math)
+  (public_name     ocaml-r.math)
+  (wrapped         false)
+  (foreign_stubs
+    (language c)
+    (names         r_math_stubs)
+    (flags         (:include ../c_flags.sexp)))
+  (c_library_flags (:include ../c_library_flags.sexp)))

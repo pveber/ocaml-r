@@ -1,21 +1,23 @@
 (library
- (name             OCamlR)
- (public_name      ocaml-r)
- (libraries        unix)
- (private_modules  Standard_environment)
- (c_names          initialisation_stub
-                   sexp
-		   databridge
-                   allocation_stub
-                   read_internal_stub
-                   write_internal_stub
-                   symbols_stub
-                   conversion_stub
-                   s3_stub
-                   s4_stub
-                   r_parser_stub
-                   reduction_stub)
-  (c_flags         (:include c_flags.sexp))
+  (name             OCamlR)
+  (public_name      ocaml-r)
+  (libraries        unix)
+  (private_modules  Standard_environment)
+  (foreign_stubs
+    (language c)
+    (names          initialisation_stub
+                    sexp
+                    databridge
+                    allocation_stub
+                    read_internal_stub
+                    write_internal_stub
+                    symbols_stub
+                    conversion_stub
+                    s3_stub
+                    s4_stub
+                    r_parser_stub
+                    reduction_stub)
+    (flags         (:include c_flags.sexp)))
   (c_library_flags (:include c_library_flags.sexp)))
 
 (rule
