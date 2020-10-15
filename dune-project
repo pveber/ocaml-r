@@ -23,6 +23,7 @@ functions. It provide a simple means to develop bindings to any R
 package.")
   (tags (R statistics))
   (depends
+    (alcotest :with-test)
     (base (and :build (>= v0.14)))
     (conf-r (and :build))
     (conf-r-mathlib (and :build))
