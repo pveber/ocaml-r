@@ -1,7 +1,7 @@
 OCaml-R release notes
 =====================
 
-ocaml-r-0.4.0 2020-10-11
+ocaml-r-0.4.0 2020-10-15
 ------------------------
 
 This version implements a massive API refactoring, which generalizes
@@ -12,6 +12,11 @@ wrapping a bare SEXP). S3 inheritance is represented by module (type)
 inclusion.
 
 - addition of an (alco)test suite
+- (typed) matrices for logical, character and int types
+- row and column access for data.frame and matrix
+- access to factor values
+- safer interface for list and data.frame components
+- modular interface for statistical tests
 
 ocaml-r-0.3.1 2020-07-29
 ------------------------
