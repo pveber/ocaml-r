@@ -27,32 +27,35 @@
 
 (** Bindings for the R interpreter.
 
-    It encapsulates the functionalities
-    of the [libR.so] shared library provided by the R software. This
-    enables us to {b embed the R interpreter} into Objective Caml, to
-    execute R code from Objective Caml and to exchange data structures
-    between R and Objective Caml.
+    It encapsulates the functionalities of the [libR.so] shared
+   library provided by the R software. This enables us to {b embed the
+   R interpreter} into Objective Caml, to execute R code from
+   Objective Caml and to exchange data structures between R and
+   Objective Caml. A lot of information on R internals can be found in
+   the official
+   {{:https://cran.r-project.org/doc/manuals/r-release/R-ints.html}documentation}
+   as well as in this
+   {{:https://github.com/hadley/r-internals}document}.
 
     {4 THREAD SAFETY}
 
     It is important to understand that this binding is a rather
-    low-level binding of R functionality. As such, it is no more
-    thread-safe than R itself, which is not thread-safe at
-    all. Therefore, avoid real threading unless you know what you're
-    doing...
+   low-level binding of R functionality. As such, it is no more
+   thread-safe than R itself, which is not thread-safe at
+   all. Therefore, avoid real threading unless you know what you're
+   doing...
 
     {4 DATA CONVERSION}
 
     R is an array-oriented language. Therefore, simple values such as
-    a boolean, a string, a number, are in fact encapsulated, in R, in
-    an array of booleans, an array of strings, an array of
-    numbers. For a simple value, the array has only one element.
+   a boolean, a string, a number, are in fact encapsulated, in R, in
+   an array of booleans, an array of strings, an array of numbers. For
+   a simple value, the array has only one element.
 
     Moreover, as R is scientific software, it is important that data
-    types be correctly matched between Objective Caml and R. At the
-    moment, they are not. I am thinking here of the 31/32 bit issues,
-    or 63/64 bit issue, or, for instance.
-*)
+   types be correctly matched between Objective Caml and R. At the
+   moment, they are not. I am thinking here of the 31/32 bit issues,
+   or 63/64 bit issue, or, for instance.  *)
 
 
 (** {2 Internal representation of R values.} *)
