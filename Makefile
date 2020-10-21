@@ -14,6 +14,9 @@ uninstall:
 utop:
 	dune utop lib
 
+test:
+	dune runtest
+
 clean:
 	dune clean
 
