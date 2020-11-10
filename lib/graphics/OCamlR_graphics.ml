@@ -169,6 +169,15 @@ let dataframe_boxplot ?main ?xlab ?ylab formula data =
     ]
   |> ignore
 
+let list_boxplot ?main ?xlab ?ylab data =
+  call Symbol.boxplot Enc.[
+      arg List_.to_sexp ~name:"x" data ;
+      opt_arg string "main" main ;
+      opt_arg string "xlab" xlab ;
+      opt_arg string "ylab" ylab ;
+    ]
+  |> ignore
+
 let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
   call OCamlR_graphics_stubs2.abline_symbol Enc.[
       opt_arg float "a" a ;
