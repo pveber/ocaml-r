@@ -26,6 +26,7 @@ end
 
 module type Vector = sig
   include Atomic_vector
+  val c : t list -> t
   module Matrix : Matrix with type repr := repr
                           and type vector := t
 end

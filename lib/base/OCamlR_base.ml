@@ -88,12 +88,17 @@ end
 
 module type Vector = sig
   include Atomic_vector
+  val c : t list -> t
   module Matrix : Matrix with type repr := repr
                           and type vector := t
 end
 
 module Make_vector(V : Atomic_vector) = struct
   include V
+  let c_symbol = symbol "c"
+  let c xs =
+    call c_symbol (List.map (arg to_sexp) xs)
+    |> unsafe_of_sexp
   module Matrix = Make_matrix(V)
 end
 
