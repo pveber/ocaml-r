@@ -53,6 +53,7 @@ type matrix = [
 
 module List_ : sig
   include SXP
+  val create : (string option * Sexp.t) list -> t
   val as_vecsxp : t -> Vecsxp.t
   val subset2 : t -> string -> 'a Dec.t -> 'a option
   val subset2_i : t -> int -> 'a Dec.t -> 'a option

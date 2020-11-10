@@ -165,6 +165,13 @@ module List_ = struct
 
   let subset2_exn x field dec = gen_subset2_exn subset2 "subset2_exn" x field dec
   let subset2_i_exn x field dec = gen_subset2_exn subset2_i "subset2_i_exn" x field dec
+
+  let list_symbol = symbol "list"
+
+  let create xs =
+    List.map (fun (maybe_label, sexp) -> arg Sexp.to_sexp ?name:maybe_label sexp) xs
+    |> call list_symbol
+    |> unsafe_of_sexp
 end
 
 module Dataframe = struct
