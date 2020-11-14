@@ -1,7 +1,5 @@
 # OCaml-R: Objective Caml bindings for the R interpreter
 
-## Description
-
 OCaml-R is an Objective Caml binding embedding R's interpreter into
 OCaml code. It also provides bindings to R's standalone mathematical
 library, and has embryonic support for R's standard libraries.
@@ -9,8 +7,8 @@ library, and has embryonic support for R's standard libraries.
 It can be used to build R datastructures in memory, call R functions
 and convert the returned value to OCaml datastructures.
 
-The API is available
-[online](http://pveber.github.io/ocaml-r/api/_html/ocaml-r/index.html).
+The API documentation is available
+[online](http://pveber.github.io/ocaml-r/api/ocaml-r/index.html).
 
 ## Installation
 
@@ -23,22 +21,19 @@ opam install ocaml-r
 Under `utop`:
 
 ```ocaml
-# #require "ocaml-r.interpreter";;
-# open OCamlR;;
+# #require "ocaml-r.base";;
+# open OCamlR_base;;
+# Numeric.(of_list [3. ; 1. ; 4. ; 1. ; 5. ; 9.] |> print);;
+[1] 3 1 4 1 5 9
+- : unit = ()
 ```
-
-**WARNING** `#require "ocaml-r"` is not sufficient to have the R
-interpreter properly initialised. Using functions from the library
-after this will typically lead to a segmentation fault. The
-`R.interpreter` package depends on oCamlR.cmo or oCamlR.cmx, and when
-loaded, this module properly initialises the R interpreter. So you
-only have to #require "R.interpreter" to have R up and running.
 
 To access functions from package `foo`, load `ocaml-r.foo`, e.g.:
 ```ocaml
 # #require "ocaml-r.stats";;
-# OCamlR_stats.rnorm 2;;
-- : float array = [|-0.533469267471010089; 0.554898389717302543|]
+# OCamlR_stats.rnorm 6 |> Numeric.print;;
+[1]  0.17350351 -0.72756521  2.02369760 -0.77302094 -1.28523133  0.05172992
+- : unit = ()
 ```
 
 There are other packages. `ocaml-r.math` links to the standalone
@@ -57,14 +52,14 @@ interpreter parser and evaluation function, and providing data
 conversion functions for simple R types. This was version 0.1 of
 OCaml-R.
 
-The current version 0.2, is essentially an almost complete rewrite
-by Guillaume Yziquel providing tight integration with the R library.
-It can dissect R values to expose their internal structures to OCaml
-(though this shouldn't be the most useful aspect, nor the recommended
-way to use this binding), it construct R calls by building up R values
-directly, integrates OCaml's and R's garbage collectors (though somewhat
-poorly), chains R exceptions back to Objective Caml, and provides static
-initialisation of the R interpreter.
+Version 0.2, is essentially an almost complete rewrite by Guillaume
+Yziquel providing tight integration with the R library.  It can
+dissect R values to expose their internal structures to OCaml (though
+this shouldn't be the most useful aspect, nor the recommended way to
+use this binding), it construct R calls by building up R values
+directly, integrates OCaml's and R's garbage collectors (though
+somewhat poorly), chains R exceptions back to Objective Caml, and
+provides static initialisation of the R interpreter.
 
 Starting 2012, Philippe Veber took over the maintainance.
 
