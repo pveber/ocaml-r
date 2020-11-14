@@ -27,6 +27,6 @@ all: build doc
 
 publish-doc:
 	(cd _build && rm -rf gh-pages && \
-         git clone -b gh-pages --single-branch git@github.com:pveber/ocaml-r.git gh-pages)
-	rsync -a --delete --exclude=.git _build/default/_doc/_html/ _build/gh-pages/
+         git clone -b gh-pages --single-branch .. gh-pages)
+	rsync -a --delete --exclude=.git _build/default/_doc/_html/ _build/gh-pages/api/
 	(cd _build/gh-pages && git add * && git commit -m "$(shell date)" && git push origin gh-pages)
