@@ -1,19 +1,23 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>index</title>
-    <link rel="stylesheet" href="./odoc.css"/>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  </head>
-  <body>
-    <main class="content">
-      <div class="by-name">
-      <h2>OCaml package documentation</h2>
-      <ol>
-      <li><a href="ocaml-r/index.html">ocaml-r</a></li>
-      </ol>
-      </div>
-    </main>
-  </body>
-</html>
+<p>OCaml-R is an Objective Caml binding embedding R’s interpreter into OCaml code. It also provides bindings to R’s standalone mathematical library, and has embryonic support for R’s standard libraries.</p>
+<p>It can be used to build R datastructures in memory, call R functions and convert the returned value to OCaml datastructures.</p>
+<p>The API is available <a href="api/ocaml-r/index.html">online</a>.</p>
+<h2 id="installation">Installation</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="ex">opam</span> install ocaml-r</a></code></pre></div>
+<h2 id="library-usage">Library usage</h2>
+<p>Under <code>utop</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><a class="sourceLine" id="cb2-1" data-line-number="1"># #require <span class="st">&quot;ocaml-r.interpreter&quot;</span>;;</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"># <span class="kw">open</span> OCamlR;;</a></code></pre></div>
+<p><strong>WARNING</strong> <code>#require &quot;ocaml-r&quot;</code> is not sufficient to have the R interpreter properly initialised. Using functions from the library after this will typically lead to a segmentation fault. The <code>R.interpreter</code> package depends on oCamlR.cmo or oCamlR.cmx, and when loaded, this module properly initialises the R interpreter. So you only have to #require “R.interpreter” to have R up and running.</p>
+<p>To access functions from package <code>foo</code>, load <code>ocaml-r.foo</code>, e.g.:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><a class="sourceLine" id="cb3-1" data-line-number="1"># #require <span class="st">&quot;ocaml-r.stats&quot;</span>;;</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"># OCamlR_stats.rnorm <span class="dv">2</span>;;</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">- : <span class="dt">float</span> <span class="dt">array</span> = [|<span class="fl">-0.533469267471010089</span>; <span class="fl">0.554898389717302543</span>|]</a></code></pre></div>
+<p>There are other packages. <code>ocaml-r.math</code> links to the standalone mathematical shared library of R. Other packages, such as R.base and R.stats are embryonic bindings of R’s standard library. Help is very welcome on this side.</p>
+<h2 id="authorship">Authorship</h2>
+<p>OCaml-R was initially written by Maxence Guesdon. It was a rather simple binding that was used essentially by feeding strings to the R interpreter parser and evaluation function, and providing data conversion functions for simple R types. This was version 0.1 of OCaml-R.</p>
+<p>The current version 0.2, is essentially an almost complete rewrite by Guillaume Yziquel providing tight integration with the R library. It can dissect R values to expose their internal structures to OCaml (though this shouldn’t be the most useful aspect, nor the recommended way to use this binding), it construct R calls by building up R values directly, integrates OCaml’s and R’s garbage collectors (though somewhat poorly), chains R exceptions back to Objective Caml, and provides static initialisation of the R interpreter.</p>
+<p>Starting 2012, Philippe Veber took over the maintainance.</p>
+<p>Copyright 2008-2010 INRIA - Maxence Guesdon. Contact: maxence.guesdon@inria.fr</p>
+<p>Copyright 2009-2010 Guillaume Yziquel. Contact: guillaume.yziquel@citycable.ch</p>
+<p>Copyright 2011-2018 Philippe Veber. Contact: philippe.veber@gmail.com</p>
+<p>Licenced under the GPL version 3.</p>
