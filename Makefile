@@ -3,8 +3,8 @@ PAGES=index
 .PHONY: all
 all: $(patsubst %, %.html, $(PAGES))
 
-%.html: %.md
-	pandoc --from=markdown+tex_math_single_backslash+tex_math_dollars $< --to=html5 --output=$@ --katex
+%.html: %.md template.html
+	pandoc --from=markdown+tex_math_single_backslash+tex_math_dollars $< --to=html5 --output=$@ --katex --template template.html --css api/odoc.css
 
 .PHONY: rebuild
 rebuild:
