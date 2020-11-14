@@ -9,7 +9,7 @@ library, and has embryonic support for R's standard libraries.
 It can be used to build R datastructures in memory, call R functions
 and convert the returned value to OCaml datastructures.
 
-The API is available
+The API documentation is available
 [online](api/ocaml-r/index.html).
 
 ## Installation
