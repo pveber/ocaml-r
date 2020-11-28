@@ -131,6 +131,15 @@ let lines ?lty ?lwd ?col ~x ?y () =
     ]
   |> ignore
 
+let points ?pch ?col ~x ?y () =
+  call OCamlR_graphics_stubs2.points_symbol Enc.[
+      arg floats x ;
+      opt_arg floats "y" y ;
+      opt_arg int "pch" pch ;
+      opt_arg string "col" col ;
+    ]
+  |> ignore
+
 let string_of_position = function
   | `bottomright -> "bottomright"
   | `bottom -> "bottom"

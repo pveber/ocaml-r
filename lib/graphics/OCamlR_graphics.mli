@@ -62,6 +62,14 @@ val lines :
   unit ->
   unit
 
+val points :
+  ?pch:int ->
+  ?col:string ->
+  x:float array ->
+  ?y:float array ->
+  unit ->
+  unit
+
 val legend :
   ?col:string array ->
   ?lty:line_type array ->
