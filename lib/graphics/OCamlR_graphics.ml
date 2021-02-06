@@ -208,3 +208,15 @@ let smooth_scatter ?main ?xlab ?ylab ~x ?y () =
       opt_arg string "ylab" ylab ;
     ]
   |> ignore
+
+let text ?adj ?pos ?cex ?col ~x ?y ~labels () =
+  call OCamlR_graphics_stubs2.text_symbol Enc.[
+      arg ~name:"x" floats x ;
+      arg ~name:"labels" strings labels ;
+      opt_arg floats "y" y ;
+      opt_arg string "col" col ;
+      opt_arg float "cex" cex ;
+      opt_arg int "pos" pos ;
+      opt_arg (fun (h, v) -> float_opts [|h ; v|]) "adj" adj ;
+    ]
+  |> ignore

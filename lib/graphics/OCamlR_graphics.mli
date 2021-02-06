@@ -118,3 +118,14 @@ val smooth_scatter :
   ?y:float array ->
   unit ->
   unit
+
+val text :
+  ?adj:(float option * float option) ->
+  ?pos:int ->
+  ?cex:float ->
+  ?col:string ->
+  x:float array ->
+  ?y:float array ->
+  labels:string array ->
+  unit ->
+  unit
