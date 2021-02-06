@@ -109,3 +109,12 @@ val list_boxplot :
   ?ylab:string ->
   OCamlR_base.List_.t ->
   unit
+
+val smooth_scatter :
+  ?main:string ->
+  ?xlab:string ->
+  ?ylab:string ->
+  x:float array ->
+  ?y:float array ->
+  unit ->
+  unit

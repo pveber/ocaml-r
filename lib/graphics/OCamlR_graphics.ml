@@ -198,3 +198,13 @@ let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
       opt_arg string "col" col ;
     ]
   |> ignore
+
+let smooth_scatter ?main ?xlab ?ylab ~x ?y () =
+  call OCamlR_graphics_stubs2.smoothScatter_symbol Enc.[
+      arg floats x ;
+      opt_arg floats "y" y ;
+      opt_arg string "main" main ;
+      opt_arg string "xlab" xlab ;
+      opt_arg string "ylab" ylab ;
+    ]
+  |> ignore
