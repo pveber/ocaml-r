@@ -129,3 +129,17 @@ val text :
   labels:string array ->
   unit ->
   unit
+
+val axis :
+  ?at:float array ->
+  ?labels:[`Yes | `No | `Custom of string array] ->
+  ?tick:[`Yes | `No | `Custom of string array] ->
+  ?line:int ->
+  ?pos:float ->
+  ?outer:bool ->
+  ?font:int ->
+  ?lty:line_type ->
+  ?lwd:float ->
+  ?lwd'ticks:float ->
+  [`below | `left | `above | `right] ->
+  unit

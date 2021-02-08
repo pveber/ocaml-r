@@ -121,11 +121,13 @@ let int_of_line_type = function
   | `longdash -> 5
   | `twodash -> 6
 
+let line_type_arg x = Enc.int (int_of_line_type x)
+
 let lines ?lty ?lwd ?col ~x ?y () =
   call OCamlR_graphics_stubs2.lines_symbol Enc.[
       arg floats x ;
       opt_arg floats "y" y ;
-      opt_arg (fun x -> int (int_of_line_type x)) "lty" lty ;
+      opt_arg line_type_arg "lty" lty ;
       opt_arg int "lwd" lwd ;
       opt_arg string "col" col ;
     ]
@@ -193,7 +195,7 @@ let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
       opt_arg float "b" b ;
       opt_arg float "h" h ;
       opt_arg float "v" v ;
-      opt_arg (fun x -> int (int_of_line_type x)) "lty" lty ;
+      opt_arg line_type_arg "lty" lty ;
       opt_arg int "lwd" lwd ;
       opt_arg string "col" col ;
     ]
@@ -218,5 +220,35 @@ let text ?adj ?pos ?cex ?col ~x ?y ~labels () =
       opt_arg float "cex" cex ;
       opt_arg int "pos" pos ;
       opt_arg (fun (h, v) -> float_opts [|h ; v|]) "adj" adj ;
+    ]
+  |> ignore
+
+let side_arg x =
+  Enc.int (
+    match x with
+    | `below -> 1
+    | `left -> 2
+    | `above -> 3
+    | `right -> 4
+  )
+
+let logical_or_character_arg = function
+  | `Yes -> Enc.bool true
+  | `No  -> Enc.bool false
+  | `Custom xs -> Enc.strings xs
+
+let axis ?at ?labels ?tick ?line ?pos ?outer ?font ?lty ?lwd ?lwd'ticks side =
+  call OCamlR_graphics_stubs2.axis_symbol Enc.[
+      arg ~name:"side" side_arg side ;
+      opt_arg floats "at" at ;
+      opt_arg logical_or_character_arg "labels" labels ;
+      opt_arg logical_or_character_arg "tick" tick ;
+      opt_arg int "line" line ;
+      opt_arg float "pos" pos ;
+      opt_arg bool "outer" outer ;
+      opt_arg int "font" font ;
+      opt_arg line_type_arg "lty" lty ;
+      opt_arg float "lwd" lwd ;
+      opt_arg float "lwd'ticks" lwd'ticks ;
     ]
   |> ignore
