@@ -29,4 +29,4 @@ publish-doc:
 	(cd _build && rm -rf gh-pages && \
          git clone -b gh-pages --single-branch .. gh-pages)
 	rsync -a --delete --exclude=.git _build/default/_doc/_html/ _build/gh-pages/api/
-	(cd _build/gh-pages && git add * && git commit -m "$(shell date)" && git push origin gh-pages)
+	(cd _build/gh-pages && test -z "$(git status -s)" || (git add * && git commit -m "$(shell date)" && git push origin gh-pages))
