@@ -1,6 +1,16 @@
 OCaml-R release notes
 =====================
 
+ocaml-r-0.5.0 2021-11-01
+------------------------
+
+- added graphics functions (axis, text, points, smooth_scatter,
+  boxplot)
+- added base function (c, list creation)
+- fixed interaction with pkg-config (by @drjdn)
+
+
+
 ocaml-r-0.4.0 2020-10-15
 ------------------------
 
@@ -73,4 +83,3 @@ Former Changelog
 	* add: ChangeLog
 	* mod: use ocaml{c,opt} instead of ocamlmklib
 	* new: projet ocaml-r hosted on gna.org
-
