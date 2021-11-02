@@ -5,7 +5,7 @@
 (source (github pveber/ocaml-r))
 (homepage "https://github.com/pveber/ocaml-r/")
 (bug_reports "https://github.com/pveber/ocaml-r/issues")
-(license GPL3)
+(license GPL-3.0-only)
 (authors
   "Guillaume Yzyquel"
   "Maxence Guesdon"
