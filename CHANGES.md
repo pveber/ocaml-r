@@ -1,18 +1,13 @@
-OCaml-R release notes
-=====================
-
-ocaml-r-0.5.0 2021-11-01
-------------------------
+v0.5.0 2021-11-01 Villeurbanne
+------------------------------
 
 - added graphics functions (axis, text, points, smooth_scatter,
   boxplot)
 - added base function (c, list creation)
 - fixed interaction with pkg-config (by @drjdn)
 
-
-
-ocaml-r-0.4.0 2020-10-15
-------------------------
+v0.4.0 2020-10-15
+-----------------
 
 This version implements a massive API refactoring, which generalizes
 and amplifies the design experimented in version 0.2.0. Each R
@@ -28,35 +23,35 @@ inclusion.
 - safer interface for list and data.frame components
 - modular interface for statistical tests
 
-ocaml-r-0.3.1 2020-07-29
-------------------------
+v0.3.1 2020-07-29
+-----------------
 
 - replaced configurator by dune.configurator
 - fixed compilation warnings
 
-ocaml-r-0.3.0 2020-05-07
-------------------------
+v0.3.0 2020-05-07
+-----------------
 
 - base: added readRDS, saveRDS, cbind, rbind
 - graphics: abline
 - stats: ecdf
 - fixed compilation bug
 
-ocaml-r-0.2.0 2019-06-07
-------------------------
+v0.2.0 2019-06-07
+-----------------
 
 - experimented modular (instead of object) interfaces
 - a few more wrappers in base, stats and graphics
 - improved stub generation
 - API documentation
 
-ocaml-r-0.1.1 2018-11-18
-------------------------
+v0.1.1 2018-11-18
+-----------------
 
 jbuilder-to-dune transition
 
-ocaml-r-0.1.0 2018-06-06
-------------------------
+v0.1.0 2018-06-06
+-----------------
 
 First formal release
 
