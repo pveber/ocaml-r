@@ -102,3 +102,8 @@ val saveRDS :
   ?compress:bool ->
   file:string ->
   Sexp.t -> unit
+
+val table :
+  (module Vector with type t = 'a) ->
+  'a ->
+  Integer.t
