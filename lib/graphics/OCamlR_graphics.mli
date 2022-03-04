@@ -12,7 +12,8 @@ val hist :
   ?include_lowest:bool ->
   ?right:bool ->
   ?main:string -> ?xlab:string -> ?ylab:string ->
-  ?xlim:float -> ?ylim:float ->
+  ?xlim:(float * float) ->
+  ?ylim:(float * float) ->
   ?plot:bool ->
   float array -> hist
 

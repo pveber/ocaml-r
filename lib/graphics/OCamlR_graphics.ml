@@ -13,6 +13,11 @@ module Symbol = struct
 
 end
 
+let float_tup (x, y) = Enc.floats [| x ; y |]
+
+let int_tup (x, y) = Enc.ints [| x ; y |]
+
+
 class hist o = object
   method breaks = List_.subset2_exn o "breaks" Dec.floats
   method counts = List_.subset2_exn o "counts" Dec.floats
@@ -41,16 +46,12 @@ let hist ?breaks ?freq ?include_lowest ?right ?(main = "") ?(xlab = "") ?ylab ?x
       arg string ~name:"main" main;
       arg string ~name:"xlab" xlab ;
       opt_arg string "ylab" ylab ;
-      opt_arg float  "xlim" xlim ;
-      opt_arg float "ylim" ylim ;
+      opt_arg float_tup "xlim" xlim ;
+      opt_arg float_tup "ylim" ylim ;
       opt_arg bool "plot" plot ;
     ]
   |> List_.unsafe_of_sexp
   |> new hist
-
-let float_tup (x, y) = Enc.floats [| x ; y |]
-
-let int_tup (x, y) = Enc.ints [| x ; y |]
 
 type plot_type = [
   | `Points
