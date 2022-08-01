@@ -144,3 +144,8 @@ val axis :
   ?lwd'ticks:float ->
   [`below | `left | `above | `right] ->
   unit
+
+(** Low-level stuff *)
+module Enc : sig
+  val plot_type : plot_type OCamlR.Enc.t
+end

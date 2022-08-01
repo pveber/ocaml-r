@@ -149,3 +149,16 @@ module Ecdf = struct
     ]
     |> ignore
 end
+
+let qqplot ?main ?(xlab = "") ?(ylab = "") ?plot_type ?lwd ?col x y =
+  call S.qqplot_symbol Enc.[
+      arg floats x ;
+      arg floats y ;
+      opt_arg string "main" main ;
+      arg string ~name:"xlab" xlab ;
+      arg string ~name:"ylab" ylab ;
+      opt_arg OCamlR_graphics.Enc.plot_type "type" plot_type ;
+      opt_arg int "lwd" lwd ;
+      opt_arg string "col" col ;
+    ]
+  |> ignore

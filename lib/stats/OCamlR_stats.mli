@@ -90,3 +90,14 @@ val p'adjust :
   ?method_ : [`holm | `hochberg | `hommel | `bonferroni | `BH | `BY | `fdr] ->
   Numeric.t ->
   Numeric.t
+
+val qqplot :
+  ?main:string ->
+  ?xlab:string ->
+  ?ylab:string ->
+  ?plot_type:OCamlR_graphics.plot_type ->
+  ?lwd:int ->
+  ?col:string ->
+  float array ->
+  float array ->
+  unit

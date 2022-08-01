@@ -65,26 +65,28 @@ type plot_type = [
 
 type log_scale = [ `X | `Y | `XY ]
 
-let r_plot_type t =
-  Enc.string (
-    match t with
-    | `Points -> "p"
-    | `Lines -> "l"
-    | `Both -> "b"
-    | `Overplotted -> "o"
-    | `Histogram -> "h"
-    | `Stair_steps -> "s"
-    | `Other_steps -> "S"
-    | `Nothing -> "n"
-  )
+module E = struct
+  let plot_type t =
+    Enc.string (
+      match t with
+      | `Points -> "p"
+      | `Lines -> "l"
+      | `Both -> "b"
+      | `Overplotted -> "o"
+      | `Histogram -> "h"
+      | `Stair_steps -> "s"
+      | `Other_steps -> "S"
+      | `Nothing -> "n"
+    )
 
-let r_log_scale t =
-  Enc.string (
-    match t with
-    | `X -> "x"
-    | `Y -> "y"
-    | `XY -> "xy"
-  )
+  let log_scale t =
+    Enc.string (
+      match t with
+      | `X -> "x"
+      | `Y -> "y"
+      | `XY -> "xy"
+    )
+end
 
 let plot ?main ?(xlab = "") ?(ylab = "") ?xlim ?ylim ?plot_type ?lwd ?col ?log ~x ?y () =
   call Symbol.plot Enc.[
@@ -95,10 +97,10 @@ let plot ?main ?(xlab = "") ?(ylab = "") ?xlim ?ylim ?plot_type ?lwd ?col ?log ~
       arg string ~name:"ylab" ylab ;
       opt_arg float_tup "xlim" xlim ;
       opt_arg float_tup "ylim" ylim ;
-      opt_arg r_plot_type "type" plot_type ;
+      opt_arg E.plot_type "type" plot_type ;
       opt_arg int "lwd" lwd ;
       opt_arg string "col" col ;
-      opt_arg r_log_scale "log" log ;
+      opt_arg E.log_scale "log" log ;
     ]
   |> ignore
 
@@ -252,3 +254,5 @@ let axis ?at ?labels ?tick ?line ?pos ?outer ?font ?lty ?lwd ?lwd'ticks side =
       opt_arg float "lwd'ticks" lwd'ticks ;
     ]
   |> ignore
+
+module Enc = E

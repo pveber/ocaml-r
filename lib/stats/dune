@@ -3,9 +3,9 @@
  (public_name     ocaml-r.stats)
  (wrapped         false)
  (modules         OCamlR_stats OCamlR_stats_stubs OCamlR_stats_stubs2)
- (libraries       ocaml-r.base ocaml-r.interpreter))
+ (libraries       ocaml-r.base ocaml-r.graphics ocaml-r.interpreter))
 
-(rule         
+(rule
  (targets OCamlR_stats_stubs2.ml)
  (deps    (:exe ../../stubgen/stubgen.exe))
  (action  (with-stdout-to %{targets} (run %{exe} stats))))
