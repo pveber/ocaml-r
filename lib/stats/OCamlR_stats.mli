@@ -2,10 +2,7 @@
 
 open OCamlR_base
 
-module Formula : sig
-  include OCamlR.SXP
-  val of_string : string -> t
-end
+val formula : string -> Formula.t
 
 module Ecdf : sig
   type t

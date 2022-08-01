@@ -100,7 +100,7 @@ val dataframe_boxplot :
   ?main:string ->
   ?xlab:string ->
   ?ylab:string ->
-  OCamlR_stats.Formula.t ->
+  OCamlR_base.Formula.t ->
   OCamlR_base.Dataframe.t ->
   unit
 

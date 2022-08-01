@@ -284,3 +284,7 @@ let saveRDS ?ascii ?compress ~file obj =
 let table (type s) (module Vector : Vector with type t = s) (x : s) =
   call Stubs.table_symbol [ arg Vector.to_sexp x ]
   |> Integer.unsafe_of_sexp
+
+module Formula = struct
+  include Langsxp
+end

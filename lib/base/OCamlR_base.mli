@@ -87,6 +87,9 @@ module Dataframe : sig
   val as'matrix : t -> matrix
 end
 
+module Formula : sig
+  include OCamlR.SXP
+end
 
 val sample :
   ?replace:bool ->

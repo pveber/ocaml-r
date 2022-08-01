@@ -1,6 +1,5 @@
 open OCamlR
 open OCamlR_base
-open OCamlR_stats
 
 let () = ignore (eval_string "require(graphics, quietly=TRUE)")
 

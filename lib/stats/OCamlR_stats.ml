@@ -15,13 +15,9 @@ module Symbol = struct
   let p'adjust = symbol "p.adjust"
 end
 
-module Formula = struct
-  include Langsxp
-  let of_string x =
-    S.formula ~x:(Enc.string x) ()
-    |> unsafe_of_sexp
-end
-
+let formula x =
+  S.formula ~x:(Enc.string x) ()
+  |> Formula.unsafe_of_sexp
 
 let rnorm ?mean ?sd n =
   S.rnorm
