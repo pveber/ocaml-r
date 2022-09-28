@@ -1,12 +1,5 @@
 open OCamlR
 open OCamlR_base
-open OCamlR_wraputils
-
-module S = OCamlR_stats_stubs2
-
-let o x f = match x with
-  | None -> None
-  | Some x -> Some (f x)
 
 let float_tup (x, y) = Enc.floats [| x ; y |]
 
@@ -15,16 +8,20 @@ module Symbol = struct
   let p'adjust = symbol "p.adjust"
 end
 
+let formula_stub = symbol "formula"
+
 let formula x =
-  S.formula ~x:(Enc.string x) ()
+  call formula_stub [ arg Enc.string x ]
   |> Formula.unsafe_of_sexp
 
+let rnorm_symbol = symbol "rnorm"
+
 let rnorm ?mean ?sd n =
-  S.rnorm
-    ?mean:(mean |?> Enc.float)
-    ?sd:(sd |?> Enc.float)
-    ~n:(n |> Enc.int)
-    ()
+  call rnorm_symbol Enc.[
+      arg ~name:"n" int n ;
+      opt_arg float "mean" mean ;
+      opt_arg float "sd" sd ;
+    ]
   |> Numeric.unsafe_of_sexp
 
 
@@ -68,20 +65,24 @@ end
 module Fisher'test = struct
   include Test_impl
 
+  let fisher_test_symbol = symbol "fisher.test"
+
   let logicals ?alternative v v' =
-    S.fisher'test
-      ?alternative:(alternative |?> string_of_test_kind |?> Enc.string)
-      ~x:(Logical.to_sexp v)
-      ~y:(Logical.to_sexp v')
-      ()
+    call fisher_test_symbol [
+      arg ~name:"x" Logical.to_sexp v ;
+      arg ~name:"y" Logical.to_sexp v' ;
+      opt_arg enc_test_kind "alternative" alternative ;
+    ]
     |> List_.unsafe_of_sexp
 end
 
 module T'test = struct
   include Test_impl
 
+  let t_test_symbol = symbol "t.test"
+
   let one_sample ?alternative x =
-    call S.t'test_symbol [
+    call t_test_symbol [
       opt_arg enc_test_kind "alternative" alternative ;
       arg ~name:"x" Numeric.to_sexp x ;
     ]
@@ -91,13 +92,15 @@ end
 module Chisq'test = struct
   include Test_impl
 
+  let chisq_test_symbol = symbol "chisq.test"
+
   let contingency_table ?correct ?simulate'p'value ?b mat =
-    S.chisq'test
-      ~x:(Integer.Matrix.to_sexp mat)
-      ?correct:(o correct Enc.bool)
-      ?simulate'p'value:(o simulate'p'value Enc.bool)
-      ?_B:(o b Enc.int)
-      ()
+    call chisq_test_symbol Enc.[
+      arg ~name:"x" Integer.Matrix.to_sexp mat ;
+      opt_arg bool "correct" correct ;
+      opt_arg bool "simulate.p.value" simulate'p'value ;
+      opt_arg int "B" b ;
+    ]
     |> List_.unsafe_of_sexp
 end
 
@@ -134,12 +137,17 @@ let p'adjust ?method_ data =
 
 module Ecdf = struct
   type t = List_.t
+
+  let ecdf_symbol = symbol "ecdf"
+
   let make x =
-    OCamlR_stats_stubs2.ecdf ~x:(Numeric.to_sexp x) ()
+    call ecdf_symbol [ arg Numeric.to_sexp x ]
     |> List_.unsafe_of_sexp
 
+  let plot_ecdf_symbol = symbol "plot.ecdf"
+
   let plot ?(main = "") ?xlab ?ylab ?xlim ?ylim o =
-    call OCamlR_stats_stubs2.plot'ecdf_symbol Enc.[
+    call plot_ecdf_symbol Enc.[
       arg ~name:"x" List_.to_sexp o ;
       opt_arg string "xlab" xlab ;
       opt_arg string "ylab" ylab ;
@@ -150,8 +158,10 @@ module Ecdf = struct
     |> ignore
 end
 
+let qqplot_symbol = symbol "qqplot"
+
 let qqplot ?main ?(xlab = "") ?(ylab = "") ?plot_type ?lwd ?col x y =
-  call S.qqplot_symbol Enc.[
+  call qqplot_symbol Enc.[
       arg floats x ;
       arg floats y ;
       opt_arg string "main" main ;

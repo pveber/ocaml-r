@@ -1,6 +1,5 @@
 open OCamlR
 
-module Stubs = OCamlR_base_stubs
 module Stubs2 = OCamlR_base_stubs2
 
 let subset_symbol = symbol "["
@@ -27,8 +26,9 @@ let inherits x s =
 module Environment = struct
   include Envsxp
 
+  let new_env_symbol = symbol "new.env"
   let create () =
-    Stubs.new'env ()
+    call new_env_symbol []
     |> unsafe_of_sexp
 
   let get env ~class_ x =
@@ -59,6 +59,8 @@ module Make_matrix(V : Atomic_vector) = struct
 
   let as_vector x = x
 
+  let matrix_symbol = symbol "matrix"
+
   let of_arrays m =
     let data =
       Array.to_list m
@@ -66,7 +68,11 @@ module Make_matrix(V : Atomic_vector) = struct
       |> V.of_array
       |> to_sexp
     in
-    Stubs.matrix ~data ~nrow:(Enc.int (Array.length m)) ~byrow:(Enc.bool true) ()
+    call matrix_symbol Enc.[
+      arg Fun.id data ;
+      arg int ~name:"nrow" (Array.length m) ;
+      arg bool ~name:"byrow" true ;
+    ]
     |> unsafe_of_sexp
 
   let get_row m i =
@@ -178,8 +184,13 @@ module Dataframe = struct
   include List_
   let as_list x = x
 
+  let dim_symbol = symbol "dim.data.frame"
   let dim x =
-    match Stubs.dim'data'frame ~x:(to_sexp x) () |> Dec.ints with
+    call dim_symbol [
+      arg to_sexp ~name:"x" x ;
+    ]
+    |> Dec.ints
+    |> function
     | [| i ; j |] -> (i, j)
     | _ -> assert false
 
@@ -211,15 +222,19 @@ module Dataframe = struct
     |> call (symbol "data.frame")
     |> unsafe_of_sexp
 
+  let rbind_symbol = symbol "rbind"
+
   let rbind x y =
-    call Stubs.rbind_symbol [
+    call rbind_symbol [
       arg to_sexp x ;
       arg to_sexp y
     ]
     |> unsafe_of_sexp
 
+  let cbind_symbol = symbol "cbind"
+
   let cbind x y =
-    call Stubs.cbind_symbol [
+    call cbind_symbol [
       arg to_sexp x ;
       arg to_sexp y ;
     ]
@@ -252,37 +267,49 @@ module Dataframe = struct
     ]
     |> classify_column
 
+  let as_matrix_symbol = symbol "as.matrix.data.frame"
+
   let as'matrix df =
-    call Stubs.as'matrix'data'frame_symbol [
+    call as_matrix_symbol [
       arg to_sexp df ;
     ]
     |> classify_atomic_data
     |> Option.get
 end
 
+let sample_symbol = symbol "sample"
+
 let sample ?replace ?prob ~size x =
-  Stubs.sample
-    ~x:(Enc.floats x)
-    ~size:(Enc.int size)
-    ?replace:(Option.map Enc.bool replace)
-    ?prob:(Option.map Enc.floats prob)
-    ()
+  call sample_symbol Enc.[
+    arg floats x ;
+    arg ~name:"size" int size ;
+    opt_arg bool "replace" replace ;
+    opt_arg floats "prob" prob ;
+  ]
   |> Dec.floats
 
+let readRDS_symbol = symbol "readRDS"
+
 let readRDS fn =
-  Stubs.readRDS ~file:(Enc.string fn) ()
+  call readRDS_symbol Enc.[
+    arg ~name:"file" string fn ;
+  ]
+
+let saveRDS_symbol = symbol "saveRDS"
 
 let saveRDS ?ascii ?compress ~file obj =
-  Stubs.saveRDS
-    ~object_:obj
-    ~file:(Enc.string file)
-    ?ascii:(Option.map Enc.bool ascii)
-    ?compress:(Option.map Enc.bool compress)
-    ()
+  call saveRDS_symbol Enc.[
+    arg ~name:"object" Fun.id obj ;
+    arg ~name:"file" string file ;
+    opt_arg bool "ascii" ascii ;
+    opt_arg bool "compress" compress ;
+  ]
   |> ignore
 
+let table_symbol = symbol "table"
+
 let table (type s) (module Vector : Vector with type t = s) (x : s) =
-  call Stubs.table_symbol [ arg Vector.to_sexp x ]
+  call table_symbol [ arg Vector.to_sexp x ]
   |> Integer.unsafe_of_sexp
 
 module Formula = struct

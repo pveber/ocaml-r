@@ -25,10 +25,6 @@
 /*             guillaume.yziquel@citycable.ch                                    */
 /*********************************************************************************/
 
-#define USE_RINTERNALS /* This compilation directive allows us to have access to
-                          the definition of R internal types. Compilation of the
-                          inspect* functions is otherwise prohibited. */
-
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
 #include <caml/memory.h>
@@ -94,20 +90,6 @@ CAMLprim value ocamlr_inspect_vecsxp_length (value vecsexp) {
 
 
 /* Concerning various types of SEXPs: */
-
-
-/**  Returns the offset of an R primitive function.
-  *
-  *  @note: This function bypasses the provided API, and requires the
-  *         use of the #define USE_RINTERNALS directive.
-  *
-  *  @param sexp An R value which is a primitive function.
-  *  @return Its offset in the R table of primitives.
-  */
-CAMLprim value ocamlr_inspect_primsxp_offset (value sexp) {
-  return(Val_int(Sexp_val(sexp)->u.primsxp.offset));
-}
-
 
 /**  Returns the name of an R symbol.
   *
@@ -227,46 +209,6 @@ CAMLprim value ocamlr_inspect_closxp_body (value sexp) {
 CAMLprim value ocamlr_inspect_closxp_env (value sexp) {
   return(Val_sexp(CLOENV(Sexp_val(sexp))));
 }
-
-
-/**  Returns the value of a promise.
-  *
-  *  @note This function bypasses the provided API, and requires the
-  *        use of the #define USE_RINTERNALS directive.
-  *
-  *  @param sexp An R promise.
-  *  @return The value of the R promise.
-  */
-CAMLprim value ocamlr_inspect_promsxp_value (value sexp) {
-  return(Val_sexp(Sexp_val(sexp)->u.promsxp.value));
-}
-
-
-/**  Returns the expression of a promise.
-  *
-  *  @note This function bypasses the provided R API, and requires the
-  *        use of the #define USE_RINTERNALS directive.
-  *
-  *  @param sexp An R promise.
-  *  @return The expression of the R promise.
-  */
-CAMLprim value ocamlr_inspect_promsxp_expr (value sexp) {
-  return(Val_sexp(Sexp_val(sexp)->u.promsxp.expr));
-}
-
-
-/**  Returns the environment of a promise.
-  *
-  *  @note This function bypasses the provided R API, and requires the
-  *        use of the #define USE_RINTERNALS directive.
-  *
-  *  @param sexp An R promise.
-  *  @return The environment of the R promise.
-  */
-CAMLprim value ocamlr_inspect_promsxp_env (value sexp) {
-  return(Val_sexp(Sexp_val(sexp)->u.promsxp.env));
-}
-
 
 /**  Returns an element of a logical vector.
   *

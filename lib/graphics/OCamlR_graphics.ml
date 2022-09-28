@@ -125,8 +125,10 @@ let int_of_line_type = function
 
 let line_type_arg x = Enc.int (int_of_line_type x)
 
+let lines_symbol = symbol "lines"
+
 let lines ?lty ?lwd ?col ~x ?y () =
-  call OCamlR_graphics_stubs2.lines_symbol Enc.[
+  call lines_symbol Enc.[
       arg floats x ;
       opt_arg floats "y" y ;
       opt_arg line_type_arg "lty" lty ;
@@ -135,8 +137,10 @@ let lines ?lty ?lwd ?col ~x ?y () =
     ]
   |> ignore
 
+let points_symbol = symbol "points"
+
 let points ?pch ?col ~x ?y () =
-  call OCamlR_graphics_stubs2.points_symbol Enc.[
+  call points_symbol Enc.[
       arg floats x ;
       opt_arg floats "y" y ;
       opt_arg int "pch" pch ;
@@ -155,8 +159,10 @@ let string_of_position = function
   | `right -> "right"
   | `center -> "center"
 
+let legend_symbol = symbol "legend"
+
 let legend ?col ?lty ?lwd ?pch x legend =
-  call OCamlR_graphics_stubs2.legend_symbol Enc.[
+  call legend_symbol Enc.[
       arg (fun x -> string (string_of_position x)) x ;
       arg strings legend ;
       opt_arg strings "col" col ;
@@ -191,8 +197,10 @@ let list_boxplot ?main ?xlab ?ylab data =
     ]
   |> ignore
 
+let abline_symbol = symbol "abline"
+
 let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
-  call OCamlR_graphics_stubs2.abline_symbol Enc.[
+  call abline_symbol Enc.[
       opt_arg float "a" a ;
       opt_arg float "b" b ;
       opt_arg float "h" h ;
@@ -203,8 +211,10 @@ let abline ?a ?b ?h ?v ?lty ?lwd ?col () =
     ]
   |> ignore
 
+let smooth_scatter_symbol = symbol "smoothScatter"
+
 let smooth_scatter ?main ?xlab ?ylab ~x ?y () =
-  call OCamlR_graphics_stubs2.smoothScatter_symbol Enc.[
+  call smooth_scatter_symbol Enc.[
       arg floats x ;
       opt_arg floats "y" y ;
       opt_arg string "main" main ;
@@ -213,8 +223,10 @@ let smooth_scatter ?main ?xlab ?ylab ~x ?y () =
     ]
   |> ignore
 
+let text_symbol = symbol "text"
+
 let text ?adj ?pos ?cex ?col ~x ?y ~labels () =
-  call OCamlR_graphics_stubs2.text_symbol Enc.[
+  call text_symbol Enc.[
       arg ~name:"x" floats x ;
       arg ~name:"labels" strings labels ;
       opt_arg floats "y" y ;
@@ -239,8 +251,10 @@ let logical_or_character_arg = function
   | `No  -> Enc.bool false
   | `Custom xs -> Enc.strings xs
 
+let axis_symbol = symbol "axis"
+
 let axis ?at ?labels ?tick ?line ?pos ?outer ?font ?lty ?lwd ?lwd'ticks side =
-  call OCamlR_graphics_stubs2.axis_symbol Enc.[
+  call axis_symbol Enc.[
       arg ~name:"side" side_arg side ;
       opt_arg floats "at" at ;
       opt_arg logical_or_character_arg "labels" labels ;

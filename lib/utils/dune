@@ -3,8 +3,3 @@
  (public_name     ocaml-r.utils)
  (wrapped         false)
  (libraries       ocaml-r.base ocaml-r.wraputils))
-
-(rule
- (targets OCamlR_utils_stubs.ml)
- (deps    (:exe ../../stubgen/stubgen.exe))
- (action  (with-stdout-to %{targets} (run %{exe} utils))))

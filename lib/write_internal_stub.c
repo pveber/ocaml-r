@@ -25,10 +25,6 @@
 /*             guillaume.yziquel@citycable.ch                                    */
 /*********************************************************************************/
 
-#define USE_RINTERNALS /* This compilation directive allows us to have access to
-                          the definition of R internal types. Compilation of the
-                          inspect* functions is otherwise prohibited. */
-
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
 #include <caml/memory.h>
@@ -47,22 +43,14 @@
 #include "databridge.h"
 
 CAMLprim value ocamlr_write_lisplist_carval (value lisplist, value elmnt) {
-  Sexp_val(lisplist)->u.listsxp.carval = Sexp_val(elmnt);
-  return Val_unit;
+    SETCAR(Sexp_val(lisplist), Sexp_val(elmnt));
+    return Val_unit;
 }
 
 CAMLprim value ocamlr_write_lisplist_tagval (value lisplist, value tag) {
-  Sexp_val(lisplist)->u.listsxp.tagval = Sexp_val(tag);
-  return Val_unit;
+    SET_TAG(Sexp_val(lisplist), Sexp_val(tag));
+    return Val_unit;
 }
-
-//CAMLprim value r_write_lisplist_element (value lisplist, value tag, value elmnt) {
-//  CAMLparam3(lisplist, tag, elmnt);
-//  Sexp_val(lisplist)->u.listsxp.tagval = Sexp_val(tag);
-//  Sexp_val(lisplist)->u.listsxp.carval = Sexp_val(elmnt);
-//  CAMLreturn(Val_unit);
-//}
-
 
 /**  Sets the element of a logical vector.
   *

@@ -231,44 +231,6 @@ module Sexptype : sig
   val to_string : t -> string
 end
 
-(**  Provides facilities to inspect internal structure of
-     SEXPs. Useful in the toplevel when you encounter
-     unexpected R values. *)
-module Pretty : sig
-
-  (**  Semantic interpretation and description of SEXPs. *)
-  type t =
-    | Recursive of t Lazy.t
-    | NULL
-    | SYMBOL of (string * t) option
-    | ARG of string
-    | PLACE
-    | LIST of pairlist
-    | CLOSURE of closure
-    | ENV of environment
-    | PROMISE of promise
-    | CALL of t * pairlist
-    | SPECIAL of int
-    | BUILTIN
-    | STRING of string
-    | STRINGS of string list
-    | INTS of int list
-    | VECSXP of t list
-    | BOOLS of bool list
-    | FLOATS of float list
-    | Unknown
-
-  and closure     = { formals: t; body: t; clos_env: t }
-  and environment = { frame: t }
-  and promise     = { value: t; expr: t; prom_env: t }
-
-  and pairlist = (t * t) list
-
-  (**  Analyses recursively the structure of a given SEXP. *)
-  val t_of_sexp : Sexp.t -> t
-
-end
-
 (** {2 Parsing R code.} *)
 
 type parse_status =
@@ -456,7 +418,6 @@ module Low_level : sig
   external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
   external length_of_vector   : [< vector] sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
-  external inspect_primsxp_offset  : [< `Special | `Builtin ] sxp -> int = "ocamlr_inspect_primsxp_offset"
   external inspect_symsxp_pname    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_pname"
   external inspect_symsxp_value    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_value"
   external inspect_symsxp_internal : symsxp         -> sexp              = "ocamlr_inspect_symsxp_internal"
@@ -469,9 +430,6 @@ module Low_level : sig
   external inspect_closxp_formals  : closxp         -> sexp              = "ocamlr_inspect_closxp_formals"
   external inspect_closxp_body     : closxp         -> sexp              = "ocamlr_inspect_closxp_body"
   external inspect_closxp_env      : closxp         -> sexp              = "ocamlr_inspect_closxp_env"
-  external inspect_promsxp_value   : promsxp        -> sexp              = "ocamlr_inspect_promsxp_value"
-  external inspect_promsxp_expr    : promsxp        -> sexp              = "ocamlr_inspect_promsxp_expr"
-  external inspect_promsxp_env     : promsxp        -> sexp               = "ocamlr_inspect_promsxp_env"
 
   external access_lglsxp  : lglsxp  -> int -> bool     = "ocamlr_access_lglsxp"
   external access_intsxp  : intsxp  -> int -> int      = "ocamlr_access_intsxp"

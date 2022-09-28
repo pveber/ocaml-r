@@ -25,10 +25,6 @@
 /*             guillaume.yziquel@citycable.ch                                    */
 /*********************************************************************************/
 
-#define USE_RINTERNALS /* This compilation directive allows us to have access to
-                          the definition of R internal types. Compilation of the
-                          inspect* functions is otherwise prohibited. */
-
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
 #include <caml/memory.h>
