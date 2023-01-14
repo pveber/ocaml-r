@@ -1,3 +1,12 @@
+v0.6.0 2023-01-14 Villeurbanne
+------------------------------
+
+- update wrt to R 4.2, which restricts access to R internals. As a
+  consequence, many functions have been removed. Stubgen is not
+  possible anymore, and many wrappers have been rewritten by hand, so
+  that high level bindings are not affected in the end.
+- added table and qqplot
+
 v0.5.0 2021-11-01 Villeurbanne
 ------------------------------
 
