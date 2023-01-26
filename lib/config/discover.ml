@@ -4,23 +4,28 @@ module S = String
 let trim_to_list str =
   S.split_on_char ' ' (S.trim str)
 
+let ( ++ ) maybe_x maybe_y =
+  match maybe_x, maybe_y with
+  | Some x, Some y -> Some (x @ y)
+  | _ -> maybe_x
+
+let default : C.Pkg_config.package_conf = {
+  libs = ["-lR"; "-lRmath"];
+  cflags = []
+}
+
 let cfig c =
-  let default: C.Pkg_config.package_conf = {
-      libs = ["-lR"; "-lRmath"];
-      cflags = [] }
+  let pkg_config args =
+    let res = C.Process.run c "pkg-config" args in
+    if res.exit_code = 0 then Some (trim_to_list res.stdout) else None
   in
-  let rlib = C.Process.run c "pkg-config" ["--libs-only-L"; "--libs-only-l"; "libR"; "libRmath"] in
-  let rflg = C.Process.run c "pkg-config" ["--cflags"; "libR"; "libRmath"] in
-  let chk = (rlib.exit_code, rflg.exit_code) in
-  let lib = trim_to_list rlib.stdout in
-  let flg = trim_to_list rflg.stdout in  
-  let discover: C.Pkg_config.package_conf = {
-      libs = lib;
-      cflags = flg }
-  in
-  let conf =
-    match chk with
-    | (0, 0) -> discover
+  let pkg_config_lib x = pkg_config ["--libs-only-L"; "--libs-only-l"; x] in
+  let pkg_config_flg x = pkg_config ["--cflags"; x] in
+  let lib = pkg_config_lib "libR" ++ pkg_config_lib "libRmath" in
+  let cflags = pkg_config_flg "libR" ++ pkg_config_flg "libRmath" in
+  let conf : C.Pkg_config.package_conf =
+    match lib, cflags with
+    | Some libs, Some cflags -> { libs ; cflags }
     | _ -> default
   in
   C.Flags.write_sexp "c_flags.sexp" conf.cflags;
