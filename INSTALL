@@ -7,9 +7,8 @@
 
 *** How to compile ***
 
-  ocaml setup.ml -configure
-  ocaml setup.ml -build
-  ocaml setup.ml -install
+  make build
+  opam install .
 
 
 *** How to use ***
