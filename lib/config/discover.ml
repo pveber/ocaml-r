@@ -22,7 +22,7 @@ let cfig c =
   let pkg_config_lib x = pkg_config ["--libs-only-L"; "--libs-only-l"; x] in
   let pkg_config_flg x = pkg_config ["--cflags"; x] in
   let lib = pkg_config_lib "libR" ++ pkg_config_lib "libRmath" in
-  let cflags = pkg_config_flg "libR" ++ pkg_config_flg "libRmath" in
+  let cflags = pkg_config_flg "libR" ++ pkg_config_flg "libRmath" ++ Some ["-fPIC"] in
   let conf : C.Pkg_config.package_conf =
     match lib, cflags with
     | Some libs, Some cflags -> { libs ; cflags }
