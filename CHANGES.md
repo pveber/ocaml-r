@@ -1,3 +1,10 @@
+v0.7.0 2026-01-14 Villeurbanne
+------------------------------
+
+- update wrt to R 4.6, which further restricts access to R
+  internals. A few (unused) functions had to be removed
+- a few portability/install fixes
+
 v0.6.0 2023-01-14 Villeurbanne
 ------------------------------
 
