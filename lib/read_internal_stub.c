@@ -151,36 +151,6 @@ CAMLprim value ocamlr_inspect_listsxp_tagval (value sexp) {
 }
 
 
-/**  Returns the frame of an environment.
-  *
-  *  @param sexp An R environment.
-  *  @return The frame of the R environment.
-  */
-CAMLprim value ocamlr_inspect_envsxp_frame (value sexp) {
-  return(Val_sexp(FRAME(Sexp_val(sexp))));
-}
-
-
-/**  Returns the enclosing environment of an environment.
-  *
-  *  @param sexp An R environment.
-  *  @return The enclosing environmnent of the R environment.
-  */
-CAMLprim value ocamlr_inspect_envsxp_enclos (value sexp) {
-  return(Val_sexp(ENCLOS(Sexp_val(sexp))));
-}
-
-
-/**  Returns the hash table of an environment.
-  *
-  *  @param sexp An R environment.
-  *  @return The hash table of the R environment.
-  */
-CAMLprim value ocamlr_inspect_envsxp_hashtab (value sexp) {
-  return(Val_sexp(HASHTAB(Sexp_val(sexp))));
-}
-
-
 /**  Returns the list of formal arguments of a closure.
   *
   *  @param sexp An R closure.
