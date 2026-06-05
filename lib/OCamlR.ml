@@ -295,12 +295,9 @@ module Low_level = struct
      that gets updated by R itself. *)
   external global_env : unit -> sexp = "ocamlr_global_env"
 
-  external cons : sexp -> [< `Nil | `List] sxp -> [> `List] sxp = "ocamlr_cons"
+  external cons  : sexp -> [< `Nil | `List] sxp -> [> `List] sxp = "ocamlr_cons"
+  external lcons : sexp -> [< `Nil | `List] sxp -> [> `Lang] sxp = "ocamlr_lcons"
   external tag : listsxp -> string -> unit = "ocamlr_tag"
-
-  external set_langsxp : listsxp -> unit = "ocamlr_set_langsxp"
-  (* Beware: [set_langsxp x] breaks typing, since after the call, [x] is
-     now of type [langsxp]. *)
 
   (* === S3 ===== *)
   (**  Get the S3 class of a given SEXP.
@@ -552,11 +549,6 @@ let pairlist_of_list (l: (sexp * sexp) list) =
   r_l
 
 let langsxp (f: sexp) (args: (string option * sexp) list) : langsxp =
-  let lcons hd tl =
-    let x = cons hd tl in
-    set_langsxp x ; (* here, type of [x] has been changed to [langsxp]! *)
-    (upcast (x : listsxp :> sexp) : langsxp)
-  in
   let g (t, hd) tl =
     let x = cons hd tl in match t with
     | None -> x

@@ -55,6 +55,16 @@ CAMLprim value ocamlr_cons (value car, value tail) {
   return(Val_sexp(CONS(Sexp_val(car), Sexp_val(tail))));
 }
 
+/**  Cons operation in R for language pairlists
+  *
+  *  @param car The head element.
+  *  @param tail The tail list.
+  *  @return The result of consing car and tail.
+  */
+CAMLprim value ocamlr_lcons (value car, value tail) {
+  return(Val_sexp(LCONS(Sexp_val(car), Sexp_val(tail))));
+}
+
 
 /**  Tagging a pairlist's head
   *
@@ -66,18 +76,6 @@ CAMLprim value ocamlr_cons (value car, value tail) {
   */
 CAMLprim value ocamlr_tag (value s, value t) {
   SET_TAG(Sexp_val(s), install(String_val(t)));
-  return Val_unit;
-}
-
-
-/**  Creating a call out of a pairlist.
-  *
-  *  @param s A pairlist, containing function and arguments.
-  *  @return An executable version of the pairlist, with a head
-  *          element sexptyped as a LANGSXP.
-  */
-CAMLprim value ocamlr_set_langsxp (value s) {
-  SET_TYPEOF(Sexp_val(s), LANGSXP);
   return Val_unit;
 }
 
