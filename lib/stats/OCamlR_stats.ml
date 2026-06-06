@@ -1,6 +1,8 @@
 open OCamlR
 open OCamlR_base
 
+let () = ignore (eval_string "require(stats, quietly=TRUE)")
+
 let float_tup (x, y) = Enc.floats [| x ; y |]
 
 module Symbol = struct

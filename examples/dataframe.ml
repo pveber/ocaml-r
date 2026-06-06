@@ -9,7 +9,7 @@ module FT = OCamlR_stats.Fisher'test
 let res =
   FT.logicals
     (Logical.of_array [| true ; true ; false ; false ; true ; false|])
-    (Logical.of_array [| true ; true ; true ; false ; true ; false|])
+    (Logical.of_array [| true ; false ; true ; false ; true ; false|])
 
 let () =
   Printf.printf
