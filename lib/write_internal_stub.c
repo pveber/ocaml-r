@@ -139,7 +139,7 @@ CAMLprim value ocamlr_assign_realsxp_opt (value realsxp, value offset, value x) 
   */
 
 CAMLprim value ocamlr_assign_strsxp (value strsxp, value offset, value s) {
-  STRING_PTR(Sexp_val(strsxp))[Int_val(offset)] = mkChar(String_val(s));
+  SET_STRING_ELT(Sexp_val(strsxp), Int_val(offset), mkChar(String_val(s)));
   return Val_unit;
 }
 

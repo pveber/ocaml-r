@@ -68,16 +68,6 @@
    CHARSXP cache. */
 
 
-/**  Returns the attributes of an R value.
-  *
-  *  @param sexp An R value.
-  *  @return The attributes of this value, as a pairlist.
-  */
-CAMLprim value ocamlr_inspect_attributes (value sexp) {
-  return(Val_sexp(ATTRIB(Sexp_val(sexp))));
-}
-
-
 /**  Returns the length of a VECSEXP.
   *
   *  @param vecsexp An R vector value.
@@ -157,7 +147,7 @@ CAMLprim value ocamlr_inspect_listsxp_tagval (value sexp) {
   *  @return The list of formal arguments of the R closure.
   */
 CAMLprim value ocamlr_inspect_closxp_formals (value sexp) {
-  return(Val_sexp(FORMALS(Sexp_val(sexp))));
+  return(Val_sexp(R_ClosureFormals(Sexp_val(sexp))));
 }
 
 
@@ -167,7 +157,7 @@ CAMLprim value ocamlr_inspect_closxp_formals (value sexp) {
   *  @return The body of the R closure.
   */
 CAMLprim value ocamlr_inspect_closxp_body (value sexp) {
-  return(Val_sexp(BODY(Sexp_val(sexp))));
+  return(Val_sexp(R_ClosureBody(Sexp_val(sexp))));
 }
 
 
@@ -177,7 +167,7 @@ CAMLprim value ocamlr_inspect_closxp_body (value sexp) {
   *  @return The environment of the R closure.
   */
 CAMLprim value ocamlr_inspect_closxp_env (value sexp) {
-  return(Val_sexp(CLOENV(Sexp_val(sexp))));
+  return(Val_sexp(R_ClosureEnv(Sexp_val(sexp))));
 }
 
 /**  Returns an element of a logical vector.

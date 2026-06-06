@@ -158,7 +158,6 @@ module Low_level = struct
   (* What follows is low-level accessor functions, in order to inspect
      in details the contents of SEXPs and VECSEXPs. *)
 
-  external inspect_attributes : sexp -> sexp = "ocamlr_inspect_attributes"
   external length_of_vector   : 'a at_most_vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
   external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"

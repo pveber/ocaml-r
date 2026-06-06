@@ -415,7 +415,6 @@ module Low_level : sig
   external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
   external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
 
-  external inspect_attributes : sexp   -> sexp = "ocamlr_inspect_attributes"
   external length_of_vector   : [< vector] sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
   external inspect_symsxp_pname    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_pname"
