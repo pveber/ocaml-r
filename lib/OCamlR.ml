@@ -104,8 +104,6 @@ type internallist = [ `Nil | `List | `Lang | `Dots]
   *  a call which is somewhat similar to closure
   *  ready for execution. *)
 
-type 'a at_most_internallist = [< internallist] as 'a
-
 type 'a pairlist = [< `Nil | `List] as 'a
 
 type vector = [ `Char | `Lgl | `Int  | `Real
@@ -160,9 +158,6 @@ module Low_level = struct
 
   external length_of_vector   : 'a at_most_vector sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
-  external inspect_symsxp_pname    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_pname"
-  external inspect_symsxp_value    : symsxp         -> sexp          = "ocamlr_inspect_symsxp_value"
-  external inspect_symsxp_internal : symsxp         -> sexp          = "ocamlr_inspect_symsxp_internal"
   external inspect_listsxp_carval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_carval"
   external inspect_listsxp_cdrval  : 'a nonempty_list sxp -> [> internallist] sxp = "ocamlr_inspect_listsxp_cdrval"
   external inspect_listsxp_tagval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_tagval"
@@ -319,8 +314,6 @@ module Low_level = struct
 
   (* ==== REDUCTION ==== *)
   external eval_langsxp : langsxp -> sexp = "ocamlr_eval_sxp"
-
-  external string_of_charsxp : charsxp -> string = "ocamlr_internal_string_of_charsxp"
 
   let list_of_vector (access : 'a at_most_vector sxp -> int -> 'b) (s : 'a at_most_vector sxp) =
     let lngth = length_of_vector s in
@@ -522,18 +515,6 @@ let symbol ?(generic = false) s : sexp =
 
 (* === CONVERSION  ===== *)
 
-let rec list_of_pairlist (ll : [< internallist] sxp) =
-  match sexptype (ll : 'a at_most_internallist sxp :> sexp) with
-  | NilSxp -> []
-  | ListSxp | LangSxp | DotSxp ->
-    let ll : _ nonempty_list sxp = upcast (ll : 'a at_most_internallist sxp :> sexp) in
-    (
-      (upcast (inspect_listsxp_tagval ll) : symsxp (* TODO: This may be excessive *)),
-      inspect_listsxp_carval ll
-    )
-    :: list_of_pairlist (inspect_listsxp_cdrval ll)
-  | _ -> failwith "Conversion failure in list_of_listsxp."
-
 let pairlist_of_list (l: (sexp * sexp) list) =
   let r_l = alloc_list (List.length l) in
   let cursor = ref r_l in
@@ -644,37 +625,7 @@ module Symsxp = struct
 
   let missing_arg = missing_arg_creator
   let is_missing_arg = is_missing_arg
-
-  type description = (string * (sexp option)) option option
-
-  let description (s : symsxp) =
-    let pname    = inspect_symsxp_pname    s
-    and value    = inspect_symsxp_value    s
-    and internal = inspect_symsxp_internal s in
-    match sexptype pname, sexptype value, sexptype internal with
-    | (NilSxp,  _, NilSxp) when sexp_equality (s : symsxp :> sexp) value -> None
-    | (CharSxp, SymSxp, NilSxp) -> (
-        match (sexp_equality (s : symsxp :> sexp) value) &&
-              ("" = string_of_charsxp (upcast pname : charsxp)) with
-        | true -> Some None
-        | false -> (
-            match (sexp_equality value (inspect_symsxp_value (upcast value : symsxp)))  &&
-                  (NilSxp = sexptype (inspect_symsxp_pname (upcast value : symsxp)))    &&
-                  (NilSxp = sexptype (inspect_symsxp_internal (upcast value : symsxp))) with
-            | true -> Some (Some ((string_of_charsxp (upcast pname : charsxp)), None))
-            | false -> assert false
-          )
-      )
-    | (CharSxp, _, (NilSxp | BuiltinSxp)) ->
-      let symbol_name = string_of_charsxp (upcast pname : charsxp) in
-      Some (Some (symbol_name, (Some value)))
-    | _ -> assert false
-
 end
-
-let attributes sexp =
-  let f (a, x) = (Symsxp.description a), x in
-  List.map f (list_of_pairlist (upcast sexp))
 
 module type Vector = sig
   type t

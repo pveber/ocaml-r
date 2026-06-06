@@ -61,7 +61,7 @@ CAMLprim value ocamlr_install (value symbol) {
 CAMLprim value ocamlr_findvar (value symbol) {
   /* The findVar function is defined in envir.c. It looks up a symbol
      in an environment. */
-  return(Val_sexp(findVar(Sexp_val(symbol), R_GlobalEnv)));
+  return(Val_sexp(Rf_findVar(Sexp_val(symbol), R_GlobalEnv)));
 }
 
 CAMLprim value ocamlr_findfun (value symbol) {
@@ -69,19 +69,5 @@ CAMLprim value ocamlr_findfun (value symbol) {
      for function types built into the R source code. The major difference
      is that findvar yields a promise, whether findfun yiels directly
      an R function sexptype. */
-  return(Val_sexp(findFun(Sexp_val(symbol), R_GlobalEnv)));
+  return(Val_sexp(Rf_findFun(Sexp_val(symbol), R_GlobalEnv)));
 }
-
-/**********************************************************************
- *                                                                    *
- *                 Old code concerning symbols.                       *
- *                                                                    *
- **********************************************************************/
-
-//CAMLprim value r_set_var (value name, value sexp) {
-//  CAMLparam2(name,sexp);
-//  char* c_name = String_val(name);
-//  SEXP e = (SEXP) Long_val(Field(sexp,0));
-//  setVar(install(c_name), e, R_GlobalEnv);
-//  CAMLreturn(Val_unit);
-//}

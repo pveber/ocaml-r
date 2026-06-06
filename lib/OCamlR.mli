@@ -141,10 +141,6 @@ module Symsxp : sig
 
   val missing_arg : unit -> t
   val is_missing_arg : t -> bool
-
-  (** Semantic description of [SYMSXP] structures. *)
-  type description = (string * (sexp option)) option option
-  val description : t -> description
 end
 
 (** {3 Vector types}
@@ -417,9 +413,6 @@ module Low_level : sig
 
   external length_of_vector   : [< vector] sxp -> int  = "ocamlr_inspect_vecsxp_length"
 
-  external inspect_symsxp_pname    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_pname"
-  external inspect_symsxp_value    : symsxp         -> sexp              = "ocamlr_inspect_symsxp_value"
-  external inspect_symsxp_internal : symsxp         -> sexp              = "ocamlr_inspect_symsxp_internal"
   external inspect_listsxp_carval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_carval"
   external inspect_listsxp_cdrval  : 'a nonempty_list sxp -> [> internallist] sxp = "ocamlr_inspect_listsxp_cdrval"
   external inspect_listsxp_tagval  : 'a nonempty_list sxp -> sexp    = "ocamlr_inspect_listsxp_tagval"
@@ -460,5 +453,4 @@ module Low_level : sig
   val classes : sexp -> string list
 end
 
-val attributes : sexp -> (Symsxp.description * sexp) list
 val pairlist_of_list : (sexp * sexp) list -> [> internallist] sxp
