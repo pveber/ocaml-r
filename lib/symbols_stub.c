@@ -59,9 +59,7 @@ CAMLprim value ocamlr_install (value symbol) {
 }
 
 CAMLprim value ocamlr_findvar (value symbol) {
-  /* The findVar function is defined in envir.c. It looks up a symbol
-     in an environment. */
-  return(Val_sexp(Rf_findVar(Sexp_val(symbol), R_GlobalEnv)));
+  return(Val_sexp(R_getVar(Sexp_val(symbol), R_GlobalEnv, TRUE)));
 }
 
 CAMLprim value ocamlr_findfun (value symbol) {

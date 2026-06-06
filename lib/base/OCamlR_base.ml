@@ -2,7 +2,7 @@ open OCamlR
 
 module Stubs2 = OCamlR_base_stubs2
 
-let subset_symbol = symbol "["
+let subset_symbol = symbol ~generic:true "["
 let subset2_symbol = symbol ~generic:true "[["
 let missing_arg = (Symsxp.missing_arg () :> sexp)
 
