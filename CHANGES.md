@@ -1,5 +1,5 @@
-v0.7.0 2026-01-14 Villeurbanne
-------------------------------
+v0.7.0 2026-06-07 Coublanc
+--------------------------
 
 - update wrt to R 4.5 and 4.6, which further restrict access to R
   internals. A few (unused) functions had to be removed
