@@ -32,6 +32,7 @@
 #include <caml/callback.h>
 #include <caml/signals.h>
 #include <caml/custom.h>
+#define ENABLE_LEGACY_NONAPI_FUNS
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
