@@ -91,16 +91,6 @@ CAMLprim value ocamlr_inspect_symsxp_pname (value sexp) {
 }
 
 
-/**  Returns the internal sexp of a symbol.
-  *
-  *  @param sexp An R value of sexptype SYMSXP.
-  *  @return The internal value of a symbol.
-  */
-CAMLprim value ocamlr_inspect_symsxp_internal (value sexp) {
-  return(Val_sexp(INTERNAL(Sexp_val(sexp))));
-}
-
-
 /**  Returns the head element of a pairlist.
   *
   *  @param sexp An R pairlist.
