@@ -304,8 +304,6 @@ module Low_level = struct
   external aux_get_attrib : sexp -> symsxp -> sexp = "ocamlr_get_attrib"
   let get_attrib s name = aux_get_attrib s (install name)
 
-  external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
-
   (* === S4 ===== *)
 
   external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"

@@ -76,14 +76,3 @@ CAMLprim value ocamlr_s3_class (value sexp) {
 CAMLprim value ocamlr_get_attrib (value sexp, value symbolname) {
   return(Val_sexp(getAttrib(Sexp_val(sexp), Sexp_val(symbolname))));
 }
-
-
-/**  Get the attribute list of a given SEXP.
-  *
-  *  r_get_attributes takes a SEXP as first argument, and returns
-  *  the attributes of the given SEXP.
-  */
-
-CAMLprim value ocamlr_get_attributes (value sexp) {
-  return(Val_sexp(ATTRIB(Sexp_val(sexp))));
-}

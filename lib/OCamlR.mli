@@ -407,7 +407,6 @@ module Interpreter_initialization(Env : Environment) : sig end
 (**  {2 Low-level inspection} *)
 module Low_level : sig
   external s3_class : sexp -> strsxp = "ocamlr_s3_class"
-  external get_attributes : sexp -> _ pairlist sxp = "ocamlr_get_attributes"
   external is_s4_object : sexp -> bool = "ocamlr_is_s4_object"
   external do_new_object : sexp -> sexp = "ocamlr_do_new_object"
 
